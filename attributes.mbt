@@ -82,7 +82,7 @@ pub fn parse_attributes(
     raise Invalid(0, "ASN 宽度必须为 2 或 4")
   }
   let c = Cursor::new(data)
-  let seen : Map[Int, Bool] = {}
+  let seen : Map[Int, Bool] = Map([])
   let mut origin = None
   let mut path = []
   let mut as4_path = []
@@ -121,7 +121,16 @@ pub fn parse_attributes(
     }
     value.finish()
   }
-  { origin, path, as4_path, next_hop, med, local_pref, communities, other, }
+  {
+    origin,
+    path: effective_path(path, as4_path, other, asn_width),
+    as4_path,
+    next_hop,
+    med,
+    local_pref,
+    communities,
+    other,
+  }
 }
 
 ///|
