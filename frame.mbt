@@ -24,7 +24,7 @@ pub fn read_frame(data : Bytes) -> Frame raise ParseError {
   if size > 16777216U {
     raise Invalid(8, "MRT 记录超过 16 MiB 上限")
   }
-  let length = size.to_int()
+  let length = size.reinterpret_as_int()
   let body = c.take(length)
   c.finish()
   let microseconds = if kind == 17 || kind == 33 || kind == 49 {
@@ -32,7 +32,7 @@ pub fn read_frame(data : Bytes) -> Frame raise ParseError {
     if micros >= 1000000U {
       raise Invalid(12, "微秒字段超出范围")
     }
-    Some(micros.to_int())
+    Some(micros.reinterpret_as_int())
   } else {
     None
   }
