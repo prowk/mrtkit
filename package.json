@@ -6,8 +6,8 @@
   "engines": { "node": ">=22" },
   "scripts": {
     "build": "moon build --target js --release",
-    "test": "moon test && node --test tests/*.test.mjs",
-    "demo": "node scripts/fixtures.mjs && node cli/mrtkit.mjs stats fixtures/demo.mrt"
+    "test": "moon test --deny-warn && moon build --target js --release --deny-warn && node --test tests/*.test.mjs",
+    "demo": "npm run build && node scripts/fixtures.mjs && node cli/mrtkit.mjs stats --threshold 3 fixtures/demo.mrt"
   },
   "bin": { "mrtkit": "cli/mrtkit.mjs" }
 }

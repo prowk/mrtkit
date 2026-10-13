@@ -1,0 +1,19 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "broti/mrtkit/bridge"
+
+// Values
+pub fn configure(String) -> String
+
+pub fn consume(Bytes) -> String
+
+pub fn finish() -> String
+
+pub fn reset_file() -> Unit
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

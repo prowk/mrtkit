@@ -1,5 +1,11 @@
 # Project Agents.md Guide
 
+## 文件约定
+
+- 文本文件使用 UTF-8，修改时保持原有编码；MRT 和压缩样本保持二进制格式。
+- PowerShell 读取中文前执行 `chcp 65001` 并设置 UTF-8 输出，使用 `Get-Content -Encoding UTF8`。
+- 不使用 sed/awk 处理中文文件；使用 Python 或 Node.js。代码注释使用中文。
+
 This is a [MoonBit](https://docs.moonbitlang.com) project.
 
 You can browse and install extra skills here:

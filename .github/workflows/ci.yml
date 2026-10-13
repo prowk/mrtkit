@@ -1,0 +1,31 @@
+name: MRT verification
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: 安装 MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - name: 格式与接口检查
+        run: |
+          moon version
+          moon fmt --check
+          moon info
+          git diff --exit-code -- '*.mbti'
+      - name: JS 库和 CLI 测试
+        run: npm test
+      - name: Wasm 后端测试
+        run: |
+          moon test --target wasm --deny-warn
+          moon test --target wasm-gc --deny-warn

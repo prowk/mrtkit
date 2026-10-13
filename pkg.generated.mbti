@@ -1,0 +1,214 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "broti/mrtkit"
+
+// Values
+pub fn csv_header() -> String
+
+pub fn event_csv(RouteEvent) -> String
+
+pub fn event_json(RouteEvent) -> String
+
+pub fn origin_as(Array[AsSegment]) -> UInt?
+
+pub fn parse_attributes(Bytes, Int) -> Attributes raise ParseError
+
+pub fn parse_bgp4mp(Frame) -> BgpRecord raise ParseError
+
+pub fn parse_peers(Bytes) -> PeerTable raise ParseError
+
+pub fn parse_prefix(Bytes, Int) -> Prefix raise ParseError
+
+pub fn parse_rib(Frame, Array[Peer]) -> Array[RouteEvent] raise ParseError
+
+pub fn path_length(Array[AsSegment]) -> Int
+
+pub fn path_text(Array[AsSegment]) -> String
+
+pub fn read_frame(Bytes) -> Frame raise ParseError
+
+pub fn reconstruct_path(Array[AsSegment], Array[AsSegment]) -> Array[AsSegment]
+
+// Errors
+pub suberror ParseError {
+  Invalid(Int, String)
+}
+
+// Types and methods
+pub struct Analyzer {
+  // private fields
+}
+pub fn Analyzer::new(window_seconds? : Int, threshold? : Int, capacity? : Int) -> Self raise ParseError
+pub fn Analyzer::observe(Self, RouteEvent) -> Array[Change] raise ParseError
+pub fn Analyzer::observe_state(Self, StateChange) -> Unit
+pub fn Analyzer::record_batch(Self, Batch) -> Unit
+pub fn Analyzer::summary(Self) -> Summary
+
+pub struct AsSegment {
+  kind : Int
+  asns : Array[UInt]
+} derive(Eq, ToJson)
+pub fn AsSegment::equal(Self, Self) -> Bool
+pub fn AsSegment::not_equal(Self, Self) -> Bool
+pub fn AsSegment::to_json(Self) -> Json
+
+pub struct Attributes {
+  origin : Int?
+  path : Array[AsSegment]
+  wire_path : Array[AsSegment]
+  as4_path : Array[AsSegment]
+  next_hop : String?
+  med : UInt?
+  local_pref : UInt?
+  communities : Array[UInt]
+  other : Array[RawAttribute]
+} derive(Eq, ToJson)
+pub fn Attributes::equal(Self, Self) -> Bool
+pub fn Attributes::not_equal(Self, Self) -> Bool
+pub fn Attributes::to_json(Self) -> Json
+
+pub struct Batch {
+  header : Header
+  events : Array[RouteEvent]
+  states : Array[StateChange]
+  skipped : Bool
+  ignored_families : Int
+  message_type : Int?
+} derive(ToJson)
+pub fn Batch::to_json(Self) -> Json
+
+pub struct BgpRecord {
+  message_type : Int
+  events : Array[RouteEvent]
+  states : Array[StateChange]
+  ignored_families : Int
+}
+
+pub struct Change {
+  timestamp : UInt
+  prefix : String
+  peer_asn : UInt
+  peer_ip : String
+  outbound : Bool
+  kind : String
+  before : String
+  after : String
+} derive(ToJson)
+pub fn Change::to_json(Self) -> Json
+
+pub struct Decoder {
+  // private fields
+}
+pub fn Decoder::decode(Self, Bytes) -> Batch raise ParseError
+pub fn Decoder::new() -> Self
+pub fn Decoder::reset(Self) -> Unit
+
+pub struct Frame {
+  header : Header
+  microseconds : Int?
+  payload : Bytes
+} derive(Eq)
+pub fn Frame::equal(Self, Self) -> Bool
+pub fn Frame::not_equal(Self, Self) -> Bool
+
+pub struct Header {
+  timestamp : UInt
+  kind : Int
+  subtype : Int
+  length : Int
+} derive(Eq, ToJson)
+pub fn Header::equal(Self, Self) -> Bool
+pub fn Header::not_equal(Self, Self) -> Bool
+pub fn Header::to_json(Self) -> Json
+
+pub struct Peer {
+  bgp_id : UInt
+  address : String
+  asn : UInt
+} derive(ToJson)
+pub fn Peer::to_json(Self) -> Json
+
+pub struct PeerTable {
+  collector_id : UInt
+  view_name : Bytes
+  peers : Array[Peer]
+}
+
+pub struct Prefix {
+  afi : Int
+  length : Int
+  address : Bytes
+} derive(Eq, ToJson)
+pub fn Prefix::equal(Self, Self) -> Bool
+pub fn Prefix::not_equal(Self, Self) -> Bool
+pub fn Prefix::text(Self) -> String
+pub fn Prefix::to_json(Self) -> Json
+
+pub struct Query {
+  // private fields
+}
+pub fn Query::matches(Self, RouteEvent) -> Bool
+pub fn Query::new(prefix? : String, asn? : UInt, from_time? : UInt, to_time? : UInt) -> Self raise ParseError
+
+pub struct RawAttribute {
+  flags : Int
+  code : Int
+  value : Bytes
+} derive(Eq, ToJson)
+pub fn RawAttribute::equal(Self, Self) -> Bool
+pub fn RawAttribute::not_equal(Self, Self) -> Bool
+pub fn RawAttribute::to_json(Self) -> Json
+
+pub struct RouteEvent {
+  timestamp : UInt
+  microseconds : Int?
+  action : String
+  prefix : String
+  peer_asn : UInt
+  peer_ip : String
+  outbound : Bool
+  originated : UInt?
+  attributes : Attributes
+} derive(ToJson)
+pub fn RouteEvent::to_json(Self) -> Json
+
+pub struct StateChange {
+  timestamp : UInt
+  microseconds : Int?
+  peer_asn : UInt
+  peer_ip : String
+  old_state : Int
+  new_state : Int
+} derive(ToJson)
+pub fn StateChange::to_json(Self) -> Json
+
+pub struct StreamDecoder {
+  // private fields
+}
+pub fn StreamDecoder::feed(Self, Bytes) -> Array[Batch] raise ParseError
+pub fn StreamDecoder::finish(Self) -> Unit raise ParseError
+pub fn StreamDecoder::new() -> Self
+
+pub struct Summary {
+  records : Int64
+  skipped_records : Int64
+  ignored_families : Int64
+  rib_routes : Int64
+  announcements : Int64
+  withdrawals : Int64
+  path_changes : Int64
+  attribute_changes : Int64
+  origin_changes : Int64
+  duplicate_announcements : Int64
+  churn_alerts : Int64
+  out_of_order : Int64
+  session_resets : Int64
+  tracked_routes : Int
+  active_routes : Int
+  mean_path_length : Double
+  max_path_length : Int
+} derive(ToJson)
+pub fn Summary::to_json(Self) -> Json
+
+// Type aliases
+
+// Traits
