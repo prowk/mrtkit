@@ -15,6 +15,7 @@ pub struct BgpRecord {
   message_type : Int
   events : Array[RouteEvent]
   states : Array[StateChange]
+  ignored_families : Int
 }
 
 ///|
@@ -85,6 +86,7 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
     c.finish()
     return {
       message_type: 0,
+      ignored_families: 0,
       events: [],
       states: [
         {
@@ -113,11 +115,43 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
     raise Invalid(message.pos - 1, "无效 BGP 消息类型")
   }
   let events = []
+  let mut ignored_families = 0
   if message_type == 2 {
     let withdrawn = message.take(message.u16())
     let withdrawals = read_nlri(withdrawn, 1)
     let attributes = parse_attributes(message.bytes(message.u16()), width)
     let announcements = read_nlri(message, 1)
+    for attr in attributes.other {
+      if attr.code == 14 || attr.code == 15 {
+        let reach = attr.code == 14
+        let mp = parse_mp(attr.value, reach)
+        if !mp.supported {
+          ignored_families += 1
+        }
+        for prefix in mp.prefixes {
+          let attrs = if reach {
+            { ..attributes, next_hop: mp.next_hop, }
+          } else {
+            empty_attributes()
+          }
+          events.push(
+            make_event(
+              frame,
+              peer_asn,
+              peer_ip,
+              outbound,
+              if reach {
+                "announce"
+              } else {
+                "withdraw"
+              },
+              prefix,
+              attrs,
+            ),
+          )
+        }
+      }
+    }
     for prefix in withdrawals {
       events.push(
         make_event(
@@ -154,5 +188,5 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
     ignore(message.bytes(message.remaining()))
   }
   message.finish()
-  { message_type, events, states: [], }
+  { message_type, events, states: [], ignored_families, }
 }
