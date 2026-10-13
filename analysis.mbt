@@ -168,8 +168,8 @@ pub fn Analyzer::observe(
     path = if active { event.attributes.path } else { previous.path }
     attributes = if active { event.attributes } else { previous.attributes }
     if event.action == "announce" && previous.active {
-      changed = previous.attributes != attributes
-      if previous.path != path {
+      changed = !route_attributes_equal(previous.attributes, attributes)
+      if !same_path(previous.path, path) {
         stats = { ..stats, path_changes: stats.path_changes + 1L, }
         notices.push(
           change(
