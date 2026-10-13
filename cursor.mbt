@@ -1,6 +1,6 @@
 ///|
 /// 有界游标保证嵌套长度不会跨越父记录边界。
-struct Cursor {
+priv struct Cursor {
   data : Bytes
   mut pos : Int
   end : Int
@@ -40,8 +40,8 @@ fn Cursor::u16(self : Cursor) -> Int raise ParseError {
 
 ///|
 fn Cursor::u32(self : Cursor) -> UInt raise ParseError {
-  let a = self.u16().to_uint()
-  let b = self.u16().to_uint()
+  let a = self.u16().reinterpret_as_uint()
+  let b = self.u16().reinterpret_as_uint()
   (a << 16) | b
 }
 
