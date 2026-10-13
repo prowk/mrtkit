@@ -1,0 +1,17 @@
+import {
+  "broti/mrtkit" @mrt,
+  "moonbitlang/core/json",
+}
+
+pkgtype(kind: "foreign_library")
+
+supported_targets = "js"
+
+options(
+  link: {
+    "js": {
+      "exports": [ "configure", "consume", "finish", "reset_file" ],
+      "format": "esm",
+    },
+  },
+)

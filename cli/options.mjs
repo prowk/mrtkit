@@ -1,0 +1,67 @@
+import { isIP } from 'node:net';
+
+export function integer(text, name, min = 0, max = 4294967295) {
+  if (!/^\d+$/.test(text)) throw new Error(`${name} 必须为整数`);
+  const value = Number(text);
+  if (!Number.isSafeInteger(value) || value < min || value > max) throw new Error(`${name} 超出范围 ${min}..${max}`);
+  return value;
+}
+
+export function canonicalPrefix(text) {
+  const parts = text.split('/');
+  if (parts.length !== 2) throw new Error('前缀必须包含 /长度');
+  const family = isIP(parts[0]);
+  if (!family) throw new Error('前缀 IP 地址无效');
+  const length = integer(parts[1], '前缀长度', 0, family === 4 ? 32 : 128);
+  let bytes;
+  if (family === 4) bytes = parts[0].split('.').map(Number);
+  else {
+    // URL 提供 IPv6 展开前的标准化，同时转换嵌入式 IPv4 地址。
+    const address = new URL(`http://[${parts[0]}]/`).hostname.slice(1, -1);
+    const [left, right = ''] = address.split('::');
+    const head = left ? left.split(':') : [];
+    const tail = right ? right.split(':') : [];
+    const groups = address.includes('::') ? [...head, ...Array(8 - head.length - tail.length).fill('0'), ...tail] : head;
+    bytes = groups.flatMap(group => { const n = parseInt(group, 16); return [n >> 8, n & 255]; });
+  }
+  bytes = bytes.map((byte, i) => {
+    const remaining = length - i * 8;
+    return remaining >= 8 ? byte : remaining <= 0 ? 0 : byte & (255 << (8 - remaining));
+  });
+  if (family === 4) return `${bytes.join('.')}/${length}`;
+  const full = Array.from({ length: 8 }, (_, i) => ((bytes[i * 2] << 8) | bytes[i * 2 + 1]).toString(16)).join(':');
+  return `${new URL(`http://[${full}]/`).hostname.slice(1, -1)}/${length}`;
+}
+
+export function options(argv) {
+  const mode = argv.shift();
+  if (!['parse', 'stats', 'changes'].includes(mode)) throw new Error('命令必须为 parse、stats 或 changes');
+  const config = { mode, format: 'json', prefix: null, asn: null, peer_asn: null, from_time: 0, to_time: 4294967295,
+    window_seconds: 60, threshold: 10, capacity: 1000000 };
+  const files = [];
+  let endOptions = false;
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--' && !endOptions) { endOptions = true; continue; }
+    if (!endOptions && arg.startsWith('--')) {
+      const name = arg.slice(2);
+      if (!['format', 'prefix', 'asn', 'peer-asn', 'from', 'to', 'window', 'threshold', 'capacity'].includes(name)) throw new Error(`未知选项: ${arg}`);
+      const value = argv[++i];
+      if (value === undefined) throw new Error(`${arg} 缺少值`);
+      if (name === 'format') config.format = value;
+      else if (name === 'prefix') config.prefix = canonicalPrefix(value);
+      else if (name === 'asn') config.asn = integer(value, arg);
+      else if (name === 'peer-asn') config.peer_asn = integer(value, arg);
+      else if (name === 'from') config.from_time = integer(value, arg);
+      else if (name === 'to') config.to_time = integer(value, arg);
+      else config[{ window: 'window_seconds', threshold: 'threshold', capacity: 'capacity' }[name]] = integer(value, arg, name === 'threshold' ? 2 : 1, 2147483647);
+    } else files.push(arg);
+  }
+  if (!files.length) throw new Error('请指定 MRT 文件，或使用 - 读取未压缩标准输入');
+  if (files.filter(file => file === '-').length > 1) throw new Error('标准输入只能使用一次');
+  if (!['json', 'csv'].includes(config.format)) throw new Error('--format 必须为 json 或 csv');
+  if (mode !== 'parse' && config.format !== 'json') throw new Error('stats/changes 仅支持 JSON 输出');
+  if (mode !== 'parse' && config.asn !== null) throw new Error('分析请使用 --peer-asn，--asn 路径筛选仅支持 parse');
+  if (config.from_time > config.to_time) throw new Error('--from 晚于 --to');
+  return { config, files };
+}

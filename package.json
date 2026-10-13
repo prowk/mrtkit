@@ -1,0 +1,13 @@
+{
+  "name": "moonbit-mrtkit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "moon build --target js --release",
+    "test": "moon test && node --test tests/*.test.mjs",
+    "demo": "node scripts/fixtures.mjs && node cli/mrtkit.mjs stats fixtures/demo.mrt"
+  },
+  "bin": { "mrtkit": "cli/mrtkit.mjs" }
+}
