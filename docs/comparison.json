@@ -1,0 +1,35 @@
+{
+  "reference": "mrtparse 2.2.0",
+  "checked_fields": [
+    "timestamp",
+    "action",
+    "prefix",
+    "peer_asn",
+    "peer_ip",
+    "outbound",
+    "originated",
+    "wire AS_PATH segments",
+    "AS4_PATH segments",
+    "next_hop",
+    "origin",
+    "MED",
+    "local_pref",
+    "communities"
+  ],
+  "samples": [
+    {
+      "sample": "ris-updates.mrt",
+      "records": 1000,
+      "events": 1457,
+      "matched": true,
+      "sha256": "44460ee6bc4b31f93fc0d0162ed59951c2acb18b640e3a34b57f760a00991d99"
+    },
+    {
+      "sample": "ris-rib.mrt",
+      "records": 1000,
+      "events": 44888,
+      "matched": true,
+      "sha256": "faa7278b3312dffc9847c628ce9ec33e30e200ca30808a24dbd62e92d7aa32cd"
+    }
+  ]
+}

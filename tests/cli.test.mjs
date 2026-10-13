@@ -57,3 +57,24 @@ test('gzip 输入和错误退出码', () => {
     assert.equal(cli(['stats', '--capacity', '1', '-'], demo()).status, 1);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+const python = process.env.MRTKIT_PYTHON || 'python';
+const hasPython = spawnSync(python, ['--version'], { windowsHide: true }).status === 0;
+test('bz2 输入、缺失解压器及损坏压缩流', { skip: !hasPython }, () => {
+  const dir = mkdtempSync(join(tmpdir(), 'mrtkit-bz2-'));
+  try {
+    const path = join(dir, '测试.mrt.bz2');
+    const packed = spawnSync(python, ['-c', 'import bz2,sys;sys.stdout.buffer.write(bz2.compress(sys.stdin.buffer.read()))'], { input: demo(), windowsHide: true });
+    assert.equal(packed.status, 0);
+    writeFileSync(path, packed.stdout);
+    const result = cli(['stats', path]);
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(Number(JSON.parse(result.stdout).records), 8);
+    const missing = spawnSync(process.execPath, ['cli/mrtkit.mjs', 'stats', path], {
+      encoding: 'utf8', windowsHide: true, env: { ...process.env, MRTKIT_PYTHON: 'mrtkit-no-such-python' },
+    });
+    assert.equal(missing.status, 1);
+    writeFileSync(path, Buffer.from('broken'));
+    assert.equal(cli(['stats', path]).status, 1);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

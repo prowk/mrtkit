@@ -1,0 +1,16 @@
+[
+  {
+    "sample": "ris-updates.mrt",
+    "source": "https://data.ris.ripe.net/rrc00/2025.01/updates.20250101.0000.gz",
+    "records": 1000,
+    "bytes": 148823,
+    "sha256": "44460ee6bc4b31f93fc0d0162ed59951c2acb18b640e3a34b57f760a00991d99"
+  },
+  {
+    "sample": "ris-rib.mrt",
+    "source": "https://data.ris.ripe.net/rrc00/2025.01/bview.20250101.0000.gz",
+    "records": 1000,
+    "bytes": 2910035,
+    "sha256": "faa7278b3312dffc9847c628ce9ec33e30e200ca30808a24dbd62e92d7aa32cd"
+  }
+]
