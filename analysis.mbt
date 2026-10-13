@@ -22,6 +22,7 @@ pub struct Summary {
   announcements : Int64
   withdrawals : Int64
   path_changes : Int64
+  attribute_changes : Int64
   origin_changes : Int64
   duplicate_announcements : Int64
   churn_alerts : Int64
@@ -41,6 +42,7 @@ priv struct TrackedRoute {
   peer : String
   active : Bool
   path : Array[AsSegment]
+  attributes : Attributes
   time : UInt64
   window_start : UInt64
   window_count : Int
@@ -79,6 +81,7 @@ pub fn Analyzer::new(
       announcements: 0L,
       withdrawals: 0L,
       path_changes: 0L,
+      attribute_changes: 0L,
       origin_changes: 0L,
       duplicate_announcements: 0L,
       churn_alerts: 0L,
@@ -160,11 +163,13 @@ pub fn Analyzer::observe(
   let mut start = time
   let mut count = 0
   let mut path = event.attributes.path
+  let mut attributes = event.attributes
   if old is Some(previous) {
     path = if active { event.attributes.path } else { previous.path }
+    attributes = if active { event.attributes } else { previous.attributes }
     if event.action == "announce" && previous.active {
-      changed = previous.path != path
-      if changed {
+      changed = previous.attributes != attributes
+      if previous.path != path {
         stats = { ..stats, path_changes: stats.path_changes + 1L, }
         notices.push(
           change(
@@ -183,6 +188,16 @@ pub fn Analyzer::observe(
           }
           _ => ()
         }
+      } else if changed {
+        stats = { ..stats, attribute_changes: stats.attribute_changes + 1L, }
+        notices.push(
+          change(
+            event,
+            "attribute_change",
+            previous.attributes.to_json().stringify(),
+            attributes.to_json().stringify(),
+          ),
+        )
       } else {
         stats = {
           ..stats,
@@ -213,6 +228,7 @@ pub fn Analyzer::observe(
     peer,
     active,
     path,
+    attributes,
     time,
     window_start: start,
     window_count: count,
@@ -227,9 +243,21 @@ pub fn Analyzer::observe_state(self : Analyzer, state : StateChange) -> Unit {
   if state.old_state == 6 && state.new_state != 6 {
     let inbound = peer_key(state.peer_asn, state.peer_ip, false)
     let outbound = peer_key(state.peer_asn, state.peer_ip, true)
+    let micros = match state.microseconds {
+      Some(n) => n.to_uint64()
+      None => 0UL
+    }
+    let time = state.timestamp.to_uint64() * 1000000UL + micros
     let keys = []
     for key, route in self.routes {
       if route.peer == inbound || route.peer == outbound {
+        if time < route.time {
+          self.stats = {
+            ..self.stats,
+            out_of_order: self.stats.out_of_order + 1L,
+          }
+          return
+        }
         keys.push(key)
       }
     }

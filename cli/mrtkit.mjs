@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { pathToFileURL, fileURLToPath } from 'node:url';
+import { pathToFileURL } from 'node:url';
 import { frames, inputChunks } from './input.mjs';
 import { options } from './options.mjs';
 
@@ -49,7 +49,10 @@ export async function main(argv) {
         ignored += result.ignored_families;
         if (result.lines.length) await write(process.stdout, `${result.lines.join('\n')}\n`);
       }
-    } catch (error) { throw new Error(`${file}: ${error.message}`); }
+    } catch (error) {
+      if (error.code === 'EPIPE') throw error;
+      throw new Error(`${file}: ${error.message}`);
+    }
   }
   const summary = JSON.parse(bridge.finish());
   if (summary.error) throw new Error(summary.error);
@@ -58,7 +61,9 @@ export async function main(argv) {
   if (config.mode === 'changes') await write(process.stderr, `${JSON.stringify(summary)}\n`);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(fileURLToPath(pathToFileURL(process.argv[1]))).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  // 管道接收端提前退出时由写回调处理 EPIPE。
+  process.stdout.on('error', () => {});
   main(process.argv.slice(2)).catch(error => {
     if (error.code === 'EPIPE') return;
     process.stderr.write(`mrtkit: ${error.message}\n`, 'utf8');

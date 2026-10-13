@@ -15,7 +15,10 @@ pub struct RawAttribute {
   flags : Int
   code : Int
   value : Bytes
-} derive(ToJson)
+} derive(Eq, ToJson)
+
+///|
+pub extend RawAttribute with Eq::{equal, not_equal}
 
 ///|
 pub extend RawAttribute with ToJson::{to_json}
@@ -24,13 +27,17 @@ pub extend RawAttribute with ToJson::{to_json}
 pub struct Attributes {
   origin : Int?
   path : Array[AsSegment]
+  wire_path : Array[AsSegment]
   as4_path : Array[AsSegment]
   next_hop : String?
   med : UInt?
   local_pref : UInt?
   communities : Array[UInt]
   other : Array[RawAttribute]
-} derive(ToJson)
+} derive(Eq, ToJson)
+
+///|
+pub extend Attributes with Eq::{equal, not_equal}
 
 ///|
 pub extend Attributes with ToJson::{to_json}
@@ -40,6 +47,7 @@ fn empty_attributes() -> Attributes {
   {
     origin: None,
     path: [],
+    wire_path: [],
     as4_path: [],
     next_hop: None,
     med: None,
@@ -124,6 +132,7 @@ pub fn parse_attributes(
   {
     origin,
     path: effective_path(path, as4_path, other, asn_width),
+    wire_path: path,
     as4_path,
     next_hop,
     med,

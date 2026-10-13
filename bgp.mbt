@@ -1,6 +1,7 @@
 ///|
 pub struct StateChange {
   timestamp : UInt
+  microseconds : Int?
   peer_asn : UInt
   peer_ip : String
   old_state : Int
@@ -91,6 +92,7 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
       states: [
         {
           timestamp: frame.header.timestamp,
+          microseconds: frame.microseconds,
           peer_asn,
           peer_ip,
           old_state,

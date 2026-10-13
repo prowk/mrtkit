@@ -7,11 +7,20 @@ pub struct Header {
 } derive(Eq, ToJson)
 
 ///|
+pub extend Header with Eq::{equal, not_equal}
+
+///|
+pub extend Header with ToJson::{to_json}
+
+///|
 pub struct Frame {
   header : Header
   microseconds : Int?
   payload : Bytes
 } derive(Eq)
+
+///|
+pub extend Frame with Eq::{equal, not_equal}
 
 ///|
 /// 单条记录上限为 16 MiB，未知类型仍保留完整记录。

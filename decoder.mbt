@@ -97,34 +97,30 @@ pub fn StreamDecoder::feed(
   if self.failed {
     raise Invalid(0, "解码器已失败，请新建会话")
   }
-  try {
-    if chunk.length() > 1048576 {
-      raise Invalid(0, "输入分块超过 1 MiB")
-    }
-    let data = self.pending + chunk
-    let batches = []
-    let mut offset = 0
-    while data.length() - offset >= 12 {
-      let c : Cursor = { data, pos: offset + 8, end: data.length(), }
-      let length = c.u32()
-      if length > 16777216U {
-        raise Invalid(offset + 8, "MRT 记录超过 16 MiB 上限")
-      }
-      let size = length.reinterpret_as_int() + 12
-      if data.length() - offset < size {
-        break
-      }
-      batches.push(self.decoder.decode(data[offset:offset + size].to_owned()))
-      offset += size
-    }
-    self.pending = data[offset:].to_owned()
-    batches
-  } catch {
-    error => {
-      self.failed = true
-      raise error
-    }
+  errdefer {
+    self.failed = true
   }
+  if chunk.length() > 1048576 {
+    raise Invalid(0, "输入分块超过 1 MiB")
+  }
+  let data = self.pending + chunk
+  let batches = []
+  let mut offset = 0
+  while data.length() - offset >= 12 {
+    let c : Cursor = { data, pos: offset + 8, end: data.length(), }
+    let length = c.u32()
+    if length > 16777216U {
+      raise Invalid(offset + 8, "MRT 记录超过 16 MiB 上限")
+    }
+    let size = length.reinterpret_as_int() + 12
+    if data.length() - offset < size {
+      break
+    }
+    batches.push(self.decoder.decode(data[offset:offset + size].to_owned()))
+    offset += size
+  }
+  self.pending = data[offset:].to_owned()
+  batches
 }
 
 ///|
