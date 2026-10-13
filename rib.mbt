@@ -23,7 +23,7 @@ pub struct RouteEvent {
   prefix : String
   peer_asn : UInt
   peer_ip : String
-  local : Bool
+  outbound : Bool
   originated : UInt?
   attributes : Attributes
 } derive(ToJson)
@@ -91,7 +91,7 @@ pub fn parse_rib(
       prefix,
       peer_asn: peer.asn,
       peer_ip: peer.address,
-      local: false,
+      outbound: false,
       originated: Some(originated),
       attributes,
     })
