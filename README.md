@@ -22,7 +22,7 @@ node cli/mrtkit.mjs changes --threshold 3 fixtures/demo.mrt
 | MRT | 网络字节序、长度校验、扩展微秒时间戳、未知类型跳过统计 |
 | 快照 | TABLE_DUMP_V2 的 PEER_INDEX_TABLE、IPv4/IPv6 单播 RIB |
 | 更新 | BGP4MP/BGP4MP_ET 的 MESSAGE、MESSAGE_AS4、两种 LOCAL 和两种 STATE_CHANGE |
-| 属性 | ORIGIN、AS_PATH、AS4_PATH、NEXT_HOP、MED、LOCAL_PREF、COMMUNITY；其他属性保留原始字节 |
+| 属性 | ORIGIN、AS_PATH、AS4_PATH、NEXT_HOP、MED、LOCAL_PREF、COMMUNITY、LARGE_COMMUNITY；其他属性保留原始字节 |
 | 多协议 | IPv4/IPv6 单播 MP_REACH/MP_UNREACH；RIB 精简/历史完整下一跳编码 |
 | 查询 | 前缀精确匹配、peer/路径 ASN、包含端点的 Unix 秒范围 |
 | 输出 | 路由 JSON Lines、CSV、统计 JSON、变化 JSON Lines |

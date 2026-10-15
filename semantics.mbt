@@ -41,16 +41,22 @@ fn route_attributes_equal(a : Attributes, b : Attributes) -> Bool {
     a.local_pref != b.local_pref {
     return false
   }
-  let ac = a.communities.copy()
-  let bc = b.communities.copy()
-  ac.sort()
-  bc.sort()
+  let ac = unique_communities(a.communities)
+  let bc = unique_communities(b.communities)
   if ac != bc {
     return false
   }
+  if unique_large_communities(a.large_communities) !=
+    unique_large_communities(b.large_communities) {
+    return false
+  }
   // 同一 UPDATE 携带的其他前缀及 ASN 兼容编码不构成该路由的变化。
-  let ao = a.other.filter(fn(attr) { attr.code != 14 && attr.code != 15 })
-  let bo = b.other.filter(fn(attr) { attr.code != 14 && attr.code != 15 })
+  let ao = a.other.filter(fn(attr) {
+    attr.code != 14 && attr.code != 15 && attr.code != 32
+  })
+  let bo = b.other.filter(fn(attr) {
+    attr.code != 14 && attr.code != 15 && attr.code != 32
+  })
   ao.sort_by_key(fn(attr) { attr.code })
   bo.sort_by_key(fn(attr) { attr.code })
   ao == bo

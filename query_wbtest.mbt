@@ -43,7 +43,7 @@ test "导出 CSV 转义与 JSON 结构" {
   let event = sample_event(100U, "announce", [65536U])
   assert_eq(
     event_csv(event),
-    "2.0,100,,\"announce\",\"192.0.2.0/24\",64512,\"198.51.100.1\",false,65536,\"65536\",\"\",,,,,",
+    "2.0,100,,\"announce\",\"192.0.2.0/24\",64512,\"198.51.100.1\",false,65536,\"65536\",\"\",,,,,,\"\"",
   )
   assert_true(event_json(event).contains("\"peer_asn\":64512"))
   assert_eq(path_text([{ kind: 1, asns: [1U, 2U], }]), "{1,2}")

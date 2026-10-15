@@ -15,7 +15,16 @@ pub struct RawAttribute {
   flags : Int
   code : Int
   value : Bytes
-} derive(Eq, ToJson)
+} derive(Eq)
+
+///|
+pub impl ToJson for RawAttribute with fn to_json(self) {
+  Json::object({
+    "flags": self.flags.to_json(),
+    "code": self.code.to_json(),
+    "value": self.value.to_array().map(fn(b) { b.to_int() }).to_json(),
+  })
+}
 
 ///|
 pub extend RawAttribute with Eq::{equal, not_equal}
@@ -33,6 +42,7 @@ pub struct Attributes {
   med : UInt?
   local_pref : UInt?
   communities : Array[UInt]
+  large_communities : Array[(UInt, UInt, UInt)]
   other : Array[RawAttribute]
 } derive(Eq, ToJson)
 
@@ -53,6 +63,7 @@ fn empty_attributes() -> Attributes {
     med: None,
     local_pref: None,
     communities: [],
+    large_communities: [],
     other: [],
   }
 }
@@ -98,6 +109,7 @@ pub fn parse_attributes(
   let mut med = None
   let mut local_pref = None
   let communities = []
+  let large_communities = []
   let other = []
   while c.remaining() > 0 {
     let flags = c.u8()
@@ -125,6 +137,20 @@ pub fn parse_attributes(
           communities.push(value.u32())
         }
       17 => as4_path = read_as_path(value, 4)
+      32 => {
+        let raw = value.bytes(value.remaining())
+        if raw.length() == 0 || raw.length() % 12 != 0 {
+          raise Invalid(
+            value.pos - raw.length(),
+            "LARGE_COMMUNITY 长度必须是非零的 12 字节倍数",
+          )
+        }
+        let values = Cursor::new(raw)
+        while values.remaining() > 0 {
+          large_communities.push((values.u32(), values.u32(), values.u32()))
+        }
+        other.push({ flags, code, value: raw, })
+      }
       _ => other.push({ flags, code, value: value.bytes(value.remaining()), })
     }
     value.finish()
@@ -138,6 +164,7 @@ pub fn parse_attributes(
     med,
     local_pref,
     communities,
+    large_communities: unique_large_communities(large_communities),
     other,
   }
 }

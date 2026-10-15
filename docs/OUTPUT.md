@@ -9,3 +9,5 @@
 `source` 包含输入文件名、从 1 开始的 `record`、解压后 MRT 记录起始 `offset`、从 0 开始的记录内 `event_index`。64 位记录号与偏移使用十进制字符串。快照基线和变化前后状态各自保留来源。压缩文件的偏移不是压缩字节偏移；错误报告中的“解析器局部偏移”不是记录起点。底层无来源的 `decode` 可省略来源，需审计时使用 `decode_at`。
 
 CSV 同样以 `schema_version` 开头，包含来源文件、记录号、记录偏移及事件索引。使用库的 `csv_header` 读取列定义，按列名消费，不依赖固定列号。统计中的 64 位计数保持十进制字符串。
+
+Large Communities 按 [RFC 8092](https://www.rfc-editor.org/rfc/rfc8092.html) 解码为 `[全局管理员, 本地值1, 本地值2]` 三元组数组，规范排序并去重，原始编码保留在 `attributes.other` 的 code 32 中。排列和重复不产生语义变化，`diff.large_communities` 给出前后值及增删成员；CSV 使用空格分隔的 `ASN:值1:值2`。长度为零或不是 12 的倍数时抛出 `ParseError::Invalid`，这是离线格式解析错误，不将坏数据冒充真实观测到的撤回消息。

@@ -63,6 +63,7 @@ pub struct Attributes {
   med : UInt?
   local_pref : UInt?
   communities : Array[UInt]
+  large_communities : Array[(UInt, UInt, UInt)]
   other : Array[RawAttribute]
 } derive(Eq, ToJson)
 pub fn Attributes::equal(Self, Self) -> Bool
@@ -145,6 +146,14 @@ pub struct HopDiff {
 pub fn HopDiff::to_json(Self) -> Json
 pub impl ToJson for HopDiff
 
+pub struct LargeCommunityDiff {
+  before : Array[(UInt, UInt, UInt)]
+  after : Array[(UInt, UInt, UInt)]
+  added : Array[(UInt, UInt, UInt)]
+  removed : Array[(UInt, UInt, UInt)]
+} derive(ToJson)
+pub fn LargeCommunityDiff::to_json(Self) -> Json
+
 pub struct OriginDiff {
   before : UInt?
   after : UInt?
@@ -191,16 +200,18 @@ pub struct RawAttribute {
   flags : Int
   code : Int
   value : Bytes
-} derive(Eq, ToJson)
+} derive(Eq)
 pub fn RawAttribute::equal(Self, Self) -> Bool
 pub fn RawAttribute::not_equal(Self, Self) -> Bool
 pub fn RawAttribute::to_json(Self) -> Json
+pub impl ToJson for RawAttribute
 
 pub struct RouteDiff {
   path : PathDiff?
   origin_as : OriginDiff?
   next_hop : HopDiff?
   communities : CommunityDiff?
+  large_communities : LargeCommunityDiff?
 } derive(ToJson)
 pub fn RouteDiff::to_json(Self) -> Json
 

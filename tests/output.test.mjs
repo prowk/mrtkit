@@ -45,3 +45,19 @@ test('同一记录内多事件具有不同索引且来源偏移指记录起点',
   assert.deepEqual(reply.lines.map(JSON.parse).map(e => e.source), [0, 1].map(event_index => ({ file: '多前缀.mrt', record: '2', offset: '55', event_index })));
   assert.throws(() => options(['parse', '--output-version', '1', '-']));
 });
+
+test('Large Communities 排列和重复不产生提醒，增删可定位', () => {
+  configure();
+  const prefix = Buffer.from([24, 203, 0, 113]);
+  const encode = (values, time) => bgpUpdate(prefix, undefined, cat(attributes([64512, 1]), attr(32, cat(...values.flatMap(c => c.map(u32))), 192)), time);
+  const a = [65536, 1, 2], b = [65536, 3, 4], c = [65536, 5, 6];
+  bridge.consume(encode([a, b], 100));
+  assert.equal(JSON.parse(bridge.consume(encode([b, a, a], 101))).lines.length, 0);
+  const changes = JSON.parse(bridge.consume(encode([b, c], 102))).lines.map(JSON.parse);
+  assert.equal(changes.length, 1);
+  assert.deepEqual(changes[0].diff.large_communities, { before: [a, b], after: [b, c], added: [c], removed: [a] });
+  configure('parse');
+  const parsed = JSON.parse(JSON.parse(bridge.consume(encode([a, a], 100))).lines[0]);
+  assert.deepEqual(parsed.attributes.large_communities, [a]);
+  assert.equal(parsed.attributes.other.find(a => a.code === 32).value.length, 24);
+});

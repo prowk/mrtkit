@@ -70,6 +70,7 @@ pub struct RouteDiff {
   origin_as : OriginDiff?
   next_hop : HopDiff?
   communities : CommunityDiff?
+  large_communities : LargeCommunityDiff?
 } derive(ToJson)
 
 ///|
@@ -92,7 +93,19 @@ fn unique_communities(values : Array[UInt]) -> Array[UInt] {
 fn route_diff(a : Attributes, b : Attributes) -> RouteDiff {
   let ac = unique_communities(a.communities)
   let bc = unique_communities(b.communities)
+  let al = unique_large_communities(a.large_communities)
+  let bl = unique_large_communities(b.large_communities)
   {
+    large_communities: if al == bl {
+      None
+    } else {
+      Some({
+        before: al,
+        after: bl,
+        added: bl.filter(fn(n) { !al.contains(n) }),
+        removed: al.filter(fn(n) { !bl.contains(n) }),
+      })
+    },
     path: if same_path(a.path, b.path) {
       None
     } else {
@@ -119,6 +132,32 @@ fn route_diff(a : Attributes, b : Attributes) -> RouteDiff {
       })
     },
   }
+}
+
+///|
+pub struct LargeCommunityDiff {
+  before : Array[(UInt, UInt, UInt)]
+  after : Array[(UInt, UInt, UInt)]
+  added : Array[(UInt, UInt, UInt)]
+  removed : Array[(UInt, UInt, UInt)]
+} derive(ToJson)
+
+///|
+pub extend LargeCommunityDiff with ToJson::{to_json}
+
+///|
+fn unique_large_communities(
+  values : Array[(UInt, UInt, UInt)],
+) -> Array[(UInt, UInt, UInt)] {
+  let sorted = values.copy()
+  sorted.sort()
+  let result = []
+  for value in sorted {
+    if result.last() != Some(value) {
+      result.push(value)
+    }
+  }
+  result
 }
 
 ///|
