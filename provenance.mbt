@@ -4,10 +4,13 @@ pub struct Source {
   record : Int64
   offset : Int64
   event_index : Int
-} derive(Eq, ToJson)
+} derive(Eq, Hash, ToJson)
 
 ///|
 pub extend Source with Eq::{equal, not_equal}
+
+///|
+pub extend Source with Hash::{hash, hash_combine}
 
 ///|
 pub extend Source with ToJson::{to_json}

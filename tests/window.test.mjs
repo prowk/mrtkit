@@ -72,3 +72,19 @@ test('跨文件微秒端点和前后会话重置均按同一窗口处理', () =>
     assert.equal(JSON.parse(cli(['stats', '--from', '101', '--to', '101', '-'], Buffer.alloc(0)).stdout).baseline_status, 'missing');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test('初始 RIB 拒绝空文件、未来 peer 表和不支持的记录', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'mrtkit-baseline-invalid-'));
+  try {
+    const initial = join(dir, 'initial.mrt');
+    const cases = [Buffer.alloc(0), mrt(13, 1, cat(u32(0), u16(0), u16(0)), 200), mrt(13, 3, Buffer.alloc(0), 100)];
+    for (const data of cases) {
+      writeFileSync(initial, data);
+      const result = spawnSync(process.execPath, ['cli/mrtkit.mjs', 'stats', '--from', '100', '--initial-rib', initial, '-'],
+        {input: Buffer.alloc(0), encoding: 'utf8', windowsHide: true});
+      assert.equal(result.status, 1);
+      assert.equal(result.stdout, '');
+      assert.match(result.stderr, /初始 RIB/);
+    }
+  } finally {rmSync(dir, {recursive: true, force: true});}
+});

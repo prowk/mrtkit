@@ -13,6 +13,7 @@ priv struct Config {
   window_seconds : Int
   threshold : Int
   capacity : Int
+  top : Int?
   mode : String
   format : String
 } derive(@json.FromJson)
@@ -22,12 +23,52 @@ priv struct Session {
   decoder : @mrt.Decoder
   query : @mrt.Query
   analyzer : @mrt.Analyzer?
+  aggregation : @mrt.Aggregation?
   config : Config
   mut baseline : Bool
+  mut baseline_seen : Bool
 }
 
 ///|
 let session : Ref[Session?] = Ref(None)
+
+///|
+let stream_decoder : Ref[@mrt.StreamDecoder] = Ref(@mrt.StreamDecoder::new())
+
+///|
+pub fn stream_reset() -> Unit {
+  stream_decoder.val = @mrt.StreamDecoder::new()
+}
+
+///|
+pub fn stream_metrics(data : Bytes) -> String {
+  try {
+    let batches = stream_decoder.val.feed(data)
+    let mut events = 0
+    for batch in batches {
+      events += batch.events.length()
+    }
+    Json::object({
+      "records": batches.length().to_json(),
+      "route_events": events.to_json(),
+    }).stringify()
+  } catch {
+    @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+  }
+}
+
+///|
+pub fn stream_end() -> String {
+  try {
+    stream_decoder.val.finish()
+    "{}"
+  } catch {
+    @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+  }
+}
+
+///|
+let snapshots : Ref[(@mrt.Snapshot, @mrt.Snapshot)?] = Ref(None)
 
 ///|
 fn error_json(position : Int, message : String) -> String {
@@ -40,6 +81,7 @@ fn error_json(position : Int, message : String) -> String {
 ///|
 pub fn configure(text : String) -> String {
   session.val = None
+  snapshots.val = None
   try {
     let config : Config = @json.from_json(@json.parse(text))
     if config.output_version.unwrap_or("2.0") != "2.0" {
@@ -47,8 +89,10 @@ pub fn configure(text : String) -> String {
     }
     if config.mode != "parse" &&
       config.mode != "stats" &&
-      config.mode != "changes" {
-      return error_json(0, "命令必须为 parse、stats 或 changes")
+      config.mode != "changes" &&
+      config.mode != "aggregate" &&
+      config.mode != "snapshot-diff" {
+      return error_json(0, "不支持的命令")
     }
     if config.format != "json" && config.format != "csv" {
       return error_json(0, "格式必须为 json 或 csv")
@@ -72,7 +116,7 @@ pub fn configure(text : String) -> String {
       },
       to_time?=if config.mode == "parse" { Some(config.to_time) } else { None },
     )
-    let analyzer = if config.mode == "parse" {
+    let analyzer = if config.mode == "parse" || config.mode == "snapshot-diff" {
       None
     } else {
       Some(
@@ -91,8 +135,14 @@ pub fn configure(text : String) -> String {
       decoder: @mrt.Decoder::new(),
       query,
       analyzer,
+      aggregation: if config.mode == "aggregate" {
+        Some(@mrt.Aggregation::new())
+      } else {
+        None
+      },
       config,
       baseline: false,
+      baseline_seen: false,
     })
     "{}"
   } catch {
@@ -102,7 +152,11 @@ pub fn configure(text : String) -> String {
 }
 
 ///|
-fn consume_inner(data : Bytes, origin : (String, Int64, Int64)?) -> String {
+fn consume_inner(
+  data : Bytes,
+  origin : (String, Int64, Int64)?,
+  emit? : Bool = true,
+) -> String {
   let current = match session.val {
     Some(s) => s
     None => return error_json(0, "会话未配置")
@@ -113,8 +167,22 @@ fn consume_inner(data : Bytes, origin : (String, Int64, Int64)?) -> String {
         current.decoder.decode_at(data, file, record, offset)
       None => current.decoder.decode(data)
     }
-    if current.baseline && batch.header.kind != 13 {
-      return error_json(0, "初始 RIB 文件只能包含 TABLE_DUMP_V2")
+    if current.baseline {
+      if batch.header.kind != 13 || batch.skipped {
+        session.val = None
+        return error_json(
+          0, "初始 RIB 文件只能包含支持的 TABLE_DUMP_V2 单播记录",
+        )
+      }
+      if batch.header.timestamp > current.config.from_time {
+        session.val = None
+        return error_json(
+          0, "初始 RIB 记录必须不晚于分析开始时间",
+        )
+      }
+      if batch.header.subtype == 1 {
+        current.baseline_seen = true
+      }
     }
     if !current.baseline && current.analyzer is Some(analyzer) {
       analyzer.record_batch(batch)
@@ -134,20 +202,27 @@ fn consume_inner(data : Bytes, origin : (String, Int64, Int64)?) -> String {
             continue
           }
           let changes = analyzer.observe(event)
-          if current.config.mode == "changes" {
+          if current.aggregation is Some(aggregation) {
+            for item in changes {
+              aggregation.observe(item)
+            }
+          }
+          if emit && current.config.mode == "changes" {
             for item in changes {
               lines.push(item.to_json().stringify())
             }
           }
         }
         None =>
-          lines.push(
-            if current.config.format == "csv" {
-              @mrt.event_csv(event)
-            } else {
-              @mrt.event_json(event)
-            },
-          )
+          if emit {
+            lines.push(
+              if current.config.format == "csv" {
+                @mrt.event_csv(event)
+              } else {
+                @mrt.event_json(event)
+              },
+            )
+          }
       }
     }
     Json::object({
@@ -155,11 +230,20 @@ fn consume_inner(data : Bytes, origin : (String, Int64, Int64)?) -> String {
       "skipped": batch.skipped.to_json(),
       "ignored_families": batch.ignored_families.to_json(),
       "diagnostics": batch.diagnostics.to_json(),
+      "route_events": batch.events.length().to_json(),
+      "state_events": batch.states.length().to_json(),
     }).stringify()
   } catch {
     @mrt.ParseError::Invalid(pos, message) => {
+      let summary = current.analyzer
+        .map(fn(a) { a.summary().to_json() })
+        .unwrap_or(Json::null())
       session.val = None
-      error_json(pos, message)
+      Json::object({
+        "error": message.to_json(),
+        "position": pos.to_json(),
+        "summary": summary,
+      }).stringify()
     }
   }
 }
@@ -170,6 +254,12 @@ pub fn consume(data : Bytes) -> String {
 }
 
 ///|
+/// 基准入口只省略结果序列化，解析、筛选和状态逻辑与命令行相同。
+pub fn consume_metrics(data : Bytes) -> String {
+  consume_inner(data, None, emit=false)
+}
+
+///|
 pub fn consume_at(
   data : Bytes,
   file : String,
@@ -177,6 +267,23 @@ pub fn consume_at(
   offset : Int64,
 ) -> String {
   consume_inner(data, Some((file, record, offset)))
+}
+
+///|
+/// 用于逐记录验证和工具集成，不累计完整档案的输出。
+pub fn decode_record(
+  data : Bytes,
+  file : String,
+  record : Int64,
+  offset : Int64,
+) -> String {
+  let current = match session.val {
+    Some(s) => s
+    None => return error_json(0, "会话未配置")
+  }
+  current.decoder.decode_at(data, file, record, offset).to_json().stringify() catch {
+    @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+  }
 }
 
 ///|
@@ -216,9 +323,9 @@ pub fn begin_baseline() -> String {
   match session.val {
     Some(s) =>
       match s.analyzer {
-        Some(analyzer) => {
+        Some(_) => {
           s.baseline = true
-          analyzer.set_baseline()
+          s.baseline_seen = false
           "{}"
         }
         None => error_json(0, "parse 命令不加载分析基线")
@@ -228,13 +335,106 @@ pub fn begin_baseline() -> String {
 }
 
 ///|
+pub fn end_baseline() -> String {
+  let current = match session.val {
+    Some(s) => s
+    None => return error_json(0, "会话未配置")
+  }
+  if !current.baseline || !current.baseline_seen {
+    return error_json(0, "初始 RIB 为空或缺少 peer 表")
+  }
+  if current.analyzer is Some(analyzer) {
+    analyzer.set_baseline()
+  }
+  current.baseline = false
+  "{}"
+}
+
+///|
 pub fn finish() -> String {
   match session.val {
     Some(s) =>
       match s.analyzer {
-        Some(analyzer) => analyzer.summary().to_json().stringify()
+        Some(analyzer) => {
+          if s.aggregation is Some(aggregation) {
+            return Json::object({
+              "summary": analyzer.summary().to_json(),
+              "aggregation": aggregation
+              .report(top=s.config.top.unwrap_or(20))
+              .to_json(),
+            }).stringify() catch {
+              @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+            }
+          }
+          analyzer.summary().to_json().stringify()
+        }
         None => "{}"
       }
     None => error_json(0, "会话不可用")
+  }
+}
+
+///|
+pub fn snapshot_begin(
+  before_collector : String,
+  after_collector : String,
+) -> String {
+  let current = match session.val {
+    Some(s) => s
+    None => return error_json(0, "会话未配置")
+  }
+  try {
+    snapshots.val = Some(
+      (
+        @mrt.Snapshot::new(before_collector, capacity=current.config.capacity),
+        @mrt.Snapshot::new(after_collector, capacity=current.config.capacity),
+      ),
+    )
+    "{}"
+  } catch {
+    @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+  }
+}
+
+///|
+pub fn snapshot_consume(
+  data : Bytes,
+  after : Bool,
+  file : String,
+  record : Int64,
+  offset : Int64,
+) -> String {
+  let current = match session.val {
+    Some(s) => s
+    None => return error_json(0, "会话未配置")
+  }
+  let pair = match snapshots.val {
+    Some(p) => p
+    None => return error_json(0, "快照会话未配置")
+  }
+  try {
+    let snapshot = if after { pair.1 } else { pair.0 }
+    snapshot.ingest(
+      data,
+      file,
+      record,
+      offset,
+      query=current.query,
+      peer_asn?=current.config.peer_asn,
+    )
+    "{}"
+  } catch {
+    @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+  }
+}
+
+///|
+pub fn snapshot_finish() -> String {
+  let pair = match snapshots.val {
+    Some(p) => p
+    None => return error_json(0, "快照会话未配置")
+  }
+  pair.0.diff(pair.1).to_json().stringify() catch {
+    @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
   }
 }

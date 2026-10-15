@@ -36,6 +36,26 @@ pub suberror ParseError {
 }
 
 // Types and methods
+pub struct Aggregation {
+  // private fields
+}
+pub fn Aggregation::new() -> Self
+pub fn Aggregation::observe(Self, Change) -> Unit raise ParseError
+pub fn Aggregation::report(Self, top? : Int) -> AggregationReport raise ParseError
+
+pub struct AggregationReport {
+  schema_version : String
+  scope : String
+  deduplication : String
+  ordering : String
+  changed_prefixes : Int
+  affected_peers : Int
+  change_notices : Int64
+  change_types : Map[String, Int64]
+  top_prefixes : Array[PrefixRanking]
+} derive(ToJson)
+pub fn AggregationReport::to_json(Self) -> Json
+
 pub struct Analyzer {
   // private fields
 }
@@ -206,6 +226,15 @@ pub fn Prefix::not_equal(Self, Self) -> Bool
 pub fn Prefix::text(Self) -> String
 pub fn Prefix::to_json(Self) -> Json
 
+pub struct PrefixRanking {
+  prefix : String
+  changed_events : Int
+  change_notices : Int64
+  affected_peers : Int
+  change_types : Map[String, Int64]
+} derive(ToJson)
+pub fn PrefixRanking::to_json(Self) -> Json
+
 pub struct Query {
   // private fields
 }
@@ -256,13 +285,55 @@ pub struct RouteSnapshot {
 } derive(ToJson)
 pub fn RouteSnapshot::to_json(Self) -> Json
 
+pub struct Snapshot {
+  // private fields
+}
+pub fn Snapshot::diff(Self, Self) -> SnapshotReport raise ParseError
+pub fn Snapshot::ingest(Self, Bytes, String, Int64, Int64, query? : Query, peer_asn? : UInt) -> Unit raise ParseError
+pub fn Snapshot::new(String, capacity? : Int) -> Self raise ParseError
+
+pub struct SnapshotChange {
+  schema_version : String
+  collector : String
+  kind : String
+  peer_asn : UInt
+  peer_ip : String
+  outbound : Bool
+  prefix : String?
+  path_id : UInt?
+  before : RouteEvent?
+  after : RouteEvent?
+  diff : RouteDiff?
+  before_source : Source?
+  after_source : Source?
+} derive(ToJson)
+pub fn SnapshotChange::to_json(Self) -> Json
+
+pub struct SnapshotReport {
+  schema_version : String
+  collector : String
+  interpretation : String
+  before_source : Source?
+  after_source : Source?
+  before_time : UInt?
+  after_time : UInt?
+  before_peers : Int
+  after_peers : Int
+  before_routes : Int
+  after_routes : Int
+  changes : Array[SnapshotChange]
+} derive(ToJson)
+pub fn SnapshotReport::to_json(Self) -> Json
+
 pub struct Source {
   file : String
   record : Int64
   offset : Int64
   event_index : Int
-} derive(Eq, ToJson)
+} derive(Eq, Hash, ToJson)
 pub fn Source::equal(Self, Self) -> Bool
+pub fn Source::hash(Self) -> Int
+pub fn Source::hash_combine(Self, Hasher) -> Unit
 pub fn Source::not_equal(Self, Self) -> Bool
 pub fn Source::to_json(Self) -> Json
 

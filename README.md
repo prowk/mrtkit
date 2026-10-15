@@ -26,6 +26,8 @@ node cli/mrtkit.mjs changes --threshold 3 fixtures/demo.mrt
 | 多协议 | IPv4/IPv6 单播 MP_REACH/MP_UNREACH；RIB 精简/历史完整下一跳编码 |
 | 查询 | 前缀精确、更具体、覆盖地址三种匹配、peer/路径 ASN、包含端点的秒/微秒范围 |
 | 输出 | 路由 JSON Lines、CSV、统计 JSON、变化 JSON Lines |
+| 快照差异 | 同采集器、同视图的 peer 与路由新增/缺失及结构化属性差异 |
+| 变化聚合 | 按来源事件去重的前缀排名、受影响 peer 数及变化类型分布 |
 | 分析 | 路径/起源/属性变化、重复宣告、固定窗口波动、会话重置、乱序计数 |
 | 输入 | 文件、未压缩标准输入、gzip、bz2、多文件顺序处理 |
 
@@ -58,6 +60,10 @@ node cli/mrtkit.mjs changes --from 1700000000 --to 1700000060 --window 60 --thre
 标准输出只有结果，计数和诊断写入标准错误。成功退出码为 `0`，错误为 `1`。错误前已经输出的 JSON Lines/CSV 是部分结果。文件名以 `--` 开头时，用 `--` 分隔选项。
 
 `.gz` 根据扩展名解压；`.bz2` 使用 Python 标准库流式解压，可用 `MRTKIT_PYTHON` 指定解释器。`-` 只读取未压缩标准输入。
+
+两个完整快照可用 `snapshot-diff --collector 名称 前快照 后快照` 比较，详见[快照差异](docs/SNAPSHOTS.md)。该命令区分整个 peer 缺失与路由条目缺失，不将快照缺失当作观测到的撤回。
+
+`aggregate --top 20 文件...` 对相同分析窗口的变化提醒排名；去重和复算规则见[变化聚合](docs/AGGREGATION.md)。
 
 ## 数据与分析语义
 
@@ -113,7 +119,7 @@ moon info
 moon fmt --check
 ```
 
-35 个 MoonBit 测试分别通过 JS、Wasm、Wasm GC 验证；12 个 Node 测试通过。真实 RIS 样本的 46,345 条事件与独立解析器逐项一致。范围和复现步骤见 [验证记录](docs/VALIDATION.md)，实现结构见 [开发说明](docs/DEVELOPMENT.md)。
+43 个 MoonBit 测试分别通过 JS、Wasm、Wasm GC 验证；42 个 Node 测试通过。真实 RIS 小样本的 46,345 条事件与独立解析器逐项一致。范围和复现步骤见 [验证记录](docs/VALIDATION.md)，实现结构见 [开发说明](docs/DEVELOPMENT.md)。
 
 GitHub Actions 配置覆盖格式、接口、跨后端及 CLI 测试。CI 固定官方工具链标签 `0.10.14+7d59c7ec9`（与本地已验证的编译器一致），避免自动更新改变语法、格式或接口。
 

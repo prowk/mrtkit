@@ -12,13 +12,31 @@ pub fn consume(Bytes) -> String
 
 pub fn consume_at(Bytes, String, Int64, Int64) -> String
 
+pub fn consume_metrics(Bytes) -> String
+
 pub fn csv_header() -> String
+
+pub fn decode_record(Bytes, String, Int64, Int64) -> String
+
+pub fn end_baseline() -> String
 
 pub fn finish() -> String
 
 pub fn reset_file() -> Unit
 
+pub fn snapshot_begin(String, String) -> String
+
+pub fn snapshot_consume(Bytes, Bool, String, Int64, Int64) -> String
+
+pub fn snapshot_finish() -> String
+
 pub fn state() -> String
+
+pub fn stream_end() -> String
+
+pub fn stream_metrics(Bytes) -> String
+
+pub fn stream_reset() -> Unit
 
 // Errors
 
