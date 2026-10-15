@@ -19,6 +19,7 @@ options(
         "consume_at",
         "csv_header",
         "state",
+        "canonical_prefix",
       ],
       "format": "esm",
     },

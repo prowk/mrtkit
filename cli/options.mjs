@@ -1,36 +1,9 @@
-import { isIP } from 'node:net';
 
 export function integer(text, name, min = 0, max = 4294967295) {
   if (!/^\d+$/.test(text)) throw new Error(`${name} 必须为整数`);
   const value = Number(text);
   if (!Number.isSafeInteger(value) || value < min || value > max) throw new Error(`${name} 超出范围 ${min}..${max}`);
   return value;
-}
-
-export function canonicalPrefix(text) {
-  const parts = text.split('/');
-  if (parts.length !== 2) throw new Error('前缀必须包含 /长度');
-  const family = isIP(parts[0]);
-  if (!family) throw new Error('前缀 IP 地址无效');
-  const length = integer(parts[1], '前缀长度', 0, family === 4 ? 32 : 128);
-  let bytes;
-  if (family === 4) bytes = parts[0].split('.').map(Number);
-  else {
-    // URL 提供 IPv6 展开前的标准化，同时转换嵌入式 IPv4 地址。
-    const address = new URL(`http://[${parts[0]}]/`).hostname.slice(1, -1);
-    const [left, right = ''] = address.split('::');
-    const head = left ? left.split(':') : [];
-    const tail = right ? right.split(':') : [];
-    const groups = address.includes('::') ? [...head, ...Array(8 - head.length - tail.length).fill('0'), ...tail] : head;
-    bytes = groups.flatMap(group => { const n = parseInt(group, 16); return [n >> 8, n & 255]; });
-  }
-  bytes = bytes.map((byte, i) => {
-    const remaining = length - i * 8;
-    return remaining >= 8 ? byte : remaining <= 0 ? 0 : byte & (255 << (8 - remaining));
-  });
-  if (family === 4) return `${bytes.join('.')}/${length}`;
-  const full = Array.from({ length: 8 }, (_, i) => ((bytes[i * 2] << 8) | bytes[i * 2 + 1]).toString(16)).join(':');
-  return `${new URL(`http://[${full}]/`).hostname.slice(1, -1)}/${length}`;
 }
 
 export function options(argv) {
@@ -46,14 +19,15 @@ export function options(argv) {
     if (arg === '--' && !endOptions) { endOptions = true; continue; }
     if (!endOptions && arg.startsWith('--')) {
       const name = arg.slice(2);
-      if (!['format', 'output-version', 'prefix', 'path-id', 'asn', 'peer-asn', 'from', 'to', 'from-micros', 'to-micros', 'initial-rib', 'window', 'threshold', 'capacity'].includes(name)) throw new Error(`未知选项: ${arg}`);
+      if (!['format', 'output-version', 'prefix', 'prefix-mode', 'path-id', 'asn', 'peer-asn', 'from', 'to', 'from-micros', 'to-micros', 'initial-rib', 'window', 'threshold', 'capacity'].includes(name)) throw new Error(`未知选项: ${arg}`);
       const value = argv[++i];
       if (value === undefined) throw new Error(`${arg} 缺少值`);
       if (name === 'initial-rib') { if (initialRib !== null) throw new Error('只允许一个初始 RIB'); initialRib = value; }
       else if (name === 'from-micros' || name === 'to-micros') config[name.replace('-', '_')] = integer(value, arg, 0, 999999);
       else if (name === 'format') config.format = value;
       else if (name === 'output-version') config.output_version = value;
-      else if (name === 'prefix') config.prefix = canonicalPrefix(value);
+      else if (name === 'prefix') config.prefix = value;
+      else if (name === 'prefix-mode') config.prefix_mode = value;
       else if (name === 'asn') config.asn = integer(value, arg);
       else if (name === 'path-id') config.path_id = integer(value, arg);
       else if (name === 'peer-asn') config.peer_asn = integer(value, arg);

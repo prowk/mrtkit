@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { frames } from '../cli/input.mjs';
-import { canonicalPrefix, options } from '../cli/options.mjs';
+import { options } from '../cli/options.mjs';
+import { canonical_prefix } from '../_build/js/release/build/bridge/bridge.js';
+const canonicalPrefix = text => { const result = JSON.parse(canonical_prefix(text)); if (result.error) throw new Error(result.error); return result.prefix; };
 
 async function* chunks(data, size) { for (let i = 0; i < data.length; i += size) yield data.subarray(i, i + size); }
 const header = Buffer.from('0000000100630001000000026162', 'hex');

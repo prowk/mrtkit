@@ -1,26 +1,62 @@
 ///|
 pub struct Query {
-  priv prefix : String?
+  priv prefix : Prefix?
+  priv prefix_mode : String
   priv asn : UInt?
   priv path_id : UInt?
   priv from_time : UInt?
   priv to_time : UInt?
+  priv from_micros : Int
+  priv to_micros : Int
 }
 
 ///|
 pub fn Query::new(
   prefix? : String,
+  prefix_mode? : String = "exact",
   asn? : UInt,
   path_id? : UInt,
   from_time? : UInt,
   to_time? : UInt,
+  from_micros? : Int = 0,
+  to_micros? : Int = 999999,
 ) -> Query raise ParseError {
   match (from_time, to_time) {
     (Some(a), Some(b)) if a > b =>
       raise Invalid(0, "开始时间晚于结束时间")
     _ => ()
   }
-  { prefix, asn, path_id, from_time, to_time, }
+  if prefix_mode != "exact" &&
+    prefix_mode != "more-specific" &&
+    prefix_mode != "covering" {
+    raise Invalid(0, "前缀模式无效")
+  }
+  if from_micros < 0 ||
+    from_micros > 999999 ||
+    to_micros < 0 ||
+    to_micros > 999999 {
+    raise Invalid(0, "微秒端点无效")
+  }
+  match (from_time, to_time) {
+    (Some(a), Some(b)) if event_time(a, Some(from_micros)) >
+      event_time(b, Some(to_micros)) =>
+      raise Invalid(0, "开始时间晚于结束时间")
+    _ => ()
+  }
+  let normalized = match prefix {
+    Some(text) => Some(parse_prefix_text(text))
+    None => None
+  }
+  {
+    prefix: normalized,
+    prefix_mode,
+    asn,
+    path_id,
+    from_time,
+    to_time,
+    from_micros,
+    to_micros,
+  }
 }
 
 ///|
@@ -29,13 +65,26 @@ pub fn Query::matches(self : Query, event : RouteEvent) -> Bool {
   if self.path_id is Some(id) && event.path_id != Some(id) {
     return false
   }
-  if self.prefix is Some(prefix) && event.prefix != prefix {
+  if self.prefix is Some(prefix) {
+    let target = parse_prefix_text(event.prefix) catch { _ => return false }
+    let accepted = match self.prefix_mode {
+      "more-specific" =>
+        prefix.length < target.length && prefix.contains(target)
+      "covering" => target.contains(prefix)
+      _ => prefix == target
+    }
+    if !accepted {
+      return false
+    }
+  }
+  if self.from_time is Some(t) &&
+    event_time(event.timestamp, event.microseconds) <
+    event_time(t, Some(self.from_micros)) {
     return false
   }
-  if self.from_time is Some(t) && event.timestamp < t {
-    return false
-  }
-  if self.to_time is Some(t) && event.timestamp > t {
+  if self.to_time is Some(t) &&
+    event_time(event.timestamp, event.microseconds) >
+    event_time(t, Some(self.to_micros)) {
     return false
   }
   if self.asn is Some(asn) {

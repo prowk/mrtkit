@@ -2,6 +2,7 @@
 priv struct Config {
   output_version : String?
   prefix : String?
+  prefix_mode : String?
   asn : UInt?
   peer_asn : UInt?
   path_id : UInt?
@@ -59,8 +60,11 @@ pub fn configure(text : String) -> String {
     }
     let query = @mrt.Query::new(
       prefix?=config.prefix,
+      prefix_mode=config.prefix_mode.unwrap_or("exact"),
       asn?=config.asn,
       path_id?=config.path_id,
+      from_micros=config.from_micros.unwrap_or(0),
+      to_micros=config.to_micros.unwrap_or(999999),
       from_time?=if config.mode == "parse" {
         Some(config.from_time)
       } else {
@@ -177,6 +181,13 @@ pub fn consume_at(
 ///|
 pub fn csv_header() -> String {
   @mrt.csv_header()
+}
+
+///|
+pub fn canonical_prefix(text : String) -> String {
+  Json::object({ "prefix": @mrt.parse_prefix_text(text).text().to_json() }).stringify() catch {
+    @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+  }
 }
 
 ///|

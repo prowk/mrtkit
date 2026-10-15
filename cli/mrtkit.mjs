@@ -9,6 +9,7 @@ const help = `mrtkit 0.2.0 — MoonBit BGP MRT 工具
   stats     输出统计 JSON
   changes   输出路径变化、起源变化、固定窗口波动提醒
   --prefix CIDR       精确筛选前缀（自动清除主机位）
+  --prefix-mode exact|more-specific|covering  前缀匹配模式
   --asn ASN           parse 中匹配 peer 或 AS 路径
   --peer-asn ASN      按 peer ASN 筛选，支持所有命令
   --path-id ID        精确筛选 ADD-PATH 标识（包括 0）

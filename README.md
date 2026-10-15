@@ -24,7 +24,7 @@ node cli/mrtkit.mjs changes --threshold 3 fixtures/demo.mrt
 | 更新 | BGP4MP/BGP4MP_ET 的 MESSAGE、MESSAGE_AS4、LOCAL、STATE_CHANGE 和 ADD-PATH |
 | 属性 | ORIGIN、AS_PATH、AS4_PATH、NEXT_HOP、MED、LOCAL_PREF、COMMUNITY、LARGE_COMMUNITY；其他属性保留原始字节 |
 | 多协议 | IPv4/IPv6 单播 MP_REACH/MP_UNREACH；RIB 精简/历史完整下一跳编码 |
-| 查询 | 前缀精确匹配、peer/路径 ASN、包含端点的 Unix 秒范围 |
+| 查询 | 前缀精确、更具体、覆盖地址三种匹配、peer/路径 ASN、包含端点的秒/微秒范围 |
 | 输出 | 路由 JSON Lines、CSV、统计 JSON、变化 JSON Lines |
 | 分析 | 路径/起源/属性变化、重复宣告、固定窗口波动、会话重置、乱序计数 |
 | 输入 | 文件、未压缩标准输入、gzip、bz2、多文件顺序处理 |
@@ -50,6 +50,8 @@ node cli/mrtkit.mjs changes --from 1700000000 --to 1700000060 --window 60 --thre
 ```
 
 `--asn` 仅用于 `parse`；撤回消息没有 AS_PATH，因此只能按自身的 peer ASN 匹配撤回。分析使用 `--peer-asn`，保证宣告与撤回属于同一筛选范围。
+
+`--prefix-mode exact` 精确匹配规范化前缀；`more-specific` 严格匹配更长掩码的子网，不包含原前缀；`covering` 查找覆盖指定地址或整个指定 CIDR 的路由。裸地址视为 `/32` 或 `/128`。三种模式和 IPv4/IPv6 文本解析均由 MoonBit 库统一实现，例如 `parse --prefix 192.0.2.200 --prefix-mode covering 文件`。
 
 `--from/--to` 使用 Unix 秒，包含端点，可用 `--from-micros/--to-micros` 指定端点微秒。分析会回放窗口前的 UPDATE 和会话状态作为预热；使用 `--initial-rib 文件` 显式加载初始快照。基线和预热不计入窗口统计，窗口后的事件不改变最终状态。缺少完整基线会通过 `baseline_status` 标识，详见[回放说明](docs/REPLAY.md)。
 

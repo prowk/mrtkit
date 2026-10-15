@@ -18,6 +18,8 @@ pub fn parse_peers(Bytes) -> PeerTable raise ParseError
 
 pub fn parse_prefix(Bytes, Int) -> Prefix raise ParseError
 
+pub fn parse_prefix_text(String) -> Prefix raise ParseError
+
 pub fn parse_rib(Frame, Array[Peer]) -> Array[RouteEvent] raise ParseError
 
 pub fn path_length(Array[AsSegment]) -> Int
@@ -186,6 +188,7 @@ pub struct Prefix {
   length : Int
   address : Bytes
 } derive(Eq, ToJson)
+pub fn Prefix::contains(Self, Self) -> Bool
 pub fn Prefix::equal(Self, Self) -> Bool
 pub fn Prefix::not_equal(Self, Self) -> Bool
 pub fn Prefix::text(Self) -> String
@@ -195,7 +198,7 @@ pub struct Query {
   // private fields
 }
 pub fn Query::matches(Self, RouteEvent) -> Bool
-pub fn Query::new(prefix? : String, asn? : UInt, path_id? : UInt, from_time? : UInt, to_time? : UInt) -> Self raise ParseError
+pub fn Query::new(prefix? : String, prefix_mode? : String, asn? : UInt, path_id? : UInt, from_time? : UInt, to_time? : UInt, from_micros? : Int, to_micros? : Int) -> Self raise ParseError
 
 pub struct RawAttribute {
   flags : Int
