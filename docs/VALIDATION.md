@@ -5,7 +5,7 @@
 ## 自动测试
 
 - 47 个 MoonBit 测试分别在 JS、Wasm、Wasm GC 后端通过。
-- 47 个 Node 测试通过，包含命令行端到端验证、gzip/bz2、IPv6、旧式 ASN、扩展时间戳、ADD-PATH、Large Communities、时间窗口、来源追溯、快照差异、聚合复算、前缀时间线和错误退出码。
+- 55 个 Node 测试通过，包含命令行端到端验证、gzip/bz2、IPv6、旧式 ASN、扩展时间戳、ADD-PATH（含 BGP4MP_ET 子类型矩阵）、Large Communities、时间窗口、来源追溯、快照差异、聚合复算、前缀时间线和错误退出码。
 - 确定性畸形输入测试覆盖 2,000 组随机修改/随机字节数据，所有调用均返回解析结果或错误，没有宿主异常。
 - 编译与测试启用 `--deny-warn`，当前没有编译警告。
 
@@ -63,3 +63,5 @@ python scripts/publish_validation.py
 ```
 
 样本与验证依赖只保存在被 Git 忽略的 `.validation/`，不会被提交。该流程需要网络，常规测试和演示不需要网络。
+
+性能测量方法、固定场景及优化前后比较见[性能基准](PERFORMANCE.md)。任务验收逐项对应[验收记录](ACCEPTANCE.md)，不将未覆盖的 P2 扩展列为已完成。

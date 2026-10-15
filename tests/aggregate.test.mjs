@@ -33,7 +33,7 @@ test('聚合结果可由结构化变化复算，多个类型共用一次来源�
   }
   const ranking = [...expected].map(([prefix, r]) => ({prefix, changed_events: r.events.size,
     change_notices: String(r.notices), affected_peers: r.peers.size, change_types: r.types}))
-    .sort((a, b) => b.changed_events - a.changed_events || a.prefix.localeCompare(b.prefix));
+    .sort((a, b) => b.changed_events - a.changed_events || (a.prefix < b.prefix ? -1 : a.prefix > b.prefix ? 1 : 0));
   assert.deepEqual(aggregation.top_prefixes, ranking);
   assert.deepEqual(aggregation.change_types, types);
   assert.equal(aggregation.affected_peers, peers.size);

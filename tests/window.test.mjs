@@ -77,7 +77,8 @@ test('初始 RIB 拒绝空文件、未来 peer 表和不支持的记录', () => 
   const dir = mkdtempSync(join(tmpdir(), 'mrtkit-baseline-invalid-'));
   try {
     const initial = join(dir, 'initial.mrt');
-    const cases = [Buffer.alloc(0), mrt(13, 1, cat(u32(0), u16(0), u16(0)), 200), mrt(13, 3, Buffer.alloc(0), 100)];
+    const peers = mrt(13, 1, cat(u32(0), u16(0), u16(0)), 100);
+    const cases = [Buffer.alloc(0), mrt(13, 1, cat(u32(0), u16(0), u16(0)), 200), mrt(13, 3, Buffer.alloc(0), 100), cat(peers, peers)];
     for (const data of cases) {
       writeFileSync(initial, data);
       const result = spawnSync(process.execPath, ['cli/mrtkit.mjs', 'stats', '--from', '100', '--initial-rib', initial, '-'],

@@ -1,0 +1,214 @@
+{
+  "scope": "same fixed workloads, three fresh serial processes per version; medians; state and event counts verified identical",
+  "baseline_reproduced": true,
+  "comparisons": [
+    {
+      "name": "complete_rib_parse",
+      "before": {
+        "name": "complete_rib_parse",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 19.5258798,
+        "records_per_second": 62907.178195371256,
+        "route_events_per_second": 567874.7443687532,
+        "decompressed_mib_per_second": 43.173708147627345,
+        "peak_rss_bytes": 107036672
+      },
+      "after": {
+        "name": "complete_rib_parse",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 19.0861428,
+        "records_per_second": 64356.53410284659,
+        "route_events_per_second": 580958.348483068,
+        "decompressed_mib_per_second": 44.168412897489794,
+        "peak_rss_bytes": 112324608
+      },
+      "elapsed_speedup": 1.023039594988255,
+      "peak_rss_ratio": 1.0494030307668758,
+      "selected_analysis_events": 0
+    },
+    {
+      "name": "complete_rib_analysis_filtered",
+      "before": {
+        "name": "complete_rib_analysis_filtered",
+        "active_routes": 29,
+        "cached_routes": 29,
+        "seconds": 27.9553528,
+        "records_per_second": 43938.56192006276,
+        "route_events_per_second": 396641.53335242474,
+        "decompressed_mib_per_second": 30.155392487511445,
+        "peak_rss_bytes": 107163648
+      },
+      "after": {
+        "name": "complete_rib_analysis_filtered",
+        "active_routes": 29,
+        "cached_routes": 29,
+        "seconds": 19.3670247,
+        "records_per_second": 63423.16483956361,
+        "route_events_per_second": 572532.6513369913,
+        "decompressed_mib_per_second": 43.52783397910635,
+        "peak_rss_bytes": 104239104
+      },
+      "elapsed_speedup": 1.4434510841512995,
+      "peak_rss_ratio": 0.9727095516569201,
+      "selected_analysis_events": 29
+    },
+    {
+      "name": "one_hour_updates_parse",
+      "before": {
+        "name": "one_hour_updates_parse",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 2.0328032,
+        "records_per_second": 181821.8310557559,
+        "route_events_per_second": 422000.0243998042,
+        "decompressed_mib_per_second": 29.652446380753926,
+        "peak_rss_bytes": 70189056
+      },
+      "after": {
+        "name": "one_hour_updates_parse",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 2.0515907,
+        "records_per_second": 180156.79248302302,
+        "route_events_per_second": 418135.5472122192,
+        "decompressed_mib_per_second": 29.380903262344187,
+        "peak_rss_bytes": 67805184
+      },
+      "elapsed_speedup": 0.9908424716489501,
+      "peak_rss_ratio": 0.9660364145658263,
+      "selected_analysis_events": 0
+    },
+    {
+      "name": "one_hour_updates_analysis",
+      "before": {
+        "name": "one_hour_updates_analysis",
+        "active_routes": 41647,
+        "cached_routes": 46520,
+        "seconds": 7.0214023,
+        "records_per_second": 52640.19695894651,
+        "route_events_per_second": 122175.45204609627,
+        "decompressed_mib_per_second": 8.584836093300764,
+        "peak_rss_bytes": 280797184
+      },
+      "after": {
+        "name": "one_hour_updates_analysis",
+        "active_routes": 41647,
+        "cached_routes": 46520,
+        "seconds": 4.6048092,
+        "records_per_second": 80265.6492260309,
+        "route_events_per_second": 186292.8435775363,
+        "decompressed_mib_per_second": 13.09013799977315,
+        "peak_rss_bytes": 338554880
+      },
+      "elapsed_speedup": 1.5247976615404608,
+      "peak_rss_ratio": 1.2056918633486011,
+      "selected_analysis_events": 857843
+    },
+    {
+      "name": "complete_rib_capacity_failure",
+      "before": {
+        "name": "complete_rib_capacity_failure",
+        "active_routes": 1000,
+        "cached_routes": 1000,
+        "seconds": 0.0251745,
+        "records_per_second": 4369.50088383086,
+        "route_events_per_second": 39722.73530755328,
+        "decompressed_mib_per_second": 2.4728593756400636,
+        "peak_rss_bytes": 50696192
+      },
+      "after": {
+        "name": "complete_rib_capacity_failure",
+        "active_routes": 1000,
+        "cached_routes": 1000,
+        "seconds": 0.0288911,
+        "records_per_second": 3807.4008950853377,
+        "route_events_per_second": 34612.735409866706,
+        "decompressed_mib_per_second": 2.154746560430402,
+        "peak_rss_bytes": 48300032
+      },
+      "elapsed_speedup": 0.8713583075756893,
+      "peak_rss_ratio": 0.9527349115294498,
+      "selected_analysis_events": 1000
+    },
+    {
+      "name": "duplicate_semantic_normalization",
+      "before": {
+        "name": "duplicate_semantic_normalization",
+        "active_routes": 1,
+        "cached_routes": 1,
+        "seconds": 2.0719365,
+        "records_per_second": 48264.02739659251,
+        "route_events_per_second": 48264.02739659251,
+        "decompressed_mib_per_second": 51.32140211792054,
+        "peak_rss_bytes": 85725184
+      },
+      "after": {
+        "name": "duplicate_semantic_normalization",
+        "active_routes": 1,
+        "cached_routes": 1,
+        "seconds": 1.675955,
+        "records_per_second": 59667.473172012375,
+        "route_events_per_second": 59667.473172012375,
+        "decompressed_mib_per_second": 63.447220408242984,
+        "peak_rss_bytes": 66592768
+      },
+      "elapsed_speedup": 1.2362721552786322,
+      "peak_rss_ratio": 0.7768168569926895,
+      "selected_analysis_events": 100000
+    },
+    {
+      "name": "peer_session_resets",
+      "before": {
+        "name": "peer_session_resets",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 1.1990999,
+        "records_per_second": 67050.29330750507,
+        "route_events_per_second": 66716.70975871151,
+        "decompressed_mib_per_second": 5.292411725740074,
+        "peak_rss_bytes": 181571584
+      },
+      "after": {
+        "name": "peer_session_resets",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 0.6061553,
+        "records_per_second": 132639.27577635634,
+        "route_events_per_second": 131979.3788819466,
+        "decompressed_mib_per_second": 10.469479308510131,
+        "peak_rss_bytes": 209469440
+      },
+      "elapsed_speedup": 1.9782057502425534,
+      "peak_rss_ratio": 1.1536465970358005,
+      "selected_analysis_events": 80000
+    },
+    {
+      "name": "fragmented_library_record",
+      "before": {
+        "name": "fragmented_library_record",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 40.2513892,
+        "records_per_second": 0.024843863028707593,
+        "route_events_per_second": 0,
+        "decompressed_mib_per_second": 0.09937573643027946,
+        "peak_rss_bytes": 86757376
+      },
+      "after": {
+        "name": "fragmented_library_record",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 0.0549464,
+        "records_per_second": 18.199554474906453,
+        "route_events_per_second": 0,
+        "decompressed_mib_per_second": 72.79842617699789,
+        "peak_rss_bytes": 56979456
+      },
+      "elapsed_speedup": 732.5573504360613,
+      "peak_rss_ratio": 0.6567678579859307,
+      "selected_analysis_events": 0
+    }
+  ]
+}

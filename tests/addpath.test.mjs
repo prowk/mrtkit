@@ -33,6 +33,20 @@ function configure(mode, extra = {}) {
   assert.deepEqual(result, {});
 }
 for (const afi of [1, 2]) for (const width of [2, 4]) for (const outbound of [false, true]) {
+  test(`ADD-PATH 扩展时间戳 afi=${afi} ASN=${width} LOCAL=${outbound}`, () => {
+    configure('parse');
+    const raw = addpathUpdate({afi, width, outbound, id: 4294967295, time: 100});
+    const extended = mrt(17, raw.readUInt16BE(6), cat(u32(999999), raw.subarray(12)), 100);
+    const result = JSON.parse(bridge.consume(extended));
+    assert.equal(result.error, undefined);
+    const event = JSON.parse(result.lines[0]);
+    assert.equal(event.path_id, 4294967295);
+    assert.equal(event.microseconds, 999999);
+    assert.equal(event.outbound, outbound);
+    assert.equal(event.prefix, afi === 1 ? '203.0.113.0/24' : '2001:db8::/32');
+  });
+}
+for (const afi of [1, 2]) for (const width of [2, 4]) for (const outbound of [false, true]) {
   test(`ADD-PATH UPDATE afi=${afi} ASN=${width} LOCAL=${outbound}`, () => {
     configure('stats');
     for (const data of [addpathUpdate({ afi, width, outbound, id: 0 }), addpathUpdate({ afi, width, outbound, id: 7, time: 101 }), addpathUpdate({ afi, width, outbound, id: 0, time: 102, withdraw: true })]) {

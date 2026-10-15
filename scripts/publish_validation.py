@@ -10,6 +10,7 @@ manifest = json.loads((root / '.validation/archives/manifest.json').read_text(en
 report = json.loads((root / '.validation/complete-comparison.json').read_text(encoding='utf-8'))
 sources = {item['file']: item for item in manifest}
 assert len(sources) == len(manifest) == len(report['samples']) == 18
+assert {sample['sample'] for sample in report['samples']} == set(sources)
 for sample in report['samples']:
     source = sources[sample['sample']]
     assert sample['matched'] is True
