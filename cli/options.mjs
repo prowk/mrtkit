@@ -46,7 +46,7 @@ export function options(argv) {
     if (arg === '--' && !endOptions) { endOptions = true; continue; }
     if (!endOptions && arg.startsWith('--')) {
       const name = arg.slice(2);
-      if (!['format', 'output-version', 'prefix', 'asn', 'peer-asn', 'from', 'to', 'from-micros', 'to-micros', 'initial-rib', 'window', 'threshold', 'capacity'].includes(name)) throw new Error(`未知选项: ${arg}`);
+      if (!['format', 'output-version', 'prefix', 'path-id', 'asn', 'peer-asn', 'from', 'to', 'from-micros', 'to-micros', 'initial-rib', 'window', 'threshold', 'capacity'].includes(name)) throw new Error(`未知选项: ${arg}`);
       const value = argv[++i];
       if (value === undefined) throw new Error(`${arg} 缺少值`);
       if (name === 'initial-rib') { if (initialRib !== null) throw new Error('只允许一个初始 RIB'); initialRib = value; }
@@ -55,6 +55,7 @@ export function options(argv) {
       else if (name === 'output-version') config.output_version = value;
       else if (name === 'prefix') config.prefix = canonicalPrefix(value);
       else if (name === 'asn') config.asn = integer(value, arg);
+      else if (name === 'path-id') config.path_id = integer(value, arg);
       else if (name === 'peer-asn') config.peer_asn = integer(value, arg);
       else if (name === 'from') config.from_time = integer(value, arg);
       else if (name === 'to') config.to_time = integer(value, arg);

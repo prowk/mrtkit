@@ -50,7 +50,10 @@ pub fn Decoder::decode(self : Decoder, data : Bytes) -> Batch raise ParseError {
       self.has_peers = true
       return empty
     }
-    if header.subtype == 2 || header.subtype == 4 {
+    if header.subtype == 2 ||
+      header.subtype == 4 ||
+      header.subtype == 8 ||
+      header.subtype == 10 {
       if !self.has_peers {
         raise Invalid(12, "RIB 之前缺少 PEER_INDEX_TABLE")
       }
@@ -64,7 +67,8 @@ pub fn Decoder::decode(self : Decoder, data : Bytes) -> Batch raise ParseError {
       header.subtype == 4 ||
       header.subtype == 5 ||
       header.subtype == 6 ||
-      header.subtype == 7
+      header.subtype == 7 ||
+      (header.subtype >= 8 && header.subtype <= 11)
     ) {
     let parsed = parse_bgp4mp(frame)
     return {

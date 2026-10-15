@@ -1,6 +1,7 @@
 ///|
 priv struct MpRoutes {
   prefixes : Array[String]
+  path_ids : Array[UInt?]
   next_hop : String?
   supported : Bool
 }
@@ -20,12 +21,16 @@ fn read_next_hop(c : Cursor, afi : Int) -> String raise ParseError {
 }
 
 ///|
-fn parse_mp(value : Bytes, reach : Bool) -> MpRoutes raise ParseError {
+fn parse_mp(
+  value : Bytes,
+  reach : Bool,
+  addpath? : Bool = false,
+) -> MpRoutes raise ParseError {
   let c = Cursor::new(value)
   let afi = c.u16()
   let safi = c.u8()
   if (afi != 1 && afi != 2) || safi != 1 {
-    return { prefixes: [], next_hop: None, supported: false, }
+    return { prefixes: [], path_ids: [], next_hop: None, supported: false, }
   }
   let next_hop = if reach {
     let hop = read_next_hop(c, afi)
@@ -34,8 +39,13 @@ fn parse_mp(value : Bytes, reach : Bool) -> MpRoutes raise ParseError {
   } else {
     None
   }
-  let prefixes = read_nlri(c, afi)
-  { prefixes, next_hop, supported: true, }
+  let entries = read_nlri_paths(c, afi, addpath)
+  {
+    prefixes: entries.map(fn(entry) { entry.0 }),
+    path_ids: entries.map(fn(entry) { entry.1 }),
+    next_hop,
+    supported: true,
+  }
 }
 
 ///|

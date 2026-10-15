@@ -93,6 +93,7 @@ pub struct Change {
   timestamp : UInt
   microseconds : Int?
   prefix : String
+  path_id : UInt?
   peer_asn : UInt
   peer_ip : String
   outbound : Bool
@@ -194,7 +195,7 @@ pub struct Query {
   // private fields
 }
 pub fn Query::matches(Self, RouteEvent) -> Bool
-pub fn Query::new(prefix? : String, asn? : UInt, from_time? : UInt, to_time? : UInt) -> Self raise ParseError
+pub fn Query::new(prefix? : String, asn? : UInt, path_id? : UInt, from_time? : UInt, to_time? : UInt) -> Self raise ParseError
 
 pub struct RawAttribute {
   flags : Int
@@ -222,6 +223,7 @@ pub struct RouteEvent {
   microseconds : Int?
   action : String
   prefix : String
+  path_id : UInt?
   peer_asn : UInt
   peer_ip : String
   outbound : Bool

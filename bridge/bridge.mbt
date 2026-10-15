@@ -4,6 +4,7 @@ priv struct Config {
   prefix : String?
   asn : UInt?
   peer_asn : UInt?
+  path_id : UInt?
   from_time : UInt
   to_time : UInt
   from_micros : Int?
@@ -59,6 +60,7 @@ pub fn configure(text : String) -> String {
     let query = @mrt.Query::new(
       prefix?=config.prefix,
       asn?=config.asn,
+      path_id?=config.path_id,
       from_time?=if config.mode == "parse" {
         Some(config.from_time)
       } else {

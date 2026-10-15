@@ -20,8 +20,8 @@ node cli/mrtkit.mjs changes --threshold 3 fixtures/demo.mrt
 | 功能 | 当前范围 |
 | --- | --- |
 | MRT | 网络字节序、长度校验、扩展微秒时间戳、未知类型跳过统计 |
-| 快照 | TABLE_DUMP_V2 的 PEER_INDEX_TABLE、IPv4/IPv6 单播 RIB |
-| 更新 | BGP4MP/BGP4MP_ET 的 MESSAGE、MESSAGE_AS4、两种 LOCAL 和两种 STATE_CHANGE |
+| 快照 | TABLE_DUMP_V2 的 PEER_INDEX_TABLE、IPv4/IPv6 单播 RIB，含 ADD-PATH |
+| 更新 | BGP4MP/BGP4MP_ET 的 MESSAGE、MESSAGE_AS4、LOCAL、STATE_CHANGE 和 ADD-PATH |
 | 属性 | ORIGIN、AS_PATH、AS4_PATH、NEXT_HOP、MED、LOCAL_PREF、COMMUNITY、LARGE_COMMUNITY；其他属性保留原始字节 |
 | 多协议 | IPv4/IPv6 单播 MP_REACH/MP_UNREACH；RIB 精简/历史完整下一跳编码 |
 | 查询 | 前缀精确匹配、peer/路径 ASN、包含端点的 Unix 秒范围 |
@@ -97,7 +97,7 @@ AS_SET 计为一个跳数，联盟段不计普通路径长度。末段为 AS_SET
 
 - 单条 MRT payload 上限 16 MiB，库流式分块上限 1 MiB。
 - CLI 按记录读取，`parse` 不缓存整个文件；分析默认最多缓存 1,000,000 个路由键，包含已撤回条目，可用 `--capacity` 调整。超限明确失败。
-- ADD-PATH、旧 TABLE_DUMP、RIB_GENERIC、多播、VPN/EVPN 尚未实现；未知 MRT 类型/子类型与 MP 地址族跳过并报告数量。
+- 旧 TABLE_DUMP、RIB_GENERIC、多播、VPN/EVPN 尚未实现；未知 MRT 类型/子类型与 MP 地址族跳过并报告数量。
 - OPEN/KEEPALIVE/NOTIFICATION/ROUTE-REFRESH 仅做基本结构检查，未完整解码能力协商。解析器检查结构和边界，不作为完整 BGP 合规验证器。
 - 当前提供离线 CLI；没有实时 BGP 会话、RPKI 验证、路由劫持判定或 Web 界面。变化提醒用于排查线索。
 

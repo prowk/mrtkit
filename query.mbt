@@ -2,6 +2,7 @@
 pub struct Query {
   priv prefix : String?
   priv asn : UInt?
+  priv path_id : UInt?
   priv from_time : UInt?
   priv to_time : UInt?
 }
@@ -10,6 +11,7 @@ pub struct Query {
 pub fn Query::new(
   prefix? : String,
   asn? : UInt,
+  path_id? : UInt,
   from_time? : UInt,
   to_time? : UInt,
 ) -> Query raise ParseError {
@@ -18,12 +20,15 @@ pub fn Query::new(
       raise Invalid(0, "开始时间晚于结束时间")
     _ => ()
   }
-  { prefix, asn, from_time, to_time, }
+  { prefix, asn, path_id, from_time, to_time, }
 }
 
 ///|
 /// 前缀精确匹配；ASN 匹配 peer 或有效 AS 路径，时间包含端点。
 pub fn Query::matches(self : Query, event : RouteEvent) -> Bool {
+  if self.path_id is Some(id) && event.path_id != Some(id) {
+    return false
+  }
   if self.prefix is Some(prefix) && event.prefix != prefix {
     return false
   }
@@ -90,7 +95,7 @@ fn csv_quote(value : String) -> String {
 
 ///|
 pub fn csv_header() -> String {
-  "schema_version,timestamp,microseconds,action,prefix,peer_asn,peer_ip,outbound,origin_as,path,next_hop,originated,source_file,source_record,source_offset,event_index,large_communities"
+  "schema_version,timestamp,microseconds,action,prefix,peer_asn,peer_ip,outbound,origin_as,path,next_hop,originated,source_file,source_record,source_offset,event_index,large_communities,path_id"
 }
 
 ///|
@@ -122,5 +127,6 @@ pub fn event_csv(event : RouteEvent) -> String {
     }
     large.write_string("\{global}:\{local1}:\{local2}")
   }
-  "\{event.schema_version},\{event.timestamp},\{micros},\{csv_quote(event.action)},\{csv_quote(event.prefix)},\{event.peer_asn},\{csv_quote(event.peer_ip)},\{event.outbound},\{origin},\{csv_quote(path_text(event.attributes.path))},\{csv_quote(hop)},\{originated},\{source},\{csv_quote(large.to_string())}"
+  let id = event.path_id.map(fn(n) { n.to_string() }).unwrap_or("")
+  "\{event.schema_version},\{event.timestamp},\{micros},\{csv_quote(event.action)},\{csv_quote(event.prefix)},\{event.peer_asn},\{csv_quote(event.peer_ip)},\{event.outbound},\{origin},\{csv_quote(path_text(event.attributes.path))},\{csv_quote(hop)},\{originated},\{source},\{csv_quote(large.to_string())},\{id}"
 }

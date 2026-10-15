@@ -21,10 +21,15 @@ pub struct BgpRecord {
 }
 
 ///|
-fn read_nlri(c : Cursor, afi : Int) -> Array[String] raise ParseError {
+fn read_nlri_paths(
+  c : Cursor,
+  afi : Int,
+  addpath : Bool,
+) -> Array[(String, UInt?)] raise ParseError {
   let prefixes = []
   while c.remaining() > 0 {
-    prefixes.push(read_prefix(c, afi).text())
+    let id = if addpath { Some(c.u32()) } else { None }
+    prefixes.push((read_prefix(c, afi).text(), id))
   }
   prefixes
 }
@@ -38,6 +43,7 @@ fn make_event(
   action : String,
   prefix : String,
   attributes : Attributes,
+  path_id? : UInt,
 ) -> RouteEvent {
   {
     schema_version: "2.0",
@@ -46,6 +52,7 @@ fn make_event(
     microseconds: frame.microseconds,
     action,
     prefix,
+    path_id,
     peer_asn,
     peer_ip,
     outbound,
@@ -61,8 +68,8 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
   }
   let subtype = frame.header.subtype
   let width = match subtype {
-    0 | 1 | 6 => 2
-    4 | 5 | 7 => 4
+    0 | 1 | 6 | 8 | 10 => 2
+    4 | 5 | 7 | 9 | 11 => 4
     _ => raise Invalid(0, "不支持的 BGP4MP 子类型")
   }
   let c = Cursor::new(frame.payload)
@@ -105,7 +112,8 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
       ],
     }
   }
-  let outbound = subtype == 6 || subtype == 7
+  let outbound = subtype == 6 || subtype == 7 || subtype == 10 || subtype == 11
+  let addpath = subtype >= 8 && subtype <= 11
   let message = c.take(c.remaining())
   for i = 0; i < 16; i = i + 1 {
     if message.u8() != 255 {
@@ -124,17 +132,17 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
   let mut ignored_families = 0
   if message_type == 2 {
     let withdrawn = message.take(message.u16())
-    let withdrawals = read_nlri(withdrawn, 1)
+    let withdrawals = read_nlri_paths(withdrawn, 1, addpath)
     let attributes = parse_attributes(message.bytes(message.u16()), width)
-    let announcements = read_nlri(message, 1)
+    let announcements = read_nlri_paths(message, 1, addpath)
     for attr in attributes.other {
       if attr.code == 14 || attr.code == 15 {
         let reach = attr.code == 14
-        let mp = parse_mp(attr.value, reach)
+        let mp = parse_mp(attr.value, reach, addpath~)
         if !mp.supported {
           ignored_families += 1
         }
-        for prefix in mp.prefixes {
+        for i, prefix in mp.prefixes {
           let attrs = if reach {
             { ..attributes, next_hop: mp.next_hop, }
           } else {
@@ -153,12 +161,13 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
               },
               prefix,
               attrs,
+              path_id?=mp.path_ids[i],
             ),
           )
         }
       }
     }
-    for prefix in withdrawals {
+    for (prefix, id) in withdrawals {
       events.push(
         make_event(
           frame,
@@ -168,13 +177,21 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
           "withdraw",
           prefix,
           empty_attributes(),
+          path_id?=id,
         ),
       )
     }
-    for prefix in announcements {
+    for (prefix, id) in announcements {
       events.push(
         make_event(
-          frame, peer_asn, peer_ip, outbound, "announce", prefix, attributes,
+          frame,
+          peer_asn,
+          peer_ip,
+          outbound,
+          "announce",
+          prefix,
+          attributes,
+          path_id?=id,
         ),
       )
     }

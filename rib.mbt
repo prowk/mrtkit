@@ -23,6 +23,7 @@ pub struct RouteEvent {
   microseconds : Int?
   action : String
   prefix : String
+  path_id : UInt?
   peer_asn : UInt
   peer_ip : String
   outbound : Bool
@@ -65,8 +66,8 @@ pub fn parse_rib(
   peers : Array[Peer],
 ) -> Array[RouteEvent] raise ParseError {
   let afi = match frame.header.subtype {
-    2 => 1
-    4 => 2
+    2 | 8 => 1
+    4 | 10 => 2
     _ => raise Invalid(0, "只支持 IPv4/IPv6 单播 RIB 子类型")
   }
   if frame.header.kind != 13 {
@@ -84,6 +85,11 @@ pub fn parse_rib(
       None => raise Invalid(c.pos - 2, "RIB 引用了无效 peer 索引")
     }
     let originated = c.u32()
+    let path_id = if frame.header.subtype == 8 || frame.header.subtype == 10 {
+      Some(c.u32())
+    } else {
+      None
+    }
     let raw = c.bytes(c.u16())
     let attributes = rib_next_hop(parse_attributes(raw, 4), afi)
     events.push({
@@ -93,6 +99,7 @@ pub fn parse_rib(
       microseconds: frame.microseconds,
       action: "rib",
       prefix,
+      path_id,
       peer_asn: peer.asn,
       peer_ip: peer.address,
       outbound: false,

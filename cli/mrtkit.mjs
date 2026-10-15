@@ -11,6 +11,7 @@ const help = `mrtkit 0.2.0 — MoonBit BGP MRT 工具
   --prefix CIDR       精确筛选前缀（自动清除主机位）
   --asn ASN           parse 中匹配 peer 或 AS 路径
   --peer-asn ASN      按 peer ASN 筛选，支持所有命令
+  --path-id ID        精确筛选 ADD-PATH 标识（包括 0）
   --from / --to 秒    Unix 秒时间戳，包含端点
   --from-micros / --to-micros 微秒  时间端点的小数部分
   --initial-rib 文件  显式初始快照；窗口前 UPDATE 自动预热

@@ -4,6 +4,7 @@ pub struct Change {
   timestamp : UInt
   microseconds : Int?
   prefix : String
+  path_id : UInt?
   peer_asn : UInt
   peer_ip : String
   outbound : Bool
@@ -183,6 +184,7 @@ fn change(
     timestamp: event.timestamp,
     microseconds: event.microseconds,
     prefix: event.prefix,
+    path_id: event.path_id,
     peer_asn: event.peer_asn,
     peer_ip: event.peer_ip,
     outbound: event.outbound,
@@ -207,7 +209,11 @@ pub fn Analyzer::observe(
   event : RouteEvent,
 ) -> Array[Change] raise ParseError {
   let peer = peer_key(event.peer_asn, event.peer_ip, event.outbound)
-  let key = peer + "|" + event.prefix
+  let key = peer +
+    "|" +
+    event.prefix +
+    "|" +
+    event.path_id.map(fn(n) { n.to_string() }).unwrap_or("none")
   let time = event_time(event.timestamp, event.microseconds)
   if time > self.to_time {
     return []
