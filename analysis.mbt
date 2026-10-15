@@ -222,7 +222,10 @@ pub fn Analyzer::observe(
   }
   let measured = !self.seeding && time >= self.from_time
   let old = self.routes.get(key)
-  if old is None && self.routes.length() >= self.capacity {
+  let reset = self.peer_resets.get(peer)
+  let stale = (old is Some(previous) && time < previous.time) ||
+    (reset is Some(t) && time < t)
+  if !stale && old is None && self.routes.length() >= self.capacity {
     raise Invalid(0, "分析路由数量超过容量，请缩小筛选范围")
   }
   let mut stats = self.stats
@@ -240,9 +243,7 @@ pub fn Analyzer::observe(
       stats = { ..stats, max_path_length: length, }
     }
   }
-  let reset = self.peer_resets.get(peer)
-  if (old is Some(previous) && time < previous.time) ||
-    (reset is Some(t) && time < t) {
+  if stale {
     if measured {
       self.stats = { ..stats, out_of_order: stats.out_of_order + 1L, }
     }

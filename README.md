@@ -125,7 +125,7 @@ moon info
 moon fmt --check
 ```
 
-46 个 MoonBit 测试分别通过 JS、Wasm、Wasm GC 验证；47 个 Node 测试通过。两个采集器的完整 RIB 与连续一小时 UPDATE（18 个文件、19,663,881 条路由事件及 749 条会话事件）通过独立解析器对照。字段范围和复现步骤见 [验证记录](docs/VALIDATION.md)，实现结构见 [开发说明](docs/DEVELOPMENT.md)。
+47 个 MoonBit 测试分别通过 JS、Wasm、Wasm GC 验证；47 个 Node 测试通过。两个采集器的完整 RIB 与连续一小时 UPDATE（18 个文件、19,663,881 条路由事件及 749 条会话事件）通过独立解析器对照。字段范围和复现步骤见 [验证记录](docs/VALIDATION.md)，实现结构见 [开发说明](docs/DEVELOPMENT.md)。
 
 GitHub Actions 配置覆盖格式、接口、跨后端及 CLI 测试。CI 固定官方工具链标签 `0.10.14+7d59c7ec9`（与本地已验证的编译器一致），避免自动更新改变语法、格式或接口。
 

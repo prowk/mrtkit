@@ -61,3 +61,25 @@ test "分析容量不会静默丢弃状态" {
     },
   )
 }
+
+///|
+test "容量已满时过期的重置前宣告仍只计乱序" {
+  let analyzer = Analyzer::new(capacity=1)
+  let first = sample_event(100U, "announce", [1U])
+  ignore(analyzer.observe(first))
+  analyzer.observe_state({
+    source: None,
+    timestamp: 101U,
+    microseconds: None,
+    peer_asn: first.peer_asn,
+    peer_ip: first.peer_ip,
+    old_state: 6,
+    new_state: 1,
+  })
+  let second = { ..first, timestamp: 102U, peer_asn: 2U, }
+  ignore(analyzer.observe(second))
+  assert_eq(analyzer.observe(first).length(), 0)
+  assert_eq(analyzer.summary().out_of_order, 1L)
+  assert_eq(analyzer.summary().active_routes, 1)
+  assert_eq(analyzer.route_states()[0].peer_asn, 2U)
+}

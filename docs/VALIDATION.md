@@ -4,7 +4,7 @@
 
 ## 自动测试
 
-- 46 个 MoonBit 测试分别在 JS、Wasm、Wasm GC 后端通过。
+- 47 个 MoonBit 测试分别在 JS、Wasm、Wasm GC 后端通过。
 - 47 个 Node 测试通过，包含命令行端到端验证、gzip/bz2、IPv6、旧式 ASN、扩展时间戳、ADD-PATH、Large Communities、时间窗口、来源追溯、快照差异、聚合复算、前缀时间线和错误退出码。
 - 确定性畸形输入测试覆盖 2,000 组随机修改/随机字节数据，所有调用均返回解析结果或错误，没有宿主异常。
 - 编译与测试启用 `--deny-warn`，当前没有编译警告。
