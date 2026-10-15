@@ -14,8 +14,18 @@ priv struct Config {
   threshold : Int
   capacity : Int
   top : Int?
+  continuous_observation : Bool?
+  observation_gaps : Array[WireGap]?
   mode : String
   format : String
+} derive(@json.FromJson)
+
+///|
+priv struct WireGap {
+  from_time : UInt
+  to_time : UInt
+  from_micros : Int
+  to_micros : Int
 } derive(@json.FromJson)
 
 ///|
@@ -24,6 +34,7 @@ priv struct Session {
   query : @mrt.Query
   analyzer : @mrt.Analyzer?
   aggregation : @mrt.Aggregation?
+  timeline : @mrt.Timeline?
   config : Config
   mut baseline : Bool
   mut baseline_seen : Bool
@@ -90,6 +101,7 @@ pub fn configure(text : String) -> String {
     if config.mode != "parse" &&
       config.mode != "stats" &&
       config.mode != "changes" &&
+      config.mode != "timeline" &&
       config.mode != "aggregate" &&
       config.mode != "snapshot-diff" {
       return error_json(0, "不支持的命令")
@@ -131,10 +143,42 @@ pub fn configure(text : String) -> String {
         ),
       )
     }
+    let timeline = if config.mode == "timeline" {
+      let gaps = []
+      for gap in config.observation_gaps.unwrap_or([]) {
+        gaps.push(
+          @mrt.ObservationGap::new(
+            gap.from_time,
+            gap.to_time,
+            from_micros=gap.from_micros,
+            to_micros=gap.to_micros,
+          ),
+        )
+      }
+      if config.prefix is None ||
+        config.prefix_mode.unwrap_or("exact") != "exact" {
+        return error_json(
+          0, "timeline 需要 --prefix 并仅支持 exact 模式",
+        )
+      }
+      Some(
+        @mrt.Timeline::new(
+          config.prefix.unwrap(),
+          analyzer.unwrap(),
+          continuous=config.continuous_observation.unwrap_or(false),
+          gaps~,
+          capacity=config.capacity,
+          peer_asn?=config.peer_asn,
+        ),
+      )
+    } else {
+      None
+    }
     session.val = Some({
       decoder: @mrt.Decoder::new(),
       query,
       analyzer,
+      timeline,
       aggregation: if config.mode == "aggregate" {
         Some(@mrt.Aggregation::new())
       } else {
@@ -181,24 +225,46 @@ fn consume_inner(
         )
       }
       if batch.header.subtype == 1 {
+        if current.baseline_seen {
+          session.val = None
+          return error_json(0, "初始 RIB 只能包含一个 peer 表")
+        }
         current.baseline_seen = true
+        if current.timeline is Some(timeline) {
+          timeline.seed_peers(
+            @mrt.parse_peers(@mrt.read_frame(data).payload),
+            batch.header.timestamp,
+          )
+        }
       }
     }
     if !current.baseline && current.analyzer is Some(analyzer) {
-      analyzer.record_batch(batch)
+      if current.timeline is Some(timeline) {
+        timeline.record_batch(batch)
+      } else {
+        analyzer.record_batch(batch)
+      }
     }
     let lines = []
     for event in batch.events {
-      if !current.query.matches(event) {
+      if current.config.peer_asn is Some(asn) && event.peer_asn != asn {
         continue
       }
-      if current.config.peer_asn is Some(asn) && event.peer_asn != asn {
+      if !current.query.matches(event) {
         continue
       }
       match current.analyzer {
         Some(analyzer) => {
           if current.baseline {
-            analyzer.seed(event)
+            if current.timeline is Some(timeline) {
+              timeline.seed(event)
+            } else {
+              analyzer.seed(event)
+            }
+            continue
+          }
+          if current.timeline is Some(timeline) {
+            timeline.observe(event)
             continue
           }
           let changes = analyzer.observe(event)
@@ -356,6 +422,14 @@ pub fn finish() -> String {
     Some(s) =>
       match s.analyzer {
         Some(analyzer) => {
+          if s.timeline is Some(timeline) {
+            return Json::object({
+              "summary": analyzer.summary().to_json(),
+              "timeline": timeline.report().to_json(),
+            }).stringify() catch {
+              @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+            }
+          }
           if s.aggregation is Some(aggregation) {
             return Json::object({
               "summary": analyzer.summary().to_json(),

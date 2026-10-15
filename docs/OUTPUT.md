@@ -15,3 +15,5 @@ Large Communities 按 [RFC 8092](https://www.rfc-editor.org/rfc/rfc8092.html) �
 ADD-PATH 按 [RFC 8050](https://datatracker.ietf.org/doc/html/rfc8050) 支持单播 RIB 子类型 8/10，以及 BGP4MP/BGP4MP_ET 子类型 8/9/10/11。事件、变化和状态键包含可选 `path_id`，无标识与标识 0 不同。仅撤回指定 ID，不影响其他路径。`--path-id` 可筛选路径；普通输入省略 JSON 字段，CSV 对应列为空。
 
 标准错误额外输出 `type: "diagnostics"` JSON，按 MRT 类型/子类型以及 MP AFI/SAFI 分组，给出数量和首条代表记录的文件、记录号、解压后偏移。MRT 分组数之和等于 `skipped_records`，MP 分组数之和等于 `ignored_families`。该诊断覆盖所有实际读取的记录（包括预热），不同于统计 JSON 中按窗口计数的字段，不混入标准输出的路由和变化流。底层批次诊断的来源只用于定位记录，事件索引不用于指代路由。
+
+新增报告同样使用版本 2.0：[快照差异](SNAPSHOTS.md)输出一个含 `changes` 的对象；[变化聚合](AGGREGATION.md)输出 `summary/aggregation`；[时间线](TIMELINE.md)输出 `summary/timeline`。时间线区间使用十进制字符串的 Unix 微秒，可选字段未知时省略；其 `quality`、截尾标志及覆盖时间必须与时长一起消费。上述报告不改变 `parse`、`stats` 和 `changes` 的既有输出形状。

@@ -189,6 +189,15 @@ pub struct LargeCommunityDiff {
 } derive(ToJson)
 pub fn LargeCommunityDiff::to_json(Self) -> Json
 
+pub struct ObservationGap {
+  from_time : UInt
+  from_micros : Int
+  to_time : UInt
+  to_micros : Int
+} derive(ToJson)
+pub fn ObservationGap::new(UInt, UInt, from_micros? : Int, to_micros? : Int) -> Self
+pub fn ObservationGap::to_json(Self) -> Json
+
 pub struct OriginDiff {
   before : UInt?
   after : UInt?
@@ -378,6 +387,95 @@ pub struct Summary {
   max_path_length : Int
 } derive(ToJson)
 pub fn Summary::to_json(Self) -> Json
+
+pub struct Timeline {
+  // private fields
+}
+pub fn Timeline::new(String, Analyzer, continuous? : Bool, gaps? : Array[ObservationGap], capacity? : Int, peer_asn? : UInt) -> Self raise ParseError
+pub fn Timeline::observe(Self, RouteEvent) -> Unit raise ParseError
+pub fn Timeline::record_batch(Self, Batch) -> Unit raise ParseError
+pub fn Timeline::report(Self) -> TimelineReport raise ParseError
+pub fn Timeline::seed(Self, RouteEvent) -> Unit raise ParseError
+pub fn Timeline::seed_peers(Self, PeerTable, UInt) -> Unit raise ParseError
+
+pub struct TimelineEntry {
+  timestamp : UInt
+  microseconds : Int?
+  kind : String
+  prefix : String
+  path_id : UInt?
+  peer_asn : UInt?
+  peer_ip : String?
+  outbound : Bool?
+  accepted : Bool
+  source : Source?
+  before : RouteSnapshot?
+  after : RouteSnapshot?
+  changes : Array[Change]
+} derive(ToJson)
+pub fn TimelineEntry::to_json(Self) -> Json
+
+pub struct TimelinePath {
+  prefix : String
+  path_id : UInt?
+  peer_asn : UInt
+  peer_ip : String
+  outbound : Bool
+  visibility : String
+  observed_at : UInt64
+  source : Source?
+} derive(ToJson)
+pub fn TimelinePath::to_json(Self) -> Json
+
+pub struct TimelinePeer {
+  peer_asn : UInt
+  peer_ip : String
+  outbound : Bool
+  visibility : String
+  visible_paths : Int
+  not_visible_paths : Int
+  unobserved_paths : Int
+  baseline_present : Bool
+} derive(ToJson)
+pub fn TimelinePeer::to_json(Self) -> Json
+
+pub struct TimelineReport {
+  schema_version : String
+  prefix : String
+  interpretation : String
+  baseline_status : String
+  continuous_observation : Bool
+  last_input_time : UInt64?
+  observed_window_end : UInt64?
+  gaps : Array[ObservationGap]
+  entries : Array[TimelineEntry]
+  intervals : Array[VisibilityInterval]
+  peer_intervals : Array[VisibilityInterval]
+  paths : Array[TimelinePath]
+  peers : Array[TimelinePeer]
+} derive(ToJson)
+pub fn TimelineReport::to_json(Self) -> Json
+
+pub struct VisibilityInterval {
+  scope : String
+  prefix : String
+  path_id : UInt?
+  peer_asn : UInt
+  peer_ip : String
+  outbound : Bool
+  started_at : UInt64
+  measured_from : UInt64
+  observed_until : UInt64
+  recovery_time : UInt64?
+  known_invisible_microseconds : UInt64?
+  left_censored : Bool
+  right_censored : Bool
+  quality : String
+  closed_by : String
+  start_source : Source?
+  end_source : Source?
+} derive(ToJson)
+pub fn VisibilityInterval::to_json(Self) -> Json
 
 // Type aliases
 

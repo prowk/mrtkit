@@ -28,6 +28,7 @@ node cli/mrtkit.mjs changes --threshold 3 fixtures/demo.mrt
 | 输出 | 路由 JSON Lines、CSV、统计 JSON、变化 JSON Lines |
 | 快照差异 | 同采集器、同视图的 peer 与路由新增/缺失及结构化属性差异 |
 | 变化聚合 | 按来源事件去重的前缀排名、受影响 peer 数及变化类型分布 |
+| 前缀时间线 | 按时间展示观测、恢复、会话重置和缺档；区分路径与 peer 的可见性 |
 | 分析 | 路径/起源/属性变化、重复宣告、固定窗口波动、会话重置、乱序计数 |
 | 输入 | 文件、未压缩标准输入、gzip、bz2、多文件顺序处理 |
 
@@ -65,6 +66,8 @@ node cli/mrtkit.mjs changes --from 1700000000 --to 1700000060 --window 60 --thre
 
 `aggregate --top 20 文件...` 对相同分析窗口的变化提醒排名；去重和复算规则见[变化聚合](docs/AGGREGATION.md)。
 
+`timeline --prefix CIDR 文件...` 展示一个前缀的观测过程、各 peer 状态与有证据支持的不可见区间，详见[时间线](docs/TIMELINE.md)。
+
 ## 数据与分析语义
 
 路由事件包含采集时间、可选微秒、`rib/announce/withdraw`、规范化前缀、peer ASN/IP、`outbound`、可选快照起源时间和属性。`attributes.path` 是有效路径，`wire_path/as4_path` 是原始分段。未知属性的 `value` 是字节数组。
@@ -73,7 +76,7 @@ node cli/mrtkit.mjs changes --from 1700000000 --to 1700000060 --window 60 --thre
 
 AS_SET 计为一个跳数，联盟段不计普通路径长度。末段为 AS_SET 时不推断唯一起源 AS。变化比较忽略集合成员顺序、连续序列分段、社区排列及同一 MP 属性携带的其他前缀。
 
-分析按 **peer ASN＋peer IP＋收发方向＋前缀** 隔离。不同采集器须分开运行。使用一个初始 RIB 再接后续 UPDATE；多个完整快照须分别分析，当前不通过后续快照中缺失的条目推断撤回。
+分析按 **peer ASN＋peer IP＋收发方向＋前缀＋可选 Path Identifier** 隔离。不同采集器须分开运行。使用一个初始 RIB 再接后续 UPDATE；多个完整快照须分别分析，不通过后续快照中缺失的条目推断撤回。
 
 波动采用从首次观察或窗口重启时开始的固定窗口。初次宣告、活动路由属性变化、有效撤回和重新宣告计为变化；重复宣告/重复撤回不计。每个窗口达到阈值时提醒一次。起源变化只比较两个均可确定唯一起源的活动路由。
 
@@ -95,6 +98,9 @@ AS_SET 计为一个跳数，联盟段不计普通路径长度。末段为 AS_SET
 | `Query::new/matches` | 筛选路由事件 |
 | `Analyzer::new/record_batch/observe/summary` | 累计元数据、状态变化和路由统计 |
 | `Analyzer::seed/route_states` | 加载基线和导出可审计的最终路由状态 |
+| `Snapshot::new/ingest/diff` | 比较同源、同视图快照，区分 peer 与路由缺失 |
+| `Timeline::new/seed_peers/seed/record_batch/observe/report` | 前缀观测过程与可见性区间 |
+| `Aggregation::new/observe/report` | 对带来源的变化提醒排名和计数 |
 | `event_json/event_csv/csv_header` | 导出路由 |
 
 `record_batch` 处理元数据和会话，路由需逐条调用 `observe`，便于自行筛选。`StreamDecoder` 失败后需创建新实例。
@@ -119,7 +125,7 @@ moon info
 moon fmt --check
 ```
 
-43 个 MoonBit 测试分别通过 JS、Wasm、Wasm GC 验证；42 个 Node 测试通过。两个采集器的完整 RIB 与连续一小时 UPDATE（18 个文件、19,663,881 条路由事件及 749 条会话事件）通过独立解析器对照。字段范围和复现步骤见 [验证记录](docs/VALIDATION.md)，实现结构见 [开发说明](docs/DEVELOPMENT.md)。
+46 个 MoonBit 测试分别通过 JS、Wasm、Wasm GC 验证；47 个 Node 测试通过。两个采集器的完整 RIB 与连续一小时 UPDATE（18 个文件、19,663,881 条路由事件及 749 条会话事件）通过独立解析器对照。字段范围和复现步骤见 [验证记录](docs/VALIDATION.md)，实现结构见 [开发说明](docs/DEVELOPMENT.md)。
 
 GitHub Actions 配置覆盖格式、接口、跨后端及 CLI 测试。CI 固定官方工具链标签 `0.10.14+7d59c7ec9`（与本地已验证的编译器一致），避免自动更新改变语法、格式或接口。
 

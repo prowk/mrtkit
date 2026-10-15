@@ -78,6 +78,16 @@ pub extend RouteDiff with ToJson::{to_json}
 
 ///|
 fn unique_communities(values : Array[UInt]) -> Array[UInt] {
+  let mut ordered = true
+  for i = 1; i < values.length(); i = i + 1 {
+    if values[i - 1] >= values[i] {
+      ordered = false
+      break
+    }
+  }
+  if ordered {
+    return values
+  }
   let sorted = values.copy()
   sorted.sort()
   let result = []
@@ -149,6 +159,16 @@ pub extend LargeCommunityDiff with ToJson::{to_json}
 fn unique_large_communities(
   values : Array[(UInt, UInt, UInt)],
 ) -> Array[(UInt, UInt, UInt)] {
+  let mut ordered = true
+  for i = 1; i < values.length(); i = i + 1 {
+    if values[i - 1].compare(values[i]) >= 0 {
+      ordered = false
+      break
+    }
+  }
+  if ordered {
+    return values
+  }
   let sorted = values.copy()
   sorted.sort()
   let result = []

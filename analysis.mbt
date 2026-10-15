@@ -49,10 +49,10 @@ pub extend Summary with ToJson::{to_json}
 ///|
 priv struct TrackedRoute {
   event : RouteEvent
-  peer : String
   active : Bool
   path : Array[AsSegment]
   attributes : Attributes
+  semantic : Attributes
   time : UInt64
   window_start : UInt64
   window_count : Int
@@ -72,6 +72,7 @@ pub struct Analyzer {
   priv mut seeding : Bool
   priv peer_latest : Map[String, UInt64]
   priv peer_resets : Map[String, UInt64]
+  priv peer_routes : Map[String, Map[String, Unit]]
 }
 
 ///|
@@ -102,6 +103,7 @@ pub fn Analyzer::new(
     seeding: false,
     peer_latest: Map([]),
     peer_resets: Map([]),
+    peer_routes: Map([]),
     routes: Map([]),
     window: window_seconds.to_uint64() * 1000000UL,
     threshold,
@@ -251,6 +253,11 @@ pub fn Analyzer::observe(
   }
   let notices = []
   let active = event.action != "withdraw"
+  let semantic = if !active && old is Some(previous) {
+    previous.semantic
+  } else {
+    semantic_attributes(event.attributes)
+  }
   let mut changed = event.action == "announce"
   let mut start = time
   let mut count = 0
@@ -260,8 +267,8 @@ pub fn Analyzer::observe(
     path = if active { event.attributes.path } else { previous.path }
     attributes = if active { event.attributes } else { previous.attributes }
     if event.action == "announce" && previous.active {
-      changed = !route_attributes_equal(previous.attributes, attributes)
-      if !same_path(previous.path, path) {
+      changed = previous.semantic != semantic
+      if previous.semantic.path != semantic.path {
         stats = { ..stats, path_changes: stats.path_changes + 1L, }
         notices.push(change(event, "path_change", old, attributes))
         match (origin_as(previous.path), origin_as(path)) {
@@ -272,10 +279,8 @@ pub fn Analyzer::observe(
           _ => ()
         }
       }
-      let attribute_changed = !route_attributes_equal(
-        { ..previous.attributes, path: [], },
-        { ..attributes, path: [], },
-      )
+      let attribute_changed = { ..previous.semantic, path: [], } !=
+        { ..semantic, path: [], }
       if attribute_changed {
         stats = { ..stats, attribute_changes: stats.attribute_changes + 1L, }
         notices.push(change(event, "attribute_change", old, attributes))
@@ -311,13 +316,16 @@ pub fn Analyzer::observe(
   }
   self.routes[key] = {
     event: { ..event, attributes, },
-    peer,
     active,
     path,
     attributes,
+    semantic,
     time,
     window_start: start,
     window_count: count,
+  }
+  if old is None {
+    self.peer_routes.get_or_init(peer, fn() { Map([]) })[key] = ()
   }
   if measured {
     self.stats = stats
@@ -371,16 +379,13 @@ pub fn Analyzer::observe_state(self : Analyzer, state : StateChange) -> Unit {
       }
       return
     }
-    let keys = []
-    for key, route in self.routes {
-      if route.peer == inbound || route.peer == outbound {
-        keys.push(key)
-      }
-    }
-    for key in keys {
-      self.routes.remove(key)
-    }
     for peer in [inbound, outbound] {
+      if self.peer_routes.get(peer) is Some(keys) {
+        for key in keys.keys() {
+          self.routes.remove(key)
+        }
+        self.peer_routes.remove(peer)
+      }
       self.peer_resets[peer] = time
       self.peer_latest[peer] = time
     }

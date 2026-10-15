@@ -33,31 +33,24 @@ fn same_path(a : Array[AsSegment], b : Array[AsSegment]) -> Bool {
 }
 
 ///|
-fn route_attributes_equal(a : Attributes, b : Attributes) -> Bool {
-  if !same_path(a.path, b.path) ||
-    a.origin != b.origin ||
-    a.next_hop != b.next_hop ||
-    a.med != b.med ||
-    a.local_pref != b.local_pref {
-    return false
-  }
-  let ac = unique_communities(a.communities)
-  let bc = unique_communities(b.communities)
-  if ac != bc {
-    return false
-  }
-  if unique_large_communities(a.large_communities) !=
-    unique_large_communities(b.large_communities) {
-    return false
-  }
+fn semantic_attributes(a : Attributes) -> Attributes {
   // 同一 UPDATE 携带的其他前缀及 ASN 兼容编码不构成该路由的变化。
   let ao = a.other.filter(fn(attr) {
     attr.code != 14 && attr.code != 15 && attr.code != 32
   })
-  let bo = b.other.filter(fn(attr) {
-    attr.code != 14 && attr.code != 15 && attr.code != 32
-  })
   ao.sort_by_key(fn(attr) { attr.code })
-  bo.sort_by_key(fn(attr) { attr.code })
-  ao == bo
+  {
+    ..a,
+    path: canonical_path(a.path),
+    wire_path: [],
+    as4_path: [],
+    communities: unique_communities(a.communities),
+    large_communities: unique_large_communities(a.large_communities),
+    other: ao,
+  }
+}
+
+///|
+fn route_attributes_equal(a : Attributes, b : Attributes) -> Bool {
+  semantic_attributes(a) == semantic_attributes(b)
 }

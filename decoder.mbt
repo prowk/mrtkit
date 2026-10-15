@@ -90,13 +90,21 @@ pub fn Decoder::decode(self : Decoder, data : Bytes) -> Batch raise ParseError {
 ///|
 pub struct StreamDecoder {
   priv decoder : Decoder
-  priv mut pending : Bytes
+  priv mut pending : @buffer.Buffer
+  priv mut expected : Int
+  priv mut header_ready : Bool
   priv mut failed : Bool
 }
 
 ///|
 pub fn StreamDecoder::new() -> StreamDecoder {
-  { decoder: Decoder::new(), pending: b"", failed: false, }
+  {
+    decoder: Decoder::new(),
+    pending: @buffer.Buffer(size_hint=12),
+    expected: 12,
+    header_ready: false,
+    failed: false,
+  }
 }
 
 ///|
@@ -114,23 +122,34 @@ pub fn StreamDecoder::feed(
   if chunk.length() > 1048576 {
     raise Invalid(0, "输入分块超过 1 MiB")
   }
-  let data = self.pending + chunk
   let batches = []
   let mut offset = 0
-  while data.length() - offset >= 12 {
-    let c : Cursor = { data, pos: offset + 8, end: data.length(), }
-    let length = c.u32()
-    if length > 16777216U {
-      raise Invalid(offset + 8, "MRT 记录超过 16 MiB 上限")
+  while offset < chunk.length() {
+    let wanted = self.expected - self.pending.length()
+    let available = chunk.length() - offset
+    let take = if wanted < available { wanted } else { available }
+    self.pending.write_bytes(chunk[offset:offset + take])
+    offset += take
+    if !self.header_ready && self.pending.length() == 12 {
+      let header = self.pending.to_bytes()
+      let c : Cursor = { data: header, pos: 8, end: 12, }
+      let length = c.u32()
+      if length > 16777216U {
+        raise Invalid(8, "MRT 记录超过 16 MiB 上限")
+      }
+      self.expected = length.reinterpret_as_int() + 12
+      self.header_ready = true
+      // 验证长度后一次分配记录容量，碎片输入只复制新增字节。
+      self.pending = @buffer.Buffer(size_hint=self.expected)
+      self.pending.write_bytes(header[:])
     }
-    let size = length.reinterpret_as_int() + 12
-    if data.length() - offset < size {
-      break
+    if self.header_ready && self.pending.length() == self.expected {
+      batches.push(self.decoder.decode(self.pending.to_bytes()))
+      self.pending = @buffer.Buffer(size_hint=12)
+      self.header_ready = false
+      self.expected = 12
     }
-    batches.push(self.decoder.decode(data[offset:offset + size].to_owned()))
-    offset += size
   }
-  self.pending = data[offset:].to_owned()
   batches
 }
 

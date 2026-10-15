@@ -5,12 +5,15 @@ import { options } from './options.mjs';
 import { DiagnosticCollector } from './diagnostics.mjs';
 
 const help = `mrtkit 0.2.0 — MoonBit BGP MRT 工具
-用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate> [选项] <文件...|->
+用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate|timeline> [选项] <文件...|->
   parse     输出路由 JSON Lines；--format csv 导出 CSV
   stats     输出统计 JSON
   changes   输出路径变化、起源变化、固定窗口波动提醒
   snapshot-diff --collector 名称 前快照 后快照  比较同源同视图快照
   aggregate 输出变化最多的前缀、受影响 peer 与类型分布；--top 默认 20
+  timeline --prefix CIDR  输出前缀时间线与各 peer 的观测状态
+  --continuous-observation  声明输入覆盖连续，允许计算观测不可见时长
+  --observation-gap 开始秒:结束秒  标记观测中断，可重复，支持六位小数
   --prefix CIDR       精确筛选前缀（自动清除主机位）
   --prefix-mode exact|more-specific|covering  前缀匹配模式
   --asn ASN           parse 中匹配 peer 或 AS 路径
@@ -89,7 +92,7 @@ export async function main(argv) {
   }
   const summary = JSON.parse(bridge.finish());
   if (summary.error) throw new Error(summary.error);
-  if (config.mode === 'stats' || config.mode === 'aggregate') await write(process.stdout, `${JSON.stringify(summary)}\n`);
+  if (['stats', 'aggregate', 'timeline'].includes(config.mode)) await write(process.stdout, `${JSON.stringify(summary)}\n`);
   await write(process.stderr, `已处理 ${records} 条 MRT 记录，跳过 ${skipped} 条不支持的类型，忽略 ${ignored} 个不支持的 MP 地址族\n`);
   await write(process.stderr, `${JSON.stringify(diagnosticCollector.report())}\n`);
   if (config.mode === 'changes') await write(process.stderr, `${JSON.stringify(summary)}\n`);
