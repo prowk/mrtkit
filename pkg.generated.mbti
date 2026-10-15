@@ -37,10 +37,12 @@ pub suberror ParseError {
 pub struct Analyzer {
   // private fields
 }
-pub fn Analyzer::new(window_seconds? : Int, threshold? : Int, capacity? : Int) -> Self raise ParseError
+pub fn Analyzer::new(window_seconds? : Int, threshold? : Int, capacity? : Int, from_time? : UInt, to_time? : UInt, from_micros? : Int, to_micros? : Int) -> Self raise ParseError
 pub fn Analyzer::observe(Self, RouteEvent) -> Array[Change] raise ParseError
 pub fn Analyzer::observe_state(Self, StateChange) -> Unit
 pub fn Analyzer::record_batch(Self, Batch) -> Unit
+pub fn Analyzer::seed(Self, RouteEvent) -> Unit raise ParseError
+pub fn Analyzer::set_baseline(Self) -> Unit
 pub fn Analyzer::summary(Self) -> Summary
 
 pub struct AsSegment {
@@ -68,6 +70,7 @@ pub fn Attributes::to_json(Self) -> Json
 
 pub struct Batch {
   header : Header
+  microseconds : Int?
   events : Array[RouteEvent]
   states : Array[StateChange]
   skipped : Bool
@@ -189,6 +192,8 @@ pub fn StreamDecoder::finish(Self) -> Unit raise ParseError
 pub fn StreamDecoder::new() -> Self
 
 pub struct Summary {
+  baseline_status : String
+  warmup_records : Int64
   records : Int64
   skipped_records : Int64
   ignored_families : Int64

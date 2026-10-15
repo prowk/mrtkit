@@ -51,7 +51,7 @@ node cli/mrtkit.mjs changes --from 1700000000 --to 1700000060 --window 60 --thre
 
 `--asn` 仅用于 `parse`；撤回消息没有 AS_PATH，因此只能按自身的 peer ASN 匹配撤回。分析使用 `--peer-asn`，保证宣告与撤回属于同一筛选范围。
 
-`--from/--to` 使用 Unix 秒，包含端点。分析缓存只由区间内选中的路由建立；区间前的快照不会自动作为基线。首次观察不会凭空产生路径变化。
+`--from/--to` 使用 Unix 秒，包含端点，可用 `--from-micros/--to-micros` 指定端点微秒。分析会回放窗口前的 UPDATE 和会话状态作为预热；使用 `--initial-rib 文件` 显式加载初始快照。基线和预热不计入窗口统计，窗口后的事件不改变最终状态。缺少完整基线会通过 `baseline_status` 标识，详见[回放说明](docs/REPLAY.md)。
 
 标准输出只有结果，计数和诊断写入标准错误。成功退出码为 `0`，错误为 `1`。错误前已经输出的 JSON Lines/CSV 是部分结果。文件名以 `--` 开头时，用 `--` 分隔选项。
 
@@ -69,7 +69,7 @@ AS_SET 计为一个跳数，联盟段不计普通路径长度。末段为 AS_SET
 
 乱序事件计入输入统计，但不回退缓存。会话离开 Established 时清除对应 peer 缓存；过期会话事件不会清除更新的缓存。输入仍应按时间顺序排列。
 
-`records/skipped_records/ignored_families/session_resets` 描述读取的整个流，路由统计描述筛选后的事件。路径均值按 RIB/宣告事件加权，包含重复宣告，撤回不参与。64 位计数以**十进制字符串**输出，避免 JSON 数字精度损失；ASN 为无符号数值。
+`records/skipped_records/ignored_families/session_resets` 描述时间窗口内的流，路由统计进一步受前缀和 peer 筛选。`warmup_records` 单独计数窗口前记录。路径均值按窗口内 RIB/宣告事件加权，包含重复宣告，撤回不参与。64 位计数以**十进制字符串**输出，避免 JSON 数字精度损失；ASN 为无符号数值。
 
 ## MoonBit 库
 

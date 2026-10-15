@@ -5,6 +5,8 @@ priv struct Config {
   peer_asn : UInt?
   from_time : UInt
   to_time : UInt
+  from_micros : Int?
+  to_micros : Int?
   window_seconds : Int
   threshold : Int
   capacity : Int
@@ -18,6 +20,7 @@ priv struct Session {
   query : @mrt.Query
   analyzer : @mrt.Analyzer?
   config : Config
+  mut baseline : Bool
 }
 
 ///|
@@ -52,8 +55,12 @@ pub fn configure(text : String) -> String {
     let query = @mrt.Query::new(
       prefix?=config.prefix,
       asn?=config.asn,
-      from_time=config.from_time,
-      to_time=config.to_time,
+      from_time?=if config.mode == "parse" {
+        Some(config.from_time)
+      } else {
+        None
+      },
+      to_time?=if config.mode == "parse" { Some(config.to_time) } else { None },
     )
     let analyzer = if config.mode == "parse" {
       None
@@ -63,6 +70,10 @@ pub fn configure(text : String) -> String {
           window_seconds=config.window_seconds,
           threshold=config.threshold,
           capacity=config.capacity,
+          from_time=config.from_time,
+          to_time=config.to_time,
+          from_micros=config.from_micros.unwrap_or(0),
+          to_micros=config.to_micros.unwrap_or(999999),
         ),
       )
     }
@@ -71,6 +82,7 @@ pub fn configure(text : String) -> String {
       query,
       analyzer,
       config,
+      baseline: false,
     })
     "{}"
   } catch {
@@ -87,7 +99,10 @@ pub fn consume(data : Bytes) -> String {
   }
   try {
     let batch = current.decoder.decode(data)
-    if current.analyzer is Some(analyzer) {
+    if current.baseline && batch.header.kind != 13 {
+      return error_json(0, "初始 RIB 文件只能包含 TABLE_DUMP_V2")
+    }
+    if !current.baseline && current.analyzer is Some(analyzer) {
       analyzer.record_batch(batch)
     }
     let lines = []
@@ -100,6 +115,10 @@ pub fn consume(data : Bytes) -> String {
       }
       match current.analyzer {
         Some(analyzer) => {
+          if current.baseline {
+            analyzer.seed(event)
+            continue
+          }
           let changes = analyzer.observe(event)
           if current.config.mode == "changes" {
             for item in changes {
@@ -134,6 +153,23 @@ pub fn consume(data : Bytes) -> String {
 pub fn reset_file() -> Unit {
   if session.val is Some(s) {
     s.decoder.reset()
+    s.baseline = false
+  }
+}
+
+///|
+pub fn begin_baseline() -> String {
+  match session.val {
+    Some(s) =>
+      match s.analyzer {
+        Some(analyzer) => {
+          s.baseline = true
+          analyzer.set_baseline()
+          "{}"
+        }
+        None => error_json(0, "parse 命令不加载分析基线")
+      }
+    None => error_json(0, "会话未配置")
   }
 }
 

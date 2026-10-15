@@ -12,6 +12,8 @@ const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
   --asn ASN           parse 中匹配 peer 或 AS 路径
   --peer-asn ASN      按 peer ASN 筛选，支持所有命令
   --from / --to 秒    Unix 秒时间戳，包含端点
+  --from-micros / --to-micros 微秒  时间端点的小数部分
+  --initial-rib 文件  显式初始快照；窗口前 UPDATE 自动预热
   --window 秒        波动分析窗口，默认 60
   --threshold 次     波动提醒阈值，默认 10
   --capacity 条      最大缓存路由数，默认 1000000
@@ -25,7 +27,7 @@ async function write(stream, text) {
 export async function main(argv) {
   if (!argv.length || argv.includes('--help') || argv.includes('-h')) { await write(process.stdout, `${help}\n`); return; }
   if (argv[0] === '--version') { await write(process.stdout, '0.1.0\n'); return; }
-  const { config, files } = options([...argv]);
+  const { config, files, initialRib } = options([...argv]);
   let bridge;
   try { bridge = await import(new URL('../_build/js/release/build/bridge/bridge.js', import.meta.url)); }
   catch (error) {
@@ -37,8 +39,13 @@ export async function main(argv) {
   if (configured.error) throw new Error(configured.error);
   let records = 0, skipped = 0, ignored = 0;
   if (config.mode === 'parse' && config.format === 'csv') await write(process.stdout, 'timestamp,microseconds,action,prefix,peer_asn,peer_ip,outbound,origin_as,path,next_hop,originated\n');
-  for (const file of files) {
+  const inputs = [...(initialRib ? [{ file: initialRib, baseline: true }] : []), ...files.map(file => ({ file, baseline: false }))];
+  for (const { file, baseline } of inputs) {
     bridge.reset_file();
+    if (baseline) {
+      const result = JSON.parse(bridge.begin_baseline());
+      if (result.error) throw new Error(result.error);
+    }
     let fileRecords = 0;
     try {
       for await (const frame of frames(inputChunks(file))) {

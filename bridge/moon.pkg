@@ -10,7 +10,13 @@ supported_targets = "js"
 options(
   link: {
     "js": {
-      "exports": [ "configure", "consume", "finish", "reset_file" ],
+      "exports": [
+        "configure",
+        "consume",
+        "finish",
+        "reset_file",
+        "begin_baseline",
+      ],
       "format": "esm",
     },
   },

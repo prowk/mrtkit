@@ -2,6 +2,8 @@
 package "broti/mrtkit/bridge"
 
 // Values
+pub fn begin_baseline() -> String
+
 pub fn configure(String) -> String
 
 pub fn consume(Bytes) -> String

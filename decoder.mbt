@@ -1,6 +1,7 @@
 ///|
 pub struct Batch {
   header : Header
+  microseconds : Int?
   events : Array[RouteEvent]
   states : Array[StateChange]
   skipped : Bool
@@ -35,6 +36,7 @@ pub fn Decoder::decode(self : Decoder, data : Bytes) -> Batch raise ParseError {
   let header = frame.header
   let empty : Batch = {
     header,
+    microseconds: frame.microseconds,
     events: [],
     states: [],
     skipped: false,
