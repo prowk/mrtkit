@@ -8,9 +8,15 @@ pub fn configure(String) -> String
 
 pub fn consume(Bytes) -> String
 
+pub fn consume_at(Bytes, String, Int64, Int64) -> String
+
+pub fn csv_header() -> String
+
 pub fn finish() -> String
 
 pub fn reset_file() -> Unit
+
+pub fn state() -> String
 
 // Errors
 

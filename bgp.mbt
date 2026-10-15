@@ -1,5 +1,6 @@
 ///|
 pub struct StateChange {
+  source : Source?
   timestamp : UInt
   microseconds : Int?
   peer_asn : UInt
@@ -39,6 +40,8 @@ fn make_event(
   attributes : Attributes,
 ) -> RouteEvent {
   {
+    schema_version: "2.0",
+    source: None,
     timestamp: frame.header.timestamp,
     microseconds: frame.microseconds,
     action,
@@ -92,6 +95,7 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
       states: [
         {
           timestamp: frame.header.timestamp,
+          source: None,
           microseconds: frame.microseconds,
           peer_asn,
           peer_ip,

@@ -61,6 +61,8 @@ node cli/mrtkit.mjs changes --from 1700000000 --to 1700000060 --window 60 --thre
 
 路由事件包含采集时间、可选微秒、`rib/announce/withdraw`、规范化前缀、peer ASN/IP、`outbound`、可选快照起源时间和属性。`attributes.path` 是有效路径，`wire_path/as4_path` 是原始分段。未知属性的 `value` 是字节数组。
 
+0.2.0 使用版本化输出 `schema_version: "2.0"`。变化的前后状态和路径、起源、下一跳、社区增删均为结构化对象，包含微秒及输入来源；同一更新的路径和属性变化可共享来源追溯。详见[输出契约](docs/OUTPUT.md)。
+
 AS_SET 计为一个跳数，联盟段不计普通路径长度。末段为 AS_SET 时不推断唯一起源 AS。变化比较忽略集合成员顺序、连续序列分段、社区排列及同一 MP 属性携带的其他前缀。
 
 分析按 **peer ASN＋peer IP＋收发方向＋前缀** 隔离。不同采集器须分开运行。使用一个初始 RIB 再接后续 UPDATE；多个完整快照须分别分析，当前不通过后续快照中缺失的条目推断撤回。
@@ -78,11 +80,13 @@ AS_SET 计为一个跳数，联盟段不计普通路径长度。末段为 AS_SET
 | API | 用途 |
 | --- | --- |
 | `read_frame` | 解码一条完整记录 |
+| `Decoder::decode_at` | 解码并附加文件、记录号、解压后记录偏移及事件索引 |
 | `Decoder::new/decode/reset` | 有状态解析与 peer 表关联；新文件清除 peer 表 |
 | `StreamDecoder::new/feed/finish` | 任意分块解析及 EOF 截断检查 |
 | `parse_prefix/parse_attributes/parse_peers/parse_rib/parse_bgp4mp` | 单独使用协议组件 |
 | `Query::new/matches` | 筛选路由事件 |
 | `Analyzer::new/record_batch/observe/summary` | 累计元数据、状态变化和路由统计 |
+| `Analyzer::seed/route_states` | 加载基线和导出可审计的最终路由状态 |
 | `event_json/event_csv/csv_header` | 导出路由 |
 
 `record_batch` 处理元数据和会话，路由需逐条调用 `observe`，便于自行筛选。`StreamDecoder` 失败后需创建新实例。

@@ -17,6 +17,8 @@ pub struct PeerTable {
 
 ///|
 pub struct RouteEvent {
+  schema_version : String
+  source : Source?
   timestamp : UInt
   microseconds : Int?
   action : String
@@ -85,6 +87,8 @@ pub fn parse_rib(
     let raw = c.bytes(c.u16())
     let attributes = rib_next_hop(parse_attributes(raw, 4), afi)
     events.push({
+      schema_version: "2.0",
+      source: None,
       timestamp: frame.header.timestamp,
       microseconds: frame.microseconds,
       action: "rib",

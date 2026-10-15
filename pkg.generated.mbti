@@ -41,6 +41,7 @@ pub fn Analyzer::new(window_seconds? : Int, threshold? : Int, capacity? : Int, f
 pub fn Analyzer::observe(Self, RouteEvent) -> Array[Change] raise ParseError
 pub fn Analyzer::observe_state(Self, StateChange) -> Unit
 pub fn Analyzer::record_batch(Self, Batch) -> Unit
+pub fn Analyzer::route_states(Self) -> Array[RouteEvent]
 pub fn Analyzer::seed(Self, RouteEvent) -> Unit raise ParseError
 pub fn Analyzer::set_baseline(Self) -> Unit
 pub fn Analyzer::summary(Self) -> Summary
@@ -87,21 +88,35 @@ pub struct BgpRecord {
 }
 
 pub struct Change {
+  schema_version : String
   timestamp : UInt
+  microseconds : Int?
   prefix : String
   peer_asn : UInt
   peer_ip : String
   outbound : Bool
   kind : String
-  before : String
-  after : String
+  source : Source?
+  before : RouteSnapshot?
+  after : RouteSnapshot
+  diff : RouteDiff
+  churn_count : Int?
 } derive(ToJson)
 pub fn Change::to_json(Self) -> Json
+
+pub struct CommunityDiff {
+  before : Array[UInt]
+  after : Array[UInt]
+  added : Array[UInt]
+  removed : Array[UInt]
+} derive(ToJson)
+pub fn CommunityDiff::to_json(Self) -> Json
 
 pub struct Decoder {
   // private fields
 }
 pub fn Decoder::decode(Self, Bytes) -> Batch raise ParseError
+pub fn Decoder::decode_at(Self, Bytes, String, Int64, Int64) -> Batch raise ParseError
 pub fn Decoder::new() -> Self
 pub fn Decoder::reset(Self) -> Unit
 
@@ -122,6 +137,26 @@ pub struct Header {
 pub fn Header::equal(Self, Self) -> Bool
 pub fn Header::not_equal(Self, Self) -> Bool
 pub fn Header::to_json(Self) -> Json
+
+pub struct HopDiff {
+  before : String?
+  after : String?
+}
+pub fn HopDiff::to_json(Self) -> Json
+pub impl ToJson for HopDiff
+
+pub struct OriginDiff {
+  before : UInt?
+  after : UInt?
+}
+pub fn OriginDiff::to_json(Self) -> Json
+pub impl ToJson for OriginDiff
+
+pub struct PathDiff {
+  before : Array[AsSegment]
+  after : Array[AsSegment]
+} derive(ToJson)
+pub fn PathDiff::to_json(Self) -> Json
 
 pub struct Peer {
   bgp_id : UInt
@@ -161,7 +196,17 @@ pub fn RawAttribute::equal(Self, Self) -> Bool
 pub fn RawAttribute::not_equal(Self, Self) -> Bool
 pub fn RawAttribute::to_json(Self) -> Json
 
+pub struct RouteDiff {
+  path : PathDiff?
+  origin_as : OriginDiff?
+  next_hop : HopDiff?
+  communities : CommunityDiff?
+} derive(ToJson)
+pub fn RouteDiff::to_json(Self) -> Json
+
 pub struct RouteEvent {
+  schema_version : String
+  source : Source?
   timestamp : UInt
   microseconds : Int?
   action : String
@@ -174,7 +219,27 @@ pub struct RouteEvent {
 } derive(ToJson)
 pub fn RouteEvent::to_json(Self) -> Json
 
+pub struct RouteSnapshot {
+  timestamp : UInt
+  microseconds : Int?
+  active : Bool
+  attributes : Attributes
+  source : Source?
+} derive(ToJson)
+pub fn RouteSnapshot::to_json(Self) -> Json
+
+pub struct Source {
+  file : String
+  record : Int64
+  offset : Int64
+  event_index : Int
+} derive(Eq, ToJson)
+pub fn Source::equal(Self, Self) -> Bool
+pub fn Source::not_equal(Self, Self) -> Bool
+pub fn Source::to_json(Self) -> Json
+
 pub struct StateChange {
+  source : Source?
   timestamp : UInt
   microseconds : Int?
   peer_asn : UInt
@@ -192,6 +257,7 @@ pub fn StreamDecoder::finish(Self) -> Unit raise ParseError
 pub fn StreamDecoder::new() -> Self
 
 pub struct Summary {
+  schema_version : String
   baseline_status : String
   warmup_records : Int64
   records : Int64

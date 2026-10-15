@@ -1,5 +1,6 @@
 ///|
 priv struct Config {
+  output_version : String?
   prefix : String?
   asn : UInt?
   peer_asn : UInt?
@@ -39,6 +40,9 @@ pub fn configure(text : String) -> String {
   session.val = None
   try {
     let config : Config = @json.from_json(@json.parse(text))
+    if config.output_version.unwrap_or("2.0") != "2.0" {
+      return error_json(0, "仅支持输出版本 2.0")
+    }
     if config.mode != "parse" &&
       config.mode != "stats" &&
       config.mode != "changes" {
@@ -92,13 +96,17 @@ pub fn configure(text : String) -> String {
 }
 
 ///|
-pub fn consume(data : Bytes) -> String {
+fn consume_inner(data : Bytes, origin : (String, Int64, Int64)?) -> String {
   let current = match session.val {
     Some(s) => s
     None => return error_json(0, "会话未配置")
   }
   try {
-    let batch = current.decoder.decode(data)
+    let batch = match origin {
+      Some((file, record, offset)) =>
+        current.decoder.decode_at(data, file, record, offset)
+      None => current.decoder.decode(data)
+    }
     if current.baseline && batch.header.kind != 13 {
       return error_json(0, "初始 RIB 文件只能包含 TABLE_DUMP_V2")
     }
@@ -146,6 +154,38 @@ pub fn consume(data : Bytes) -> String {
       session.val = None
       error_json(pos, message)
     }
+  }
+}
+
+///|
+pub fn consume(data : Bytes) -> String {
+  consume_inner(data, None)
+}
+
+///|
+pub fn consume_at(
+  data : Bytes,
+  file : String,
+  record : Int64,
+  offset : Int64,
+) -> String {
+  consume_inner(data, Some((file, record, offset)))
+}
+
+///|
+pub fn csv_header() -> String {
+  @mrt.csv_header()
+}
+
+///|
+pub fn state() -> String {
+  match session.val {
+    Some(s) =>
+      match s.analyzer {
+        Some(analyzer) => analyzer.route_states().to_json().stringify()
+        None => "[]"
+      }
+    None => error_json(0, "会话不可用")
   }
 }
 

@@ -36,6 +36,7 @@ test "peer 隔离、乱序及会话重置" {
   assert_eq(analyzer.summary().out_of_order, 1L)
   assert_eq(analyzer.summary().active_routes, 2)
   analyzer.observe_state({
+    source: None,
     timestamp: 101U,
     microseconds: None,
     peer_asn: event.peer_asn,

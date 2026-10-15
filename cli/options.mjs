@@ -36,7 +36,7 @@ export function canonicalPrefix(text) {
 export function options(argv) {
   const mode = argv.shift();
   if (!['parse', 'stats', 'changes'].includes(mode)) throw new Error('命令必须为 parse、stats 或 changes');
-  const config = { mode, format: 'json', prefix: null, asn: null, peer_asn: null, from_time: 0, to_time: 4294967295,
+  const config = { mode, format: 'json', output_version: '2.0', prefix: null, asn: null, peer_asn: null, from_time: 0, to_time: 4294967295,
     from_micros: 0, to_micros: 999999, window_seconds: 60, threshold: 10, capacity: 1000000 };
   let initialRib = null;
   const files = [];
@@ -46,12 +46,13 @@ export function options(argv) {
     if (arg === '--' && !endOptions) { endOptions = true; continue; }
     if (!endOptions && arg.startsWith('--')) {
       const name = arg.slice(2);
-      if (!['format', 'prefix', 'asn', 'peer-asn', 'from', 'to', 'from-micros', 'to-micros', 'initial-rib', 'window', 'threshold', 'capacity'].includes(name)) throw new Error(`未知选项: ${arg}`);
+      if (!['format', 'output-version', 'prefix', 'asn', 'peer-asn', 'from', 'to', 'from-micros', 'to-micros', 'initial-rib', 'window', 'threshold', 'capacity'].includes(name)) throw new Error(`未知选项: ${arg}`);
       const value = argv[++i];
       if (value === undefined) throw new Error(`${arg} 缺少值`);
       if (name === 'initial-rib') { if (initialRib !== null) throw new Error('只允许一个初始 RIB'); initialRib = value; }
       else if (name === 'from-micros' || name === 'to-micros') config[name.replace('-', '_')] = integer(value, arg, 0, 999999);
       else if (name === 'format') config.format = value;
+      else if (name === 'output-version') config.output_version = value;
       else if (name === 'prefix') config.prefix = canonicalPrefix(value);
       else if (name === 'asn') config.asn = integer(value, arg);
       else if (name === 'peer-asn') config.peer_asn = integer(value, arg);
@@ -67,5 +68,6 @@ export function options(argv) {
   if (mode !== 'parse' && config.asn !== null) throw new Error('分析请使用 --peer-asn，--asn 路径筛选仅支持 parse');
   if (config.from_time > config.to_time || (config.from_time === config.to_time && config.from_micros > config.to_micros)) throw new Error('--from 晚于 --to');
   if (initialRib && mode === 'parse') throw new Error('--initial-rib 仅用于分析命令');
+  if (config.output_version !== '2.0') throw new Error('仅支持 --output-version 2.0');
   return { config, files, initialRib };
 }

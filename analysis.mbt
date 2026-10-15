@@ -1,13 +1,18 @@
 ///|
 pub struct Change {
+  schema_version : String
   timestamp : UInt
+  microseconds : Int?
   prefix : String
   peer_asn : UInt
   peer_ip : String
   outbound : Bool
   kind : String
-  before : String
-  after : String
+  source : Source?
+  before : RouteSnapshot?
+  after : RouteSnapshot
+  diff : RouteDiff
+  churn_count : Int?
 } derive(ToJson)
 
 ///|
@@ -15,6 +20,7 @@ pub extend Change with ToJson::{to_json}
 
 ///|
 pub struct Summary {
+  schema_version : String
   baseline_status : String
   warmup_records : Int64
   records : Int64
@@ -41,6 +47,7 @@ pub extend Summary with ToJson::{to_json}
 
 ///|
 priv struct TrackedRoute {
+  event : RouteEvent
   peer : String
   active : Bool
   path : Array[AsSegment]
@@ -99,6 +106,7 @@ pub fn Analyzer::new(
     threshold,
     capacity,
     stats: {
+      schema_version: "2.0",
       baseline_status: "missing",
       warmup_records: 0L,
       records: 0L,
@@ -166,18 +174,29 @@ fn peer_key(asn : UInt, ip : String, outbound : Bool) -> String {
 fn change(
   event : RouteEvent,
   kind : String,
-  before : String,
-  after : String,
+  previous : TrackedRoute?,
+  attributes : Attributes,
+  churn_count? : Int,
 ) -> Change {
   {
+    schema_version: "2.0",
     timestamp: event.timestamp,
+    microseconds: event.microseconds,
     prefix: event.prefix,
     peer_asn: event.peer_asn,
     peer_ip: event.peer_ip,
     outbound: event.outbound,
     kind,
-    before,
-    after,
+    source: event.source,
+    before: previous.map(fn(old) {
+      route_snapshot(old.event, old.active, old.attributes)
+    }),
+    after: route_snapshot(event, event.action != "withdraw", attributes),
+    diff: route_diff(
+      previous.map(fn(old) { old.attributes }).unwrap_or(empty_attributes()),
+      attributes,
+    ),
+    churn_count,
   }
 }
 
@@ -238,34 +257,24 @@ pub fn Analyzer::observe(
       changed = !route_attributes_equal(previous.attributes, attributes)
       if !same_path(previous.path, path) {
         stats = { ..stats, path_changes: stats.path_changes + 1L, }
-        notices.push(
-          change(
-            event,
-            "path_change",
-            path_text(previous.path),
-            path_text(path),
-          ),
-        )
+        notices.push(change(event, "path_change", old, attributes))
         match (origin_as(previous.path), origin_as(path)) {
           (Some(a), Some(b)) if a != b => {
             stats = { ..stats, origin_changes: stats.origin_changes + 1L, }
-            notices.push(
-              change(event, "origin_change", a.to_string(), b.to_string()),
-            )
+            notices.push(change(event, "origin_change", old, attributes))
           }
           _ => ()
         }
-      } else if changed {
+      }
+      let attribute_changed = !route_attributes_equal(
+        { ..previous.attributes, path: [], },
+        { ..attributes, path: [], },
+      )
+      if attribute_changed {
         stats = { ..stats, attribute_changes: stats.attribute_changes + 1L, }
-        notices.push(
-          change(
-            event,
-            "attribute_change",
-            previous.attributes.to_json().stringify(),
-            attributes.to_json().stringify(),
-          ),
-        )
-      } else {
+        notices.push(change(event, "attribute_change", old, attributes))
+      }
+      if !changed {
         stats = {
           ..stats,
           duplicate_announcements: stats.duplicate_announcements + 1L,
@@ -292,11 +301,10 @@ pub fn Analyzer::observe(
   }
   if measured && count == self.threshold && changed {
     stats = { ..stats, churn_alerts: stats.churn_alerts + 1L, }
-    notices.push(
-      change(event, "churn", "", "固定窗口内达到 \{count} 次变化"),
-    )
+    notices.push(change(event, "churn", old, attributes, churn_count=count))
   }
   self.routes[key] = {
+    event: { ..event, attributes, },
     peer,
     active,
     path,
@@ -315,6 +323,24 @@ pub fn Analyzer::observe(
   } else {
     []
   }
+}
+
+///|
+/// 返回可审计的结束状态，顺序按状态键排序。
+pub fn Analyzer::route_states(self : Analyzer) -> Array[RouteEvent] {
+  let keys = self.routes.keys().to_array()
+  keys.sort()
+  keys.map(fn(key) {
+    let state = self.routes.get(key).unwrap()
+    {
+      ..state.event,
+      action: if state.active {
+        "active"
+      } else {
+        "withdrawn"
+      },
+    }
+  })
 }
 
 ///|

@@ -3,7 +3,7 @@ import { pathToFileURL } from 'node:url';
 import { frames, inputChunks } from './input.mjs';
 import { options } from './options.mjs';
 
-const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
+const help = `mrtkit 0.2.0 — MoonBit BGP MRT 工具
 用法: node cli/mrtkit.mjs <parse|stats|changes> [选项] <文件...|->
   parse     输出路由 JSON Lines；--format csv 导出 CSV
   stats     输出统计 JSON
@@ -17,6 +17,7 @@ const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
   --window 秒        波动分析窗口，默认 60
   --threshold 次     波动提醒阈值，默认 10
   --capacity 条      最大缓存路由数，默认 1000000
+  --output-version 2.0  指定机器可读输出版本
 支持未压缩 MRT、.gz 和 .bz2（bz2 需要 Python 3）。
 分析多个文件时须来自同一采集器，并按时间顺序传入。`;
 
@@ -26,7 +27,7 @@ async function write(stream, text) {
 
 export async function main(argv) {
   if (!argv.length || argv.includes('--help') || argv.includes('-h')) { await write(process.stdout, `${help}\n`); return; }
-  if (argv[0] === '--version') { await write(process.stdout, '0.1.0\n'); return; }
+  if (argv[0] === '--version') { await write(process.stdout, '0.2.0\n'); return; }
   const { config, files, initialRib } = options([...argv]);
   let bridge;
   try { bridge = await import(new URL('../_build/js/release/build/bridge/bridge.js', import.meta.url)); }
@@ -38,7 +39,7 @@ export async function main(argv) {
   const configured = JSON.parse(bridge.configure(JSON.stringify(wireConfig)));
   if (configured.error) throw new Error(configured.error);
   let records = 0, skipped = 0, ignored = 0;
-  if (config.mode === 'parse' && config.format === 'csv') await write(process.stdout, 'timestamp,microseconds,action,prefix,peer_asn,peer_ip,outbound,origin_as,path,next_hop,originated\n');
+  if (config.mode === 'parse' && config.format === 'csv') await write(process.stdout, `${bridge.csv_header()}\n`);
   const inputs = [...(initialRib ? [{ file: initialRib, baseline: true }] : []), ...files.map(file => ({ file, baseline: false }))];
   for (const { file, baseline } of inputs) {
     bridge.reset_file();
@@ -50,7 +51,7 @@ export async function main(argv) {
     try {
       for await (const frame of frames(inputChunks(file))) {
         fileRecords++; records++;
-        const result = JSON.parse(bridge.consume(frame.data));
+        const result = JSON.parse(bridge.consume_at(frame.data, file, BigInt(fileRecords), BigInt(frame.offset)));
         if (result.error) throw new Error(`记录 ${fileRecords}，文件偏移 ${frame.offset}，解析器局部偏移 ${result.position}: ${result.error}`);
         if (result.skipped) skipped++;
         ignored += result.ignored_families;

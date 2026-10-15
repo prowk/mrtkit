@@ -90,7 +90,7 @@ fn csv_quote(value : String) -> String {
 
 ///|
 pub fn csv_header() -> String {
-  "timestamp,microseconds,action,prefix,peer_asn,peer_ip,outbound,origin_as,path,next_hop,originated"
+  "schema_version,timestamp,microseconds,action,prefix,peer_asn,peer_ip,outbound,origin_as,path,next_hop,originated,source_file,source_record,source_offset,event_index"
 }
 
 ///|
@@ -111,5 +111,9 @@ pub fn event_csv(event : RouteEvent) -> String {
     Some(n) => n.to_string()
     None => ""
   }
-  "\{event.timestamp},\{micros},\{csv_quote(event.action)},\{csv_quote(event.prefix)},\{event.peer_asn},\{csv_quote(event.peer_ip)},\{event.outbound},\{origin},\{csv_quote(path_text(event.attributes.path))},\{csv_quote(hop)},\{originated}"
+  let source = match event.source {
+    Some(s) => "\{csv_quote(s.file)},\{s.record},\{s.offset},\{s.event_index}"
+    None => ",,,"
+  }
+  "\{event.schema_version},\{event.timestamp},\{micros},\{csv_quote(event.action)},\{csv_quote(event.prefix)},\{event.peer_asn},\{csv_quote(event.peer_ip)},\{event.outbound},\{origin},\{csv_quote(path_text(event.attributes.path))},\{csv_quote(hop)},\{originated},\{source}"
 }

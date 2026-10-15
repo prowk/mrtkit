@@ -33,7 +33,8 @@ test('显式基线与完整历史回放的窗口变化一致，基线和预热�
     const range = ['--from', '1700000001', '--to', '1700000001'];
     const full = cli(['changes', ...range, '-'], demo());
     const seeded = cli(['changes', ...range, '--initial-rib', initial, warm, next]);
-    assert.deepEqual(seeded.stdout, full.stdout);
+    const semantic = text => text.trim().split('\n').map(line => JSON.parse(line, (key, value) => key === 'source' ? undefined : value));
+    assert.deepEqual(semantic(seeded.stdout), semantic(full.stdout));
     const summary = JSON.parse(cli(['stats', ...range, '--initial-rib', initial, warm, next]).stdout);
     assert.equal(summary.baseline_status, 'explicit_rib');
     assert.equal(summary.rib_routes, '0');

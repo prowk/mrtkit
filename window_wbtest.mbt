@@ -5,7 +5,7 @@ test "RIB 和窗口前更新只建立基线" {
   assert_eq(analyzer.observe(sample_event(99U, "announce", [2U])).length(), 0)
   let changes = analyzer.observe(sample_event(100U, "announce", [3U]))
   assert_eq(changes.length(), 2)
-  assert_eq(changes[0].before, "2")
+  assert_eq(changes[0].before.unwrap().attributes.path[0].asns[0], 2U)
   let stats = analyzer.summary()
   assert_eq(stats.rib_routes, 0L)
   assert_eq(stats.announcements, 1L)
@@ -30,6 +30,7 @@ test "会话和路由共用微秒边界且重置后拒绝过期宣告" {
   }
   ignore(analyzer.observe(event))
   let state : StateChange = {
+    source: None,
     timestamp: 100U,
     microseconds: Some(450),
     peer_asn: event.peer_asn,

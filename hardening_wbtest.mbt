@@ -49,6 +49,7 @@ test "过期会话事件不能清除更新的路由状态" {
   }
   ignore(analyzer.observe(event))
   analyzer.observe_state({
+    source: None,
     timestamp: 100U,
     microseconds: Some(499),
     peer_asn: event.peer_asn,
@@ -60,6 +61,7 @@ test "过期会话事件不能清除更新的路由状态" {
   assert_eq(analyzer.summary().session_resets, 0L)
   assert_eq(analyzer.summary().out_of_order, 1L)
   analyzer.observe_state({
+    source: None,
     timestamp: 100U,
     microseconds: Some(501),
     peer_asn: event.peer_asn,
