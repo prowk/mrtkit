@@ -154,6 +154,7 @@ fn consume_inner(data : Bytes, origin : (String, Int64, Int64)?) -> String {
       "lines": lines.to_json(),
       "skipped": batch.skipped.to_json(),
       "ignored_families": batch.ignored_families.to_json(),
+      "diagnostics": batch.diagnostics.to_json(),
     }).stringify()
   } catch {
     @mrt.ParseError::Invalid(pos, message) => {

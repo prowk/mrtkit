@@ -80,6 +80,7 @@ pub struct Batch {
   skipped : Bool
   ignored_families : Int
   message_type : Int?
+  diagnostics : Array[Diagnostic]
 } derive(ToJson)
 pub fn Batch::to_json(Self) -> Json
 
@@ -88,6 +89,7 @@ pub struct BgpRecord {
   events : Array[RouteEvent]
   states : Array[StateChange]
   ignored_families : Int
+  ignored : Array[(Int, Int)]
 }
 
 pub struct Change {
@@ -123,6 +125,16 @@ pub fn Decoder::decode(Self, Bytes) -> Batch raise ParseError
 pub fn Decoder::decode_at(Self, Bytes, String, Int64, Int64) -> Batch raise ParseError
 pub fn Decoder::new() -> Self
 pub fn Decoder::reset(Self) -> Unit
+
+pub struct Diagnostic {
+  kind : String
+  mrt_type : Int
+  subtype : Int
+  afi : Int?
+  safi : Int?
+  source : Source?
+} derive(ToJson)
+pub fn Diagnostic::to_json(Self) -> Json
 
 pub struct Frame {
   header : Header

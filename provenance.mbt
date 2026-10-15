@@ -31,5 +31,8 @@ pub fn Decoder::decode_at(
   let states = batch.states.mapi(fn(i, event) {
     { ..event, source: Some({ file, record, offset, event_index: i, }), }
   })
-  { ..batch, events, states, }
+  let diagnostics = batch.diagnostics.map(fn(item) {
+    { ..item, source: Some({ file, record, offset, event_index: 0, }), }
+  })
+  { ..batch, events, states, diagnostics, }
 }

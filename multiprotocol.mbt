@@ -4,6 +4,8 @@ priv struct MpRoutes {
   path_ids : Array[UInt?]
   next_hop : String?
   supported : Bool
+  afi : Int
+  safi : Int
 }
 
 ///|
@@ -30,7 +32,14 @@ fn parse_mp(
   let afi = c.u16()
   let safi = c.u8()
   if (afi != 1 && afi != 2) || safi != 1 {
-    return { prefixes: [], path_ids: [], next_hop: None, supported: false, }
+    return {
+      prefixes: [],
+      path_ids: [],
+      next_hop: None,
+      supported: false,
+      afi,
+      safi,
+    }
   }
   let next_hop = if reach {
     let hop = read_next_hop(c, afi)
@@ -45,6 +54,8 @@ fn parse_mp(
     path_ids: entries.map(fn(entry) { entry.1 }),
     next_hop,
     supported: true,
+    afi,
+    safi,
   }
 }
 

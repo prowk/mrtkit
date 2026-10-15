@@ -7,6 +7,7 @@ pub struct Batch {
   skipped : Bool
   ignored_families : Int
   message_type : Int?
+  diagnostics : Array[Diagnostic]
 } derive(ToJson)
 
 ///|
@@ -42,6 +43,7 @@ pub fn Decoder::decode(self : Decoder, data : Bytes) -> Batch raise ParseError {
     skipped: false,
     ignored_families: 0,
     message_type: None,
+    diagnostics: [],
   }
   if header.kind == 13 {
     if header.subtype == 1 {
@@ -77,9 +79,12 @@ pub fn Decoder::decode(self : Decoder, data : Bytes) -> Batch raise ParseError {
       states: parsed.states,
       ignored_families: parsed.ignored_families,
       message_type: Some(parsed.message_type),
+      diagnostics: parsed.ignored.map(fn(pair) {
+        diagnostic(header, Some(pair.0), Some(pair.1))
+      }),
     }
   }
-  { ..empty, skipped: true, }
+  { ..empty, skipped: true, diagnostics: [diagnostic(header, None, None)], }
 }
 
 ///|

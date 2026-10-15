@@ -18,6 +18,7 @@ pub struct BgpRecord {
   events : Array[RouteEvent]
   states : Array[StateChange]
   ignored_families : Int
+  ignored : Array[(Int, Int)]
 }
 
 ///|
@@ -98,6 +99,7 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
     return {
       message_type: 0,
       ignored_families: 0,
+      ignored: [],
       events: [],
       states: [
         {
@@ -130,6 +132,7 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
   }
   let events = []
   let mut ignored_families = 0
+  let ignored = []
   if message_type == 2 {
     let withdrawn = message.take(message.u16())
     let withdrawals = read_nlri_paths(withdrawn, 1, addpath)
@@ -141,6 +144,7 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
         let mp = parse_mp(attr.value, reach, addpath~)
         if !mp.supported {
           ignored_families += 1
+          ignored.push((mp.afi, mp.safi))
         }
         for i, prefix in mp.prefixes {
           let attrs = if reach {
@@ -211,5 +215,5 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
     ignore(message.bytes(message.remaining()))
   }
   message.finish()
-  { message_type, events, states: [], ignored_families, }
+  { message_type, events, states: [], ignored_families, ignored, }
 }

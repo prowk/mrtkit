@@ -2,6 +2,7 @@
 import { pathToFileURL } from 'node:url';
 import { frames, inputChunks } from './input.mjs';
 import { options } from './options.mjs';
+import { DiagnosticCollector } from './diagnostics.mjs';
 
 const help = `mrtkit 0.2.0 — MoonBit BGP MRT 工具
 用法: node cli/mrtkit.mjs <parse|stats|changes> [选项] <文件...|->
@@ -41,6 +42,7 @@ export async function main(argv) {
   const configured = JSON.parse(bridge.configure(JSON.stringify(wireConfig)));
   if (configured.error) throw new Error(configured.error);
   let records = 0, skipped = 0, ignored = 0;
+  const diagnosticCollector = new DiagnosticCollector();
   if (config.mode === 'parse' && config.format === 'csv') await write(process.stdout, `${bridge.csv_header()}\n`);
   const inputs = [...(initialRib ? [{ file: initialRib, baseline: true }] : []), ...files.map(file => ({ file, baseline: false }))];
   for (const { file, baseline } of inputs) {
@@ -57,6 +59,7 @@ export async function main(argv) {
         if (result.error) throw new Error(`记录 ${fileRecords}，文件偏移 ${frame.offset}，解析器局部偏移 ${result.position}: ${result.error}`);
         if (result.skipped) skipped++;
         ignored += result.ignored_families;
+        diagnosticCollector.add(result.diagnostics);
         if (result.lines.length) await write(process.stdout, `${result.lines.join('\n')}\n`);
       }
     } catch (error) {
@@ -68,6 +71,7 @@ export async function main(argv) {
   if (summary.error) throw new Error(summary.error);
   if (config.mode === 'stats') await write(process.stdout, `${JSON.stringify(summary)}\n`);
   await write(process.stderr, `已处理 ${records} 条 MRT 记录，跳过 ${skipped} 条不支持的类型，忽略 ${ignored} 个不支持的 MP 地址族\n`);
+  await write(process.stderr, `${JSON.stringify(diagnosticCollector.report())}\n`);
   if (config.mode === 'changes') await write(process.stderr, `${JSON.stringify(summary)}\n`);
 }
 
