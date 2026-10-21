@@ -1,5 +1,7 @@
 # 开发说明
 
+[文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](../reference/cli.md)
+
 ## 模块职责
 
 ```text
@@ -34,6 +36,25 @@ Decoder → MRT frame → peer/RIB 或 BGP4MP
 
 公开 API 使用黑盒测试，协议细节使用白盒测试。Node 编码器独立生成样本，验证完整 CLI。对照依赖 `mrtparse` 仅放在 `.validation/`。功能提交包含对应测试，失败时不提交该功能。
 
-开发历程包含项目建立、安全读取、分帧、前缀、属性、快照、更新、IPv6、AS4、增量处理、查询导出、变化分析、CLI、两轮语义修复、真实数据验证和交付工具配置。用 `git log --oneline --reverse` 查看各阶段。
+提交前运行：
 
-ADD-PATH、Large Communities、结构化差异和来源追溯已实现。后续可扩展 RIB_GENERIC、多采集器关联和索引查询，扩展时同步更新支持范围、真实样本与公共接口。
+```sh
+moon info
+moon fmt
+npm test
+moon test --target wasm --deny-warn
+moon test --target wasm-gc --deny-warn
+```
+
+核对 `.mbti` 的差异仅包含预期公开接口变化。代码注释使用中文，文本读写显式使用 UTF-8；MRT 和压缩样本保持二进制格式。PowerShell 读取中文前设置 UTF-8 控制台，使用 `Get-Content -Encoding UTF8`。
+
+独立对照工具的契约测试：
+
+```sh
+python -m pip install --target .validation/deps -r requirements-validation.txt
+python -m unittest discover -s scripts -p test_compare.py
+```
+
+没有下载小样本或没有历史提交时，历史算法等价测试不具备运行条件；常规 CI 保留原始属性检测、失败复现与有界摘要检查。完整档案对照和真实回放步骤见[验证记录](../validation/README.md)。
+
+README 保留最短可用入口；新功能的操作步骤放 `docs/guides/`，精确字段和语义放 `docs/reference/`，证据与 JSON 放 `docs/validation/`。文档页统一链接首页、教程和命令行，索引在 `docs/README.md`。内部任务清单、开发计划、申报材料及原始下载数据均不提交。

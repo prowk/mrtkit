@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "broti/mrtkit/bridge"
+package "prowk/mrtkit/bridge"
 
 // Values
 pub fn begin_baseline() -> String

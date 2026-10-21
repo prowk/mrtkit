@@ -1,11 +1,13 @@
 # 验证记录
 
-验证日期：2026-10-15。工具链：moon 0.1.20260920、moonc v0.10.14+7d59c7ec9，Node.js 22.14.0，Python 3.13.2。CI 使用官方安装器的发布标签 `0.10.14+7d59c7ec9` 固定编译器和核心库。
+[文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](../reference/cli.md)
+
+验证日期：2026-10-22。工具链：moon 0.1.20260920、moonc v0.10.14+7d59c7ec9，Node.js 22.14.0，Python 3.13.2。CI 使用官方安装器的发布标签 `0.10.14+7d59c7ec9` 固定编译器和核心库。
 
 ## 自动测试
 
-- 47 个 MoonBit 测试分别在 JS、Wasm、Wasm GC 后端通过。
-- 55 个 Node 测试通过，包含命令行端到端验证、gzip/bz2、IPv6、旧式 ASN、扩展时间戳、ADD-PATH（含 BGP4MP_ET 子类型矩阵）、Large Communities、时间窗口、来源追溯、快照差异、聚合复算、前缀时间线和错误退出码。
+- 51 个 MoonBit 测试分别在 JS、Wasm、Wasm GC 后端通过。
+- 73 个 Node 测试通过，包含命令行端到端验证、gzip/bz2、IPv6、旧式 ASN、扩展时间戳、ADD-PATH（含 BGP4MP_ET 子类型矩阵）、Large Communities、时间窗口、来源追溯、快照差异、聚合复算、前缀时间线和错误退出码。
 - 确定性畸形输入测试覆盖 2,000 组随机修改/随机字节数据，所有调用均返回解析结果或错误，没有宿主异常。
 - 编译与测试启用 `--deny-warn`，当前没有编译警告。
 
@@ -39,9 +41,9 @@ IP 按地址字节比较，IPv4 映射 IPv6 地址的点分与十六进制显示
 
 来源为 [RIS rrc23 月度目录](https://data.ris.ripe.net/rrc23/2025.01/)与 [RouteViews sfmix 月度目录](https://archive.routeviews.org/route-views.sfmix/bgpdata/2025.01/)。每个文件的完整 URL、压缩大小、SHA-256 见 [archive-manifest.json](archive-manifest.json)；记录/事件数量、实测起止时间、工具版本及执行命令见 [archive-comparison.json](archive-comparison.json)。压缩文件均下载至 EOF 后验证 Content-Length，并通过压缩流解码到 EOF；没有截取记录前缀。
 
-`scripts/compare.py` 同时逐条迭代 mrtparse 和 MoonBit 记录输出，只保留当前记录事件的多重集合与 peer 索引，不捕获整个 CLI 输出、不跨记录累计全部事件。额外比较微秒、Path Identifier、Large Communities（含原始顺序）、会话新旧状态和不支持类型/地址族统计。比较输入及解压均为流式，错误输出使用临时文件。内存随单条记录和 peer 表大小增长，不随档案总事件数增长；MoonBit 单记录上限为 16 MiB。
+`scripts/compare.py` 同时逐条迭代 mrtparse 和 MoonBit 记录输出，只保留当前记录事件的多重集合与 peer 索引，不捕获整个 CLI 输出、不跨记录累计全部事件。额外比较微秒、Path Identifier、Large Communities（含原始顺序）、聚合属性、全部属性 flags/code/value、会话新旧状态和不支持类型/地址族统计。比较输入及解压均为流式，错误输出使用临时文件。`--keep-going` 会逐条保存差异记录的原始 MRT（RIB 附原 peer 表）和原因到 `.validation/mismatches/`，继续验证后仍非零退出；摘要最多保留十条，全部复现逐条落盘。参考解析器失败会把该文件明确标为未完整比较。内存随单条记录和 peer 表大小增长，不随档案总事件数增长；MoonBit 单记录上限为 16 MiB。
 
-这批真实输入未遇到不支持记录或地址族，也不能代表所有采集器及扩展。ADD-PATH 和畸形属性的覆盖仍主要来自独立构造的协议测试。有效 AS4 路径还原由独立规则单元测试和 CLI 回归验证，真实数据对照比较独立解析器提供的原始 AS_PATH/AS4_PATH；未知属性原始字节和全部 BGP 能力协商未在此脚本逐项对照。不据此声称全量 RFC 兼容或生产级性能。
+这批真实输入未遇到不支持记录或地址族，也不能代表所有采集器及扩展。ADD-PATH 和畸形属性的覆盖仍主要来自独立构造的协议测试。有效 AS4 路径还原由独立规则单元测试和 CLI 回归验证，真实数据对照比较独立解析器提供的原始 AS_PATH/AS4_PATH；本轮还逐项比较 ATOMIC_AGGREGATE 存在信息、wire/AS4/有效 AGGREGATOR，以及全部属性的标志、类型和值字节；完整 BGP 能力协商不在范围内。不据此声称全量 RFC 兼容或生产级性能。
 
 ## 复现
 
@@ -58,10 +60,16 @@ python scripts/test_compare.py
 # 完整档案：2 个 RIB、16 个连续更新文件，按采集器分别验证。
 python scripts/fetch_archives.py
 $archives = Get-ChildItem .validation/archives -File | Where-Object { $_.Extension -in '.gz', '.bz2' } | Sort-Object Name | ForEach-Object { $_.FullName }
-python scripts/compare.py --report .validation/complete-comparison.json @archives
+python scripts/compare.py --keep-going --report .validation/complete-comparison.json @archives
 python scripts/publish_validation.py
 ```
 
 样本与验证依赖只保存在被 Git 忽略的 `.validation/`，不会被提交。该流程需要网络，常规测试和演示不需要网络。
 
-性能测量方法、固定场景及优化前后比较见[性能基准](PERFORMANCE.md)。任务验收逐项对应[验收记录](ACCEPTANCE.md)，不将未覆盖的 P2 扩展列为已完成。
+性能测量方法、固定场景及优化前后比较见[性能基准](performance.md)。早期 P0/P1 证据见[历史验收](acceptance.md)，本次交付见[v0.1.0 验收](release-acceptance.md)与[标准清单](../reference/compatibility.md)。
+
+## 完整输入的窗口与导出验收
+
+`python scripts/replay_acceptance.py` 校验 RIS rrc23 一个完整 RIB 与十二个连续 UPDATE 的来源和 SHA-256。全部记录解码至 EOF，分析状态筛选 `183.90.160.0/24`、peer AS58952；窗口为 2025-01-01 00:20:00–00:40:00 UTC。独立 mrtparse 事件和 Python 业务模型逐项复算窗口前后状态、路径/起源/属性变化、波动、记录/预热统计和每条变化的记录号及解压后偏移，正式 CLI 与桥接结果相同，JSON/CSV 导出一致。
+
+本次 93 条变化提醒、46 行窗口内路由导出全部一致；输入、前后状态、统计和检查项见[回放原始报告](replay-acceptance.json)。基线与预热不计窗口统计。这是完整输入、限定状态的功能验收，不是全表状态内存基准。IPv6、ADD-PATH、会话重置、乱序、缺基线和缺档由窗口、独立状态模型、ADD-PATH 与时间线端到端矩阵补充；连续性未验证时不计算确定的不可见时长。

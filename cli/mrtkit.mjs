@@ -4,7 +4,7 @@ import { frames, inputChunks } from './input.mjs';
 import { options } from './options.mjs';
 import { DiagnosticCollector } from './diagnostics.mjs';
 
-const help = `mrtkit 0.2.0 — MoonBit BGP MRT 工具
+const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
 用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate|timeline> [选项] <文件...|->
   parse     输出路由 JSON Lines；--format csv 导出 CSV
   stats     输出统计 JSON
@@ -49,7 +49,7 @@ export function errorText(error) {
 
 async function execute(argv, output, diagnostic) {
   if (!argv.length || argv.includes('--help') || argv.includes('-h')) { await output(`${help}\n`); return; }
-  if (argv[0] === '--version') { await output('0.2.0\n'); return; }
+  if (argv[0] === '--version') { await output('0.1.0\n'); return; }
   const { config, files, initialRib, collector } = options([...argv]);
   let bridge;
   try { bridge = await import(new URL('../_build/js/release/build/bridge/bridge.js', import.meta.url)); }

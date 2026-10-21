@@ -12,3 +12,19 @@ __pycache__/
 /docs/项目申报书.md
 /docs/mrtkit项目申报书.md
 /todo.md
+
+# 本地开发计划和任务草稿不进入仓库或发布包。
+**/todo.md
+**/TODO.md
+**/plan.md
+**/PLAN.md
+**/plan-*.md
+**/*开发计划*.md
+**/*开发任务*.md
+/plans/
+/docs/plans/
+**/plans/
+**/roadmap.md
+**/ROADMAP.md
+**/*-plan.md
+**/*_plan.md

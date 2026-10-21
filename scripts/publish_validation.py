@@ -32,5 +32,5 @@ for tool in ('node', 'moon'):
     report[tool] = subprocess.check_output([tool, '--version'], text=True, encoding='utf-8').strip()
 report['totals'] = {key: sum(s[key] for s in report['samples']) for key in ('records', 'events', 'state_events', 'bytes', 'skipped_records', 'ignored_families')}
 for name, value in [('archive-manifest.json', manifest), ('archive-comparison.json', report)]:
-    (root / 'docs' / name).write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')
+    (root / 'docs' / 'validation' / name).write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')
 print(json.dumps(report['totals']))

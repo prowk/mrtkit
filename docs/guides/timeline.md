@@ -1,5 +1,7 @@
 # 前缀时间线
 
+[文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](../reference/cli.md)
+
 ```powershell
 node cli/mrtkit.mjs timeline --prefix 203.0.113.0/24 fixtures/demo.mrt
 node cli/mrtkit.mjs timeline --prefix 203.0.113.0/24 --from 1735689600 --to 1735693199 --initial-rib initial.mrt.gz --continuous-observation updates-0000.mrt.gz updates-0005.mrt.gz

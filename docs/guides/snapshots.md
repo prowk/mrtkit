@@ -1,5 +1,7 @@
 # 快照差异
 
+[文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](../reference/cli.md)
+
 ```powershell
 node cli/mrtkit.mjs snapshot-diff --collector ris-rrc23 --peer-asn 64512 before.mrt.gz after.mrt.gz
 node cli/mrtkit.mjs snapshot-diff --collector ris-rrc23 --prefix 2001:db8::/32 --prefix-mode more-specific before.mrt.gz after.mrt.gz

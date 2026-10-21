@@ -44,6 +44,6 @@ for (const old of before.medians) {
 const report = {scope: 'same fixed workloads, three fresh serial processes per version; medians; state and event counts verified identical',
   baseline_reproduced: true, comparisons};
 for (const [file, value] of [['benchmark-before.json', before], ['benchmark-after.json', after], ['benchmark-comparison.json', report]])
-  writeFileSync(`docs/${file}`, JSON.stringify(value, null, 2) + '\n', 'utf8');
+  writeFileSync(`docs/validation/${file}`, JSON.stringify(value, null, 2) + '\n', 'utf8');
 process.stdout.write(JSON.stringify(comparisons.map(r => ({name: r.name, seconds_before: r.before.seconds, seconds_after: r.after.seconds,
   speedup: r.elapsed_speedup, memory_ratio: r.peak_rss_ratio, analyzed: r.selected_analysis_events})), null, 2) + '\n');

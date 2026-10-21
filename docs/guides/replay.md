@@ -1,5 +1,7 @@
 # 基线与时间窗口回放
 
+[文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](../reference/cli.md)
+
 ```powershell
 node cli/mrtkit.mjs stats --initial-rib initial.mrt.gz --from 1735689900 --to 1735690200 updates.0000.gz updates.0005.gz updates.0010.gz
 node cli/mrtkit.mjs changes --from 100 --from-micros 500 --to 100 --to-micros 700 updates.mrt

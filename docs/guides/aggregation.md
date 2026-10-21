@@ -1,5 +1,7 @@
 # 变化聚合
 
+[文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](../reference/cli.md)
+
 ```powershell
 node cli/mrtkit.mjs aggregate --from 1735689600 --to 1735693199 --top 20 updates.20250101.0000.gz updates.20250101.0005.gz
 node cli/mrtkit.mjs aggregate --from 1735689600 --initial-rib initial.mrt.gz --peer-asn 64512 updates.mrt.gz

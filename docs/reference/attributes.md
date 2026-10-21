@@ -1,5 +1,7 @@
 # 属性解释与离线校验
 
+[文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](cli.md)
+
 本页描述已实现规则，规范依据为 [RFC 4271 §4.3、§5](https://www.rfc-editor.org/rfc/rfc4271.html#section-4.3)、[RFC 4760 §3–4](https://www.rfc-editor.org/rfc/rfc4760.html#section-3)、[RFC 6793 §4、§6](https://www.rfc-editor.org/rfc/rfc6793.html#section-4.2.3)及 [RFC 7606 的格式判定](https://www.rfc-editor.org/rfc/rfc7606.html#section-7)。本工具进行离线检查，错误返回 `ParseError::Invalid` 并停止当前解析；不执行在线的 attribute-discard、treat-as-withdraw、AFI disable 或会话 NOTIFICATION，也不把坏记录变成实际撤回事件。
 
 ## 聚合属性

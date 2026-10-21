@@ -61,6 +61,8 @@ class CompareTests(unittest.TestCase):
 
     def test_legacy_small_samples(self):
         # 只对两个固定小样本运行历史全量算法，禁止用于完整档案。
+        if not all((compare.ROOT / '.validation' / (name + '.mrt')).exists() for name in ('ris-updates', 'ris-rib')):
+            self.skipTest('需要先获取文档中的两个 1000 记录小样本及历史提交')
         legacy = subprocess.run(['git', 'show', '0267b4d:scripts/compare.py'], cwd=compare.ROOT,
                                 capture_output=True, text=True, encoding='utf-8', check=True).stdout
         namespace = {'__file__': str(Path(compare.__file__)), '__name__': 'legacy_test_only'}
