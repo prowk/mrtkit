@@ -30,12 +30,26 @@ const help = `mrtkit 0.2.0 — MoonBit BGP MRT 工具
 分析多个文件时须来自同一采集器，并按时间顺序传入。`;
 
 async function write(stream, text) {
-  await new Promise((resolve, reject) => stream.write(text, 'utf8', error => error ? reject(error) : resolve()));
+  try {await new Promise((resolve, reject) => stream.write(text, 'utf8', error => error ? reject(error) : resolve()));}
+  catch (error) {error.stage = 'output'; throw error;}
 }
 
-export async function main(argv) {
-  if (!argv.length || argv.includes('--help') || argv.includes('-h')) { await write(process.stdout, `${help}\n`); return; }
-  if (argv[0] === '--version') { await write(process.stdout, '0.2.0\n'); return; }
+export async function main(argv, {stdout = process.stdout, stderr = process.stderr} = {}) {
+  let started = false;
+  const output = async text => {started = true; await write(stdout, text);};
+  try {await execute(argv, output, stderr);}
+  catch (error) {error.partial_result = started; throw error;}
+}
+
+export function errorText(error) {
+  const stage = error.stage === 'output' ? `输出失败${error.code ? ` (${error.code})` : ''}: ` : '';
+  const partial = error.partial_result ? '；标准输出可能只包含部分结果，请勿当作完整结果' : '';
+  return `mrtkit: ${stage}${error.message}${partial}\n`;
+}
+
+async function execute(argv, output, diagnostic) {
+  if (!argv.length || argv.includes('--help') || argv.includes('-h')) { await output(`${help}\n`); return; }
+  if (argv[0] === '--version') { await output('0.2.0\n'); return; }
   const { config, files, initialRib, collector } = options([...argv]);
   let bridge;
   try { bridge = await import(new URL('../_build/js/release/build/bridge/bridge.js', import.meta.url)); }
@@ -47,22 +61,24 @@ export async function main(argv) {
   const configured = JSON.parse(bridge.configure(JSON.stringify(wireConfig)));
   if (configured.error) throw new Error(configured.error);
   if (config.mode === 'snapshot-diff') {
-    const check = text => { const value = JSON.parse(text); if (value.error) throw new Error(value.error); return value; };
+    const check = text => { const value = JSON.parse(text); if (value.error) throw Object.assign(new Error(value.error), {position: value.position}); return value; };
     check(bridge.snapshot_begin(collector, collector));
     for (const [index, file] of files.entries()) {
       let record = 0;
-      for await (const frame of frames(inputChunks(file))) {
-        record++;
-        try { check(bridge.snapshot_consume(frame.data, index === 1, file, BigInt(record), BigInt(frame.offset))); }
-        catch (error) { throw new Error(`${file}: 记录 ${record}，文件偏移 ${frame.offset}: ${error.message}`); }
-      }
+      try {
+        for await (const frame of frames(inputChunks(file))) {
+          record++;
+          try { check(bridge.snapshot_consume(frame.data, index === 1, file, BigInt(record), BigInt(frame.offset))); }
+          catch (error) { throw new Error(`记录 ${record}，文件偏移 ${frame.offset}，解析器局部偏移 ${error.position}: ${error.message}`); }
+        }
+      } catch (error) {throw new Error(`${file}: ${error.message}`);}
     }
-    await write(process.stdout, `${JSON.stringify(check(bridge.snapshot_finish()))}\n`);
+    await output(`${JSON.stringify(check(bridge.snapshot_finish()))}\n`);
     return;
   }
   let records = 0, skipped = 0, ignored = 0;
   const diagnosticCollector = new DiagnosticCollector();
-  if (config.mode === 'parse' && config.format === 'csv') await write(process.stdout, `${bridge.csv_header()}\n`);
+  if (config.mode === 'parse' && config.format === 'csv') await output(`${bridge.csv_header()}\n`);
   const inputs = [...(initialRib ? [{ file: initialRib, baseline: true }] : []), ...files.map(file => ({ file, baseline: false }))];
   for (const { file, baseline } of inputs) {
     bridge.reset_file();
@@ -79,31 +95,31 @@ export async function main(argv) {
         if (result.skipped) skipped++;
         ignored += result.ignored_families;
         diagnosticCollector.add(result.diagnostics);
-        if (result.lines.length) await write(process.stdout, `${result.lines.join('\n')}\n`);
+        if (result.lines.length) await output(`${result.lines.join('\n')}\n`);
       }
       if (baseline) {
         const result = JSON.parse(bridge.end_baseline());
         if (result.error) throw new Error(result.error);
       }
     } catch (error) {
-      if (error.code === 'EPIPE') throw error;
+      if (error.stage === 'output') throw error;
       throw new Error(`${file}: ${error.message}`);
     }
   }
   const summary = JSON.parse(bridge.finish());
   if (summary.error) throw new Error(summary.error);
-  if (['stats', 'aggregate', 'timeline'].includes(config.mode)) await write(process.stdout, `${JSON.stringify(summary)}\n`);
-  await write(process.stderr, `已处理 ${records} 条 MRT 记录，跳过 ${skipped} 条不支持的类型，忽略 ${ignored} 个不支持的 MP 地址族\n`);
-  await write(process.stderr, `${JSON.stringify(diagnosticCollector.report())}\n`);
-  if (config.mode === 'changes') await write(process.stderr, `${JSON.stringify(summary)}\n`);
+  if (['stats', 'aggregate', 'timeline'].includes(config.mode)) await output(`${JSON.stringify(summary)}\n`);
+  await write(diagnostic, `已处理 ${records} 条 MRT 记录，跳过 ${skipped} 条不支持的类型，忽略 ${ignored} 个不支持的 MP 地址族\n`);
+  await write(diagnostic, `${JSON.stringify(diagnosticCollector.report())}\n`);
+  if (config.mode === 'changes') await write(diagnostic, `${JSON.stringify(summary)}\n`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   // 管道接收端提前退出时由写回调处理 EPIPE。
   process.stdout.on('error', () => {});
+  process.stderr.on('error', () => {process.exitCode = 1;});
   main(process.argv.slice(2)).catch(error => {
-    if (error.code === 'EPIPE') return;
-    process.stderr.write(`mrtkit: ${error.message}\n`, 'utf8');
     process.exitCode = 1;
+    process.stderr.write(errorText(error), 'utf8');
   });
 }
