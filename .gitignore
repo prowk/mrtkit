@@ -10,4 +10,5 @@ __pycache__/
 # 本地申报材料不上传到远程仓库。
 /docs/参考.md
 /docs/项目申报书.md
+/docs/mrtkit项目申报书.md
 /todo.md

@@ -10,7 +10,8 @@ export function mrt(type, subtype, body, timestamp = 1700000000) {
   return cat(u32(timestamp), u16(type), u16(subtype), u32(body.length), body);
 }
 export function attr(code, body, flags = 0x40) {
-  return cat(Buffer.from([flags | (body.length > 255 ? 16 : 0), code]), body.length > 255 ? u16(body.length) : Buffer.from([body.length]), body);
+  const extended = Boolean(flags & 16) || body.length > 255;
+  return cat(Buffer.from([flags | (extended ? 16 : 0), code]), extended ? u16(body.length) : Buffer.from([body.length]), body);
 }
 export function attributes(asns) {
   return cat(attr(1, Buffer.from([0])), attr(2, cat(Buffer.from([2, asns.length]), ...asns.map(u32))), attr(3, Buffer.from([192, 0, 2, 1])));

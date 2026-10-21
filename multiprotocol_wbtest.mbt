@@ -8,7 +8,7 @@ test "IPv6 宣告、撤回及不支持的 SAFI" {
   assert_eq(mp.next_hop, Some("2001:db8::1"))
   let withdrawn = parse_mp(b"\x00\x02\x01\x20\x20\x01\x0d\xb8", false)
   assert_eq(withdrawn.prefixes[0], "2001:db8::/32")
-  assert_true(!parse_mp(b"\x00\x02\x80", true).supported)
+  assert_true(!parse_mp(b"\x00\x02\x80\x00\x00", true).supported)
 }
 
 ///|

@@ -4,10 +4,12 @@ pub fn reconstruct_path(
   path : Array[AsSegment],
   as4 : Array[AsSegment],
 ) -> Array[AsSegment] {
-  if as4.is_empty() || as4.any(fn(s) { s.kind >= 3 }) {
+  // RFC 6793 §6 只剔除 AS4_PATH 中的联盟段，其余有效分段继续参与还原。
+  let compatible = as4.filter(fn(s) { s.kind < 3 })
+  if compatible.is_empty() {
     return path
   }
-  let mut keep = path_length(path) - path_length(as4)
+  let mut keep = path_length(path) - path_length(compatible)
   if keep < 0 {
     return path
   }
@@ -33,7 +35,7 @@ pub fn reconstruct_path(
       }
     }
   }
-  for segment in as4 {
+  for segment in compatible {
     result.push(segment)
   }
   result
@@ -43,20 +45,15 @@ pub fn reconstruct_path(
 fn effective_path(
   path : Array[AsSegment],
   as4 : Array[AsSegment],
-  other : Array[RawAttribute],
+  aggregator : Aggregator?,
+  as4_aggregator : Aggregator?,
   width : Int,
 ) -> Array[AsSegment] {
   if width == 4 {
     return path
   }
-  for attr in other {
-    // 旧 AGGREGATOR 不是 AS_TRANS 时必须忽略 AS4_PATH。
-    if attr.code == 7 && attr.value.length() == 6 {
-      let asn = (attr.value[0].to_int() << 8) | attr.value[1].to_int()
-      if asn != 23456 {
-        return path
-      }
-    }
+  if aggregator is Some(old) && as4_aggregator is Some(_) && old.asn != 23456U {
+    return path
   }
   reconstruct_path(path, as4)
 }

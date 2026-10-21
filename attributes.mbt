@@ -41,6 +41,11 @@ pub struct Attributes {
   next_hop : String?
   med : UInt?
   local_pref : UInt?
+  atomic_aggregate : Bool
+  aggregator : Aggregator?
+  wire_aggregator : Aggregator?
+  as4_aggregator : Aggregator?
+  raw_attributes : Array[RawAttribute]
   communities : Array[UInt]
   large_communities : Array[(UInt, UInt, UInt)]
   other : Array[RawAttribute]
@@ -62,6 +67,11 @@ fn empty_attributes() -> Attributes {
     next_hop: None,
     med: None,
     local_pref: None,
+    atomic_aggregate: false,
+    aggregator: None,
+    wire_aggregator: None,
+    as4_aggregator: None,
+    raw_attributes: [],
     communities: [],
     large_communities: [],
     other: [],
@@ -108,18 +118,26 @@ pub fn parse_attributes(
   let mut next_hop = None
   let mut med = None
   let mut local_pref = None
+  let mut atomic_aggregate = false
+  let mut wire_aggregator = None
+  let mut as4_aggregator = None
+  let raw_attributes = []
   let communities = []
   let large_communities = []
   let other = []
   while c.remaining() > 0 {
+    let position = c.pos
     let flags = c.u8()
     let code = c.u8()
+    validate_attribute_flags(flags, code, position)
     let length = if (flags & 16) != 0 { c.u16() } else { c.u8() }
     if seen.contains(code) {
       raise Invalid(c.pos, "重复 BGP 属性")
     }
     seen[code] = true
     let value = c.take(length)
+    let raw = value.data[value.pos:value.end].to_owned()
+    raw_attributes.push({ flags, code, value: raw, })
     match code {
       1 => {
         let n = value.u8()
@@ -132,11 +150,41 @@ pub fn parse_attributes(
       3 => next_hop = Some(ip_text(value.bytes(4)))
       4 => med = Some(value.u32())
       5 => local_pref = Some(value.u32())
-      8 =>
+      6 => {
+        if length != 0 {
+          raise Invalid(value.pos, "ATOMIC_AGGREGATE 长度必须为零")
+        }
+        atomic_aggregate = true
+        other.push({ flags, code, value: raw, })
+      }
+      7 => {
+        wire_aggregator = Some(read_aggregator(value, asn_width))
+        other.push({ flags, code, value: raw, })
+      }
+      8 => {
+        if length == 0 || length % 4 != 0 {
+          raise Invalid(
+            value.pos,
+            "COMMUNITY 长度必须是非零的 4 字节倍数",
+          )
+        }
         while value.remaining() > 0 {
           communities.push(value.u32())
         }
-      17 => as4_path = read_as_path(value, 4)
+      }
+      17 => {
+        if length < 6 {
+          raise Invalid(
+            value.pos,
+            "AS4_PATH 必须至少包含一个 AS 号码",
+          )
+        }
+        as4_path = read_as_path(value, 4)
+      }
+      18 => {
+        as4_aggregator = Some(read_aggregator(value, 4))
+        other.push({ flags, code, value: raw, })
+      }
       32 => {
         let raw = value.bytes(value.remaining())
         if raw.length() == 0 || raw.length() % 12 != 0 {
@@ -157,12 +205,19 @@ pub fn parse_attributes(
   }
   {
     origin,
-    path: effective_path(path, as4_path, other, asn_width),
+    path: effective_path(
+      path, as4_path, wire_aggregator, as4_aggregator, asn_width,
+    ),
     wire_path: path,
     as4_path,
     next_hop,
     med,
     local_pref,
+    atomic_aggregate,
+    aggregator: effective_aggregator(wire_aggregator, as4_aggregator, asn_width),
+    wire_aggregator,
+    as4_aggregator,
+    raw_attributes,
     communities,
     large_communities: unique_large_communities(large_communities),
     other,

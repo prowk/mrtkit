@@ -32,6 +32,11 @@ fn parse_mp(
   let afi = c.u16()
   let safi = c.u8()
   if (afi != 1 && afi != 2) || safi != 1 {
+    // 不解释范围外 NLRI，但通用 MP_REACH 头及其下一跳长度不能截断。
+    if reach {
+      ignore(c.bytes(c.u8()))
+      ignore(c.u8())
+    }
     return {
       prefixes: [],
       path_ids: [],

@@ -144,7 +144,7 @@ fn csv_quote(value : String) -> String {
 
 ///|
 pub fn csv_header() -> String {
-  "schema_version,timestamp,microseconds,action,prefix,peer_asn,peer_ip,outbound,origin_as,path,next_hop,originated,source_file,source_record,source_offset,event_index,large_communities,path_id"
+  "schema_version,timestamp,microseconds,action,prefix,peer_asn,peer_ip,outbound,origin_as,path,next_hop,originated,source_file,source_record,source_offset,event_index,large_communities,path_id,atomic_aggregate,aggregator_asn,aggregator_address,wire_aggregator_asn,wire_aggregator_address,as4_aggregator_asn,as4_aggregator_address"
 }
 
 ///|
@@ -177,5 +177,16 @@ pub fn event_csv(event : RouteEvent) -> String {
     large.write_string("\{global}:\{local1}:\{local2}")
   }
   let id = event.path_id.map(fn(n) { n.to_string() }).unwrap_or("")
-  "\{event.schema_version},\{event.timestamp},\{micros},\{csv_quote(event.action)},\{csv_quote(event.prefix)},\{event.peer_asn},\{csv_quote(event.peer_ip)},\{event.outbound},\{origin},\{csv_quote(path_text(event.attributes.path))},\{csv_quote(hop)},\{originated},\{source},\{csv_quote(large.to_string())},\{id}"
+  let aggregator = csv_aggregator(event.attributes.aggregator)
+  let wire = csv_aggregator(event.attributes.wire_aggregator)
+  let as4 = csv_aggregator(event.attributes.as4_aggregator)
+  "\{event.schema_version},\{event.timestamp},\{micros},\{csv_quote(event.action)},\{csv_quote(event.prefix)},\{event.peer_asn},\{csv_quote(event.peer_ip)},\{event.outbound},\{origin},\{csv_quote(path_text(event.attributes.path))},\{csv_quote(hop)},\{originated},\{source},\{csv_quote(large.to_string())},\{id},\{event.attributes.atomic_aggregate},\{aggregator},\{wire},\{as4}"
+}
+
+///|
+fn csv_aggregator(value : Aggregator?) -> String {
+  match value {
+    Some(a) => "\{a.asn},\{csv_quote(a.address)}"
+    None => ","
+  }
 }

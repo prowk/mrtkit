@@ -41,7 +41,7 @@ test('IPv6 RIB 与精简 MP_REACH 属性', () => {
 
 test('旧式两字节会话保留原始路径并还原 AS4_PATH', () => {
   configure();
-  const attrs = cat(attr(1, Buffer.from([0])), attr(2, cat(Buffer.from([2, 2]), u16(64512), u16(23456))), attr(17, cat(Buffer.from([2, 1]), u32(65536)), 0xc0));
+  const attrs = cat(attr(1, Buffer.from([0])), attr(2, cat(Buffer.from([2, 2]), u16(64512), u16(23456))), attr(3, Buffer.from([192, 0, 2, 1])), attr(17, cat(Buffer.from([2, 1]), u32(65536)), 0xc0));
   const body = cat(u16(0), u16(attrs.length), attrs, Buffer.from([24, 192, 0, 2]));
   const message = cat(Buffer.alloc(16, 255), u16(19 + body.length), Buffer.from([2]), body);
   const transport = cat(u16(64512), u16(64513), u16(0), u16(1), Buffer.from([192, 0, 2, 1, 192, 0, 2, 2]));
@@ -53,7 +53,7 @@ test('旧式两字节会话保留原始路径并还原 AS4_PATH', () => {
 test('空 UPDATE 和未知 MP 地址族明确统计', () => {
   configure();
   assert.deepEqual(consume(bgpUpdate()), []);
-  const unsupported = JSON.parse(bridge.consume(bgpUpdate(undefined, undefined, attr(14, Buffer.from([0, 2, 128]), 0x80))));
+  const unsupported = JSON.parse(bridge.consume(bgpUpdate(undefined, undefined, attr(14, Buffer.from([0, 2, 128, 0, 0]), 0x80))));
   assert.equal(unsupported.ignored_families, 1);
   assert.deepEqual(unsupported.lines, []);
 });

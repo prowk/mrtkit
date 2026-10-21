@@ -35,15 +35,25 @@ fn same_path(a : Array[AsSegment], b : Array[AsSegment]) -> Bool {
 ///|
 fn semantic_attributes(a : Attributes) -> Attributes {
   // 同一 UPDATE 携带的其他前缀及 ASN 兼容编码不构成该路由的变化。
-  let ao = a.other.filter(fn(attr) {
-    attr.code != 14 && attr.code != 15 && attr.code != 32
-  })
+  let ao = a.other
+    .filter(fn(attr) {
+      attr.code != 6 &&
+      attr.code != 7 &&
+      attr.code != 18 &&
+      attr.code != 14 &&
+      attr.code != 15 &&
+      attr.code != 32
+    })
+    .map(fn(attr) { { ..attr, flags: attr.flags & 224, } })
   ao.sort_by_key(fn(attr) { attr.code })
   {
     ..a,
     path: canonical_path(a.path),
     wire_path: [],
     as4_path: [],
+    wire_aggregator: None,
+    as4_aggregator: None,
+    raw_attributes: [],
     communities: unique_communities(a.communities),
     large_communities: unique_large_communities(a.large_communities),
     other: ao,

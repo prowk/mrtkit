@@ -66,6 +66,8 @@ pub extend CommunityDiff with ToJson::{to_json}
 
 ///|
 pub struct RouteDiff {
+  atomic_aggregate : AtomicAggregateDiff?
+  aggregator : AggregatorDiff?
   path : PathDiff?
   origin_as : OriginDiff?
   next_hop : HopDiff?
@@ -106,6 +108,16 @@ fn route_diff(a : Attributes, b : Attributes) -> RouteDiff {
   let al = unique_large_communities(a.large_communities)
   let bl = unique_large_communities(b.large_communities)
   {
+    atomic_aggregate: if a.atomic_aggregate == b.atomic_aggregate {
+      None
+    } else {
+      Some({ before: a.atomic_aggregate, after: b.atomic_aggregate, })
+    },
+    aggregator: if a.aggregator == b.aggregator {
+      None
+    } else {
+      Some({ before: a.aggregator, after: b.aggregator, })
+    },
     large_communities: if al == bl {
       None
     } else {

@@ -56,6 +56,21 @@ pub struct AggregationReport {
 } derive(ToJson)
 pub fn AggregationReport::to_json(Self) -> Json
 
+pub struct Aggregator {
+  asn : UInt
+  address : String
+} derive(Eq, ToJson)
+pub fn Aggregator::equal(Self, Self) -> Bool
+pub fn Aggregator::not_equal(Self, Self) -> Bool
+pub fn Aggregator::to_json(Self) -> Json
+
+pub struct AggregatorDiff {
+  before : Aggregator?
+  after : Aggregator?
+}
+pub fn AggregatorDiff::to_json(Self) -> Json
+pub impl ToJson for AggregatorDiff
+
 pub struct Analyzer {
   // private fields
 }
@@ -76,6 +91,12 @@ pub fn AsSegment::equal(Self, Self) -> Bool
 pub fn AsSegment::not_equal(Self, Self) -> Bool
 pub fn AsSegment::to_json(Self) -> Json
 
+pub struct AtomicAggregateDiff {
+  before : Bool
+  after : Bool
+} derive(ToJson)
+pub fn AtomicAggregateDiff::to_json(Self) -> Json
+
 pub struct Attributes {
   origin : Int?
   path : Array[AsSegment]
@@ -84,6 +105,11 @@ pub struct Attributes {
   next_hop : String?
   med : UInt?
   local_pref : UInt?
+  atomic_aggregate : Bool
+  aggregator : Aggregator?
+  wire_aggregator : Aggregator?
+  as4_aggregator : Aggregator?
+  raw_attributes : Array[RawAttribute]
   communities : Array[UInt]
   large_communities : Array[(UInt, UInt, UInt)]
   other : Array[RawAttribute]
@@ -261,6 +287,8 @@ pub fn RawAttribute::to_json(Self) -> Json
 pub impl ToJson for RawAttribute
 
 pub struct RouteDiff {
+  atomic_aggregate : AtomicAggregateDiff?
+  aggregator : AggregatorDiff?
   path : PathDiff?
   origin_as : OriginDiff?
   next_hop : HopDiff?

@@ -22,9 +22,14 @@ test "联盟段及聚合器规则" {
   ]
   let as4 : Array[AsSegment] = [{ kind: 2, asns: [65536U], }]
   assert_eq(reconstruct_path(path, as4)[0].kind, 3)
-  let attrs : Array[RawAttribute] = [
-    { flags: 192, code: 7, value: b"\xfc\x00\xc0\x00\x02\x01", },
-  ]
-  assert_true(effective_path(path, as4, attrs, 2) == path)
-  assert_true(effective_path(path, as4, [], 4) == path)
+  let aggregator : Aggregator = { asn: 64512U, address: "192.0.2.1", }
+  let as4_aggregator : Aggregator = { asn: 65536U, address: "192.0.2.2", }
+  assert_true(
+    effective_path(path, as4, Some(aggregator), Some(as4_aggregator), 2) == path,
+  )
+  assert_eq(
+    origin_as(effective_path(path, as4, Some(aggregator), None, 2)),
+    Some(65536U),
+  )
+  assert_true(effective_path(path, as4, None, None, 4) == path)
 }

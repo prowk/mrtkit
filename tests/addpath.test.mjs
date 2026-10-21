@@ -10,7 +10,10 @@ export function addpathUpdate({ afi = 1, width = 4, outbound = false, id = 0, wi
   const path = attr(2, cat(Buffer.from([2, 2]), width === 4 ? u32(64512) : u16(64512), width === 4 ? u32(origin) : u16(origin)));
   let attrs = withdraw ? Buffer.alloc(0) : cat(attr(1, Buffer.from([0])), path);
   let announced = Buffer.alloc(0), withdrawn = Buffer.alloc(0);
-  if (afi === 1) { if (withdraw) withdrawn = nlri; else announced = nlri; }
+  if (afi === 1) {
+    if (withdraw) withdrawn = nlri;
+    else {announced = nlri; attrs = cat(attrs, attr(3, Buffer.from([192, 0, 2, 1])));}
+  }
   else {
     const body = withdraw ? cat(u16(2), Buffer.from([1]), nlri) : cat(u16(2), Buffer.from([1, 16]), Buffer.from('20010db8000000000000000000000001', 'hex'), Buffer.from([0]), nlri);
     attrs = cat(attrs, attr(withdraw ? 15 : 14, body, 128));
@@ -75,7 +78,8 @@ for (const afi of [1, 2]) for (const width of [2, 4]) {
     const cli = spawnSync(process.execPath, ['cli/mrtkit.mjs', 'parse', '--path-id', '0', '--format', 'csv', '-'], { input: cat(peer, rib), encoding: 'utf8', windowsHide: true });
     assert.equal(cli.status, 0, cli.stderr);
     assert.equal(cli.stdout.trim().split('\n').length, 2);
-    assert.ok(cli.stdout.trim().split('\n')[1].endsWith(',0'));
+    const csv = cli.stdout.trim().split('\n');
+    assert.equal(csv[1].split(',')[csv[0].split(',').indexOf('path_id')], '0');
   });
 }
 

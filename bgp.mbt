@@ -138,10 +138,16 @@ pub fn parse_bgp4mp(frame : Frame) -> BgpRecord raise ParseError {
     let withdrawals = read_nlri_paths(withdrawn, 1, addpath)
     let attributes = parse_attributes(message.bytes(message.u16()), width)
     let announcements = read_nlri_paths(message, 1, addpath)
+    if !announcements.is_empty() {
+      require_announcement_attributes(attributes, true)
+    }
     for attr in attributes.other {
       if attr.code == 14 || attr.code == 15 {
         let reach = attr.code == 14
         let mp = parse_mp(attr.value, reach, addpath~)
+        if reach && mp.supported {
+          require_announcement_attributes(attributes, false)
+        }
         if !mp.supported {
           ignored_families += 1
           ignored.push((mp.afi, mp.safi))
