@@ -18,6 +18,8 @@ pub fn csv_header() -> String
 
 pub fn decode_record(Bytes, String, Int64, Int64) -> String
 
+pub fn drain_changes() -> String
+
 pub fn end_baseline() -> String
 
 pub fn finish() -> String
@@ -31,6 +33,8 @@ pub fn snapshot_consume(Bytes, Bool, String, Int64, Int64) -> String
 pub fn snapshot_finish() -> String
 
 pub fn state() -> String
+
+pub fn storage_stats() -> String
 
 pub fn stream_end() -> String
 

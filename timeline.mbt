@@ -463,8 +463,8 @@ pub fn Timeline::observe(
       outbound: Some(event.outbound),
       accepted: true,
       source: event.source,
-      before: old.map(fn(r) { route_snapshot(r.event, r.active, r.attributes) }),
-      after: Some(route_snapshot(next.event, next.active, next.attributes)),
+      before: old.map(fn(r) { route_snapshot(r.event, r.active, r.shared.wire) }),
+      after: Some(route_snapshot(next.event, next.active, next.shared.wire)),
       changes,
     })
   }

@@ -50,9 +50,7 @@ pub extend Summary with ToJson::{to_json}
 priv struct TrackedRoute {
   event : RouteEvent
   active : Bool
-  path : Array[AsSegment]
-  attributes : Attributes
-  semantic : Attributes
+  shared : SharedAttributes
   time : UInt64
   window_start : UInt64
   window_count : Int
@@ -61,6 +59,7 @@ priv struct TrackedRoute {
 ///|
 pub struct Analyzer {
   priv routes : Map[String, TrackedRoute]
+  priv attribute_pool : Map[Attributes, SharedAttributes]
   priv window : UInt64
   priv threshold : Int
   priv capacity : Int
@@ -105,6 +104,7 @@ pub fn Analyzer::new(
     peer_resets: Map([]),
     peer_routes: Map([]),
     routes: Map([]),
+    attribute_pool: Map([]),
     window: window_seconds.to_uint64() * 1000000UL,
     threshold,
     capacity,
@@ -193,11 +193,11 @@ fn change(
     kind,
     source: event.source,
     before: previous.map(fn(old) {
-      route_snapshot(old.event, old.active, old.attributes)
+      route_snapshot(old.event, old.active, old.shared.wire)
     }),
     after: route_snapshot(event, event.action != "withdraw", attributes),
     diff: route_diff(
-      previous.map(fn(old) { old.attributes }).unwrap_or(empty_attributes()),
+      previous.map(fn(old) { old.shared.wire }).unwrap_or(empty_attributes()),
       attributes,
     ),
     churn_count,
@@ -255,9 +255,12 @@ pub fn Analyzer::observe(
   let notices = []
   let active = event.action != "withdraw"
   let semantic = if !active && old is Some(previous) {
-    previous.semantic
+    previous.shared.semantic
   } else {
-    semantic_attributes(event.attributes)
+    match self.attribute_pool.get(event.attributes) {
+      Some(shared) => shared.semantic
+      None => semantic_attributes(event.attributes)
+    }
   }
   let mut changed = event.action == "announce"
   let mut start = time
@@ -265,14 +268,18 @@ pub fn Analyzer::observe(
   let mut path = event.attributes.path
   let mut attributes = event.attributes
   if old is Some(previous) {
-    path = if active { event.attributes.path } else { previous.path }
-    attributes = if active { event.attributes } else { previous.attributes }
+    path = if active {
+      event.attributes.path
+    } else {
+      previous.shared.wire.path
+    }
+    attributes = if active { event.attributes } else { previous.shared.wire }
     if event.action == "announce" && previous.active {
-      changed = previous.semantic != semantic
-      if previous.semantic.path != semantic.path {
+      changed = previous.shared.semantic != semantic
+      if previous.shared.semantic.path != semantic.path {
         stats = { ..stats, path_changes: stats.path_changes + 1L, }
         notices.push(change(event, "path_change", old, attributes))
-        match (origin_as(previous.path), origin_as(path)) {
+        match (origin_as(previous.shared.wire.path), origin_as(path)) {
           (Some(a), Some(b)) if a != b => {
             stats = { ..stats, origin_changes: stats.origin_changes + 1L, }
             notices.push(change(event, "origin_change", old, attributes))
@@ -280,7 +287,7 @@ pub fn Analyzer::observe(
           _ => ()
         }
       }
-      let attribute_changed = { ..previous.semantic, path: [], } !=
+      let attribute_changed = { ..previous.shared.semantic, path: [], } !=
         { ..semantic, path: [], }
       if attribute_changed {
         stats = { ..stats, attribute_changes: stats.attribute_changes + 1L, }
@@ -315,12 +322,14 @@ pub fn Analyzer::observe(
     stats = { ..stats, churn_alerts: stats.churn_alerts + 1L, }
     notices.push(change(event, "churn", old, attributes, churn_count=count))
   }
+  let shared = self.retain_attributes(attributes, semantic)
+  if old is Some(previous) {
+    self.release_attributes(previous.shared)
+  }
   self.routes[key] = {
-    event: { ..event, attributes, },
+    event: { ..event, attributes: shared.wire, },
     active,
-    path,
-    attributes,
-    semantic,
+    shared,
     time,
     window_start: start,
     window_count: count,
@@ -383,6 +392,9 @@ pub fn Analyzer::observe_state(self : Analyzer, state : StateChange) -> Unit {
     for peer in [inbound, outbound] {
       if self.peer_routes.get(peer) is Some(keys) {
         for key in keys.keys() {
+          if self.routes.get(key) is Some(route) {
+            self.release_attributes(route.shared)
+          }
           self.routes.remove(key)
         }
         self.peer_routes.remove(peer)

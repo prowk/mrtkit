@@ -2,10 +2,13 @@
 pub struct AsSegment {
   kind : Int
   asns : Array[UInt]
-} derive(Eq, ToJson)
+} derive(Eq, Hash, ToJson)
 
 ///|
 pub extend AsSegment with Eq::{equal, not_equal}
+
+///|
+pub extend AsSegment with Hash::{hash, hash_combine}
 
 ///|
 pub extend AsSegment with ToJson::{to_json}
@@ -15,7 +18,7 @@ pub struct RawAttribute {
   flags : Int
   code : Int
   value : Bytes
-} derive(Eq)
+} derive(Eq, Hash)
 
 ///|
 pub impl ToJson for RawAttribute with fn to_json(self) {
@@ -28,6 +31,9 @@ pub impl ToJson for RawAttribute with fn to_json(self) {
 
 ///|
 pub extend RawAttribute with Eq::{equal, not_equal}
+
+///|
+pub extend RawAttribute with Hash::{hash, hash_combine}
 
 ///|
 pub extend RawAttribute with ToJson::{to_json}
@@ -49,10 +55,13 @@ pub struct Attributes {
   communities : Array[UInt]
   large_communities : Array[(UInt, UInt, UInt)]
   other : Array[RawAttribute]
-} derive(Eq, ToJson)
+} derive(Eq, Hash, ToJson)
 
 ///|
 pub extend Attributes with Eq::{equal, not_equal}
+
+///|
+pub extend Attributes with Hash::{hash, hash_combine}
 
 ///|
 pub extend Attributes with ToJson::{to_json}

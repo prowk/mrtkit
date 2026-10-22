@@ -59,8 +59,10 @@ pub fn AggregationReport::to_json(Self) -> Json
 pub struct Aggregator {
   asn : UInt
   address : String
-} derive(Eq, ToJson)
+} derive(Eq, Hash, ToJson)
 pub fn Aggregator::equal(Self, Self) -> Bool
+pub fn Aggregator::hash(Self) -> Int
+pub fn Aggregator::hash_combine(Self, Hasher) -> Unit
 pub fn Aggregator::not_equal(Self, Self) -> Bool
 pub fn Aggregator::to_json(Self) -> Json
 
@@ -81,13 +83,16 @@ pub fn Analyzer::record_batch(Self, Batch) -> Unit
 pub fn Analyzer::route_states(Self) -> Array[RouteEvent]
 pub fn Analyzer::seed(Self, RouteEvent) -> Unit raise ParseError
 pub fn Analyzer::set_baseline(Self) -> Unit
+pub fn Analyzer::storage_stats(Self) -> StorageStats
 pub fn Analyzer::summary(Self) -> Summary
 
 pub struct AsSegment {
   kind : Int
   asns : Array[UInt]
-} derive(Eq, ToJson)
+} derive(Eq, Hash, ToJson)
 pub fn AsSegment::equal(Self, Self) -> Bool
+pub fn AsSegment::hash(Self) -> Int
+pub fn AsSegment::hash_combine(Self, Hasher) -> Unit
 pub fn AsSegment::not_equal(Self, Self) -> Bool
 pub fn AsSegment::to_json(Self) -> Json
 
@@ -113,8 +118,10 @@ pub struct Attributes {
   communities : Array[UInt]
   large_communities : Array[(UInt, UInt, UInt)]
   other : Array[RawAttribute]
-} derive(Eq, ToJson)
+} derive(Eq, Hash, ToJson)
 pub fn Attributes::equal(Self, Self) -> Bool
+pub fn Attributes::hash(Self) -> Int
+pub fn Attributes::hash_combine(Self, Hasher) -> Unit
 pub fn Attributes::not_equal(Self, Self) -> Bool
 pub fn Attributes::to_json(Self) -> Json
 
@@ -280,8 +287,10 @@ pub struct RawAttribute {
   flags : Int
   code : Int
   value : Bytes
-} derive(Eq)
+} derive(Eq, Hash)
 pub fn RawAttribute::equal(Self, Self) -> Bool
+pub fn RawAttribute::hash(Self) -> Int
+pub fn RawAttribute::hash_combine(Self, Hasher) -> Unit
 pub fn RawAttribute::not_equal(Self, Self) -> Bool
 pub fn RawAttribute::to_json(Self) -> Json
 pub impl ToJson for RawAttribute
@@ -384,6 +393,13 @@ pub struct StateChange {
   new_state : Int
 } derive(ToJson)
 pub fn StateChange::to_json(Self) -> Json
+
+pub struct StorageStats {
+  route_keys : Int
+  unique_attribute_sets : Int
+  attribute_references : Int
+} derive(ToJson)
+pub fn StorageStats::to_json(Self) -> Json
 
 pub struct StreamDecoder {
   // private fields

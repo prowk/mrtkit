@@ -18,6 +18,7 @@ priv struct Config {
   observation_gaps : Array[WireGap]?
   mode : String
   format : String
+  metrics_changes : Bool?
 } derive(@json.FromJson)
 
 ///|
@@ -38,6 +39,7 @@ priv struct Session {
   config : Config
   mut baseline : Bool
   mut baseline_seen : Bool
+  pending_changes : Array[@mrt.Change]
 }
 
 ///|
@@ -187,6 +189,7 @@ pub fn configure(text : String) -> String {
       config,
       baseline: false,
       baseline_seen: false,
+      pending_changes: [],
     })
     "{}"
   } catch {
@@ -206,6 +209,7 @@ fn consume_inner(
     None => return error_json(0, "会话未配置")
   }
   try {
+    current.pending_changes.clear()
     let batch = match origin {
       Some((file, record, offset)) =>
         current.decoder.decode_at(data, file, record, offset)
@@ -268,6 +272,11 @@ fn consume_inner(
             continue
           }
           let changes = analyzer.observe(event)
+          if !emit && current.config.metrics_changes.unwrap_or(false) {
+            for item in changes {
+              current.pending_changes.push(item)
+            }
+          }
           if current.aggregation is Some(aggregation) {
             for item in changes {
               aggregation.observe(item)
@@ -372,6 +381,30 @@ pub fn state() -> String {
         Some(analyzer) => analyzer.route_states().to_json().stringify()
         None => "[]"
       }
+    None => error_json(0, "会话不可用")
+  }
+}
+
+///|
+pub fn storage_stats() -> String {
+  match session.val {
+    Some(s) =>
+      s.analyzer
+      .map(fn(a) { a.storage_stats().to_json().stringify() })
+      .unwrap_or("{}")
+    None => error_json(0, "会话不可用")
+  }
+}
+
+///|
+/// 基准在每条记录后取出变化，队列始终只覆盖上一条记录。
+pub fn drain_changes() -> String {
+  match session.val {
+    Some(s) => {
+      let result = s.pending_changes.to_json().stringify()
+      s.pending_changes.clear()
+      result
+    }
     None => error_json(0, "会话不可用")
   }
 }

@@ -23,6 +23,8 @@ options(
         "canonical_prefix",
         "decode_record",
         "consume_metrics",
+        "drain_changes",
+        "storage_stats",
         "stream_reset",
         "stream_metrics",
         "stream_end",
