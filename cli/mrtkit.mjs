@@ -5,13 +5,14 @@ import { options } from './options.mjs';
 import { DiagnosticCollector } from './diagnostics.mjs';
 
 const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
-用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate|timeline> [选项] <文件...|->
+用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate|timeline|multi> [选项] <文件...|->
   parse     输出路由 JSON Lines；--format csv 导出 CSV
   stats     输出统计 JSON
   changes   输出路径变化、起源变化、固定窗口波动提醒
   snapshot-diff --collector 名称 前快照 后快照  比较同源同视图快照
   aggregate 输出变化最多的前缀、受影响 peer 与类型分布；--top 默认 20
   timeline --prefix CIDR  输出前缀时间线与各 peer 的观测状态
+  multi --manifest 配置.json --output 新目录  按采集器/视图独立回放并导出结果包
   --continuous-observation  声明输入覆盖连续，允许计算观测不可见时长
   --observation-gap 开始秒:结束秒  标记观测中断，可重复，支持六位小数
   --prefix CIDR       精确筛选前缀（自动清除主机位）
@@ -50,6 +51,11 @@ export function errorText(error) {
 async function execute(argv, output, diagnostic) {
   if (!argv.length || argv.includes('--help') || argv.includes('-h')) { await output(`${help}\n`); return; }
   if (argv[0] === '--version') { await output('0.1.0\n'); return; }
+  if (argv[0] === 'multi') {
+    const {multiCommand} = await import('./multi.mjs');
+    await output(`${JSON.stringify(await multiCommand(argv.slice(1)))}\n`);
+    return;
+  }
   const { config, files, initialRib, collector } = options([...argv]);
   let bridge;
   try { bridge = await import(new URL('../_build/js/release/build/bridge/bridge.js', import.meta.url)); }

@@ -9,6 +9,7 @@
 | 比较两个同源快照 | [快照差异](guides/snapshots.md) |
 | 查看一个前缀的观测过程与缺档 | [前缀时间线](guides/timeline.md) |
 | 对变化排名、去重与复算 | [变化聚合](guides/aggregation.md) |
+| 按采集器与视图隔离回放 | [多采集器回放](guides/multi-collector.md) |
 | 查命令、选项、筛选与分析语义 | [命令行参考](reference/cli.md) |
 | 在 MoonBit 项目中使用核心库 | [库 API](reference/api.md) |
 | 消费版本化 JSON / CSV | [输出契约](reference/output.md) |
