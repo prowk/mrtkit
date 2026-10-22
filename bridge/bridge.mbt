@@ -42,6 +42,7 @@ priv struct Session {
   mut baseline : Bool
   mut baseline_seen : Bool
   pending_changes : Array[@mrt.Change]
+  mut state_export : Iter[@mrt.RouteEvent]?
 }
 
 ///|
@@ -192,6 +193,7 @@ pub fn configure(text : String) -> String {
       baseline: false,
       baseline_seen: false,
       pending_changes: [],
+      state_export: None,
     })
     "{}"
   } catch {
@@ -209,6 +211,9 @@ fn consume_inner(
   let current = match session.val {
     Some(s) => s
     None => return error_json(0, "会话未配置")
+  }
+  if current.state_export is Some(_) {
+    return error_json(0, "状态导出过程中不能继续输入记录")
   }
   try {
     current.pending_changes.clear()
@@ -401,6 +406,51 @@ pub fn storage_stats() -> String {
       s.analyzer
       .map(fn(a) { a.storage_stats().to_json().stringify() })
       .unwrap_or("{}")
+    None => error_json(0, "会话不可用")
+  }
+}
+
+///|
+pub fn state_export_begin() -> String {
+  match session.val {
+    Some(s) =>
+      match s.analyzer {
+        Some(analyzer) => {
+          if s.state_export is Some(_) {
+            return error_json(0, "状态导出已经开始")
+          }
+          s.state_export = Some(analyzer.route_state_iter())
+          "{}"
+        }
+        None => error_json(0, "当前命令没有路由状态")
+      }
+    None => error_json(0, "会话不可用")
+  }
+}
+
+///|
+pub fn state_export_chunk(limit : Int) -> String {
+  if limit < 1 || limit > 1024 {
+    return error_json(0, "状态分块须为 1..1024")
+  }
+  match session.val {
+    Some(s) =>
+      match s.state_export {
+        Some(iterator) => {
+          let rows = []
+          for i = 0; i < limit; i = i + 1 {
+            match iterator.next() {
+              Some(event) => rows.push(event)
+              None => break
+            }
+          }
+          if rows.is_empty() {
+            s.state_export = None
+          }
+          rows.to_json().stringify()
+        }
+        None => error_json(0, "请先开始状态分块导出")
+      }
     None => error_json(0, "会话不可用")
   }
 }

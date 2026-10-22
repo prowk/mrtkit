@@ -80,6 +80,7 @@ pub fn Analyzer::new(window_seconds? : Int, threshold? : Int, capacity? : Int, f
 pub fn Analyzer::observe(Self, RouteEvent) -> Array[Change] raise ParseError
 pub fn Analyzer::observe_state(Self, StateChange) -> Unit
 pub fn Analyzer::record_batch(Self, Batch) -> Unit
+pub fn Analyzer::route_state_iter(Self) -> Iter[RouteEvent]
 pub fn Analyzer::route_states(Self) -> Array[RouteEvent]
 pub fn Analyzer::seed(Self, RouteEvent) -> Unit raise ParseError
 pub fn Analyzer::set_baseline(Self) -> Unit

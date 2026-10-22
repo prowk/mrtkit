@@ -25,6 +25,8 @@ options(
         "consume_metrics",
         "drain_changes",
         "storage_stats",
+        "state_export_begin",
+        "state_export_chunk",
         "stream_reset",
         "stream_metrics",
         "stream_end",

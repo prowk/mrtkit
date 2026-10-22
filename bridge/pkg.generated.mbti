@@ -34,6 +34,10 @@ pub fn snapshot_finish() -> String
 
 pub fn state() -> String
 
+pub fn state_export_begin() -> String
+
+pub fn state_export_chunk(Int) -> String
+
 pub fn storage_stats() -> String
 
 pub fn stream_end() -> String

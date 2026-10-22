@@ -16,6 +16,7 @@
 | `Analyzer::new/record_batch/observe/summary` | 累计元数据、状态变化和路由统计 |
 | `Analyzer::seed/route_states` | 加载基线和导出可审计的最终路由状态 |
 | `Analyzer::storage_stats` | 路由键、独立属性集和共享引用计数 |
+| `Analyzer::route_state_iter` | 不构造完整状态数组的迭代导出，顺序不作承诺 |
 | `Snapshot::new/ingest/diff` | 比较同源、同视图快照，区分 peer 与路由缺失 |
 | `Timeline::new/seed_peers/seed/record_batch/observe/report` | 前缀观测过程与可见性区间 |
 | `Aggregation::new/observe/report` | 对带来源的变化提醒排名和计数 |
@@ -28,3 +29,5 @@
 `Source.collector/view` 为可选身份。未设置时保持原有单观测点语义；显式设置后，`Analyzer` 的路由、会话水位与重置按采集器、视图、peer、方向、前缀和 Path Identifier 隔离。同名 peer 不相互覆盖。属性池可以跨独立路由共享相同的完整属性，但事件时间和来源各自保留。哈希之后仍做完整相等检查，替换及会话重置时按引用回收；撤回状态保留引用和水位，不引入过期淘汰。
 
 一个 `Timeline` 只接受一个观测点的身份，混入其他采集器/视图明确报错；联合分析须使用各自独立的时间线和 Decoder。普通 CLI 命令仍描述单观测点输入，不能仅混合文件名就获得来源隔离。共享后的公开数组仍要求调用方保持不变。
+
+大状态集优先使用 `route_state_iter`，消费完成前不得改变分析器。JS 桥接提供 `state_export_begin/state_export_chunk(1..1024)`，读到空数组结束；导出期间继续输入记录会明确失败。原有 `route_states/state` 仍保留排序及整批导出语义，整批 JSON 需要额外内存，不能用它估算仅驻留路由状态的内存成本。

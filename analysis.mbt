@@ -373,6 +373,23 @@ pub fn Analyzer::route_states(self : Analyzer) -> Array[RouteEvent] {
 }
 
 ///|
+/// 分块导出使用迭代器，顺序不作承诺；消费完成前不得改变分析器状态。
+pub fn Analyzer::route_state_iter(self : Analyzer) -> Iter[RouteEvent] {
+  self.routes
+  .values()
+  .map(fn(state) {
+    {
+      ..state.event,
+      action: if state.active {
+        "active"
+      } else {
+        "withdrawn"
+      },
+    }
+  })
+}
+
+///|
 /// 会话离开 Established 时清除该 peer 的缓存，避免跨会话误报。
 pub fn Analyzer::observe_state(self : Analyzer, state : StateChange) -> Unit {
   let time = event_time(state.timestamp, state.microseconds)
