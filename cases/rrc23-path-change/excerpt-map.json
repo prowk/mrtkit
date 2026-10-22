@@ -1,0 +1,50 @@
+{
+  "sha256": "7a72eda2199e03036ae983e0d135bf7e323ad8ca1cdef30f76e43dd8d4629b2d",
+  "scope": "four unchanged BGP records, not a complete baseline or continuous archive",
+  "records": [
+    {
+      "excerpt_record": 1,
+      "excerpt_offset": 0,
+      "bytes": 181,
+      "original": {
+        "file": "ris-rrc23-updates.20250101.0015.gz",
+        "record": "28226",
+        "offset": "4750164",
+        "event_index": 0
+      }
+    },
+    {
+      "excerpt_record": 2,
+      "excerpt_offset": 181,
+      "bytes": 177,
+      "original": {
+        "file": "ris-rrc23-updates.20250101.0020.gz",
+        "record": "1",
+        "offset": "0",
+        "event_index": 0
+      }
+    },
+    {
+      "excerpt_record": 3,
+      "excerpt_offset": 358,
+      "bytes": 165,
+      "original": {
+        "file": "ris-rrc23-updates.20250101.0020.gz",
+        "record": "11278",
+        "offset": "1914432",
+        "event_index": 0
+      }
+    },
+    {
+      "excerpt_record": 4,
+      "excerpt_offset": 523,
+      "bytes": 181,
+      "original": {
+        "file": "ris-rrc23-updates.20250101.0020.gz",
+        "record": "11279",
+        "offset": "1914597",
+        "event_index": 0
+      }
+    }
+  ]
+}

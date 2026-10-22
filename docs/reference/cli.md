@@ -16,6 +16,7 @@
 | `timeline` | `summary/timeline` JSON，需要精确 `--prefix` |
 | `multi` | 显式清单回放结果包；用 `--manifest` 与 `--output` 指定 |
 | `correlate` | 结果包的跨采集器关联 JSON；用 `--input`、`--window`、`--capacity` 指定 |
+| `report` | 本地 HTML 与分块明细；用 `--input`、`--output`、`--page-size`、`--title` 指定 |
 
 | 选项 | 默认 / 约束 |
 | --- | --- |

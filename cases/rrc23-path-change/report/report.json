@@ -1,0 +1,73 @@
+{
+  "schema_version": "2.0",
+  "type": "offline_route_report",
+  "title": "RIS rrc23 · 183.90.160.0/24 路径复盘",
+  "status": "complete",
+  "input_status": "complete",
+  "source_path_policy": "explicit_archive_labels",
+  "ordering": "collector_manifest_order_then_collector_timeline_or_change_input_order",
+  "interpretation": "independent_collector_route_observations_not_business_outage",
+  "window": {
+    "from": 1735690800,
+    "to": 1735692000
+  },
+  "rows": 46,
+  "change_notices": 93,
+  "pages": [
+    {
+      "id": 0,
+      "file": "data/page-000000.js",
+      "rows": 46,
+      "facets": {
+        "collectors": [
+          "[\"ris-rrc23\",\"default\"]"
+        ],
+        "prefixes": [
+          "183.90.160.0/24"
+        ],
+        "peers": [
+          "58952",
+          "27.111.229.109"
+        ],
+        "kinds": [
+          "path_change",
+          "attribute_change",
+          "churn"
+        ]
+      }
+    }
+  ],
+  "collectors": [
+    {
+      "collector": "ris-rrc23",
+      "view": "default",
+      "status": "complete",
+      "baseline_status": "explicit_rib",
+      "continuous": false,
+      "gaps": [],
+      "summary": {
+        "schema_version": "2.0",
+        "baseline_status": "explicit_rib",
+        "warmup_records": "121086",
+        "records": "128126",
+        "skipped_records": "0",
+        "ignored_families": "0",
+        "rib_routes": "0",
+        "announcements": "46",
+        "withdrawals": "0",
+        "path_changes": "35",
+        "attribute_changes": "46",
+        "origin_changes": "0",
+        "duplicate_announcements": "0",
+        "churn_alerts": "12",
+        "out_of_order": "0",
+        "session_resets": "221",
+        "tracked_routes": 1,
+        "active_routes": 1,
+        "mean_path_length": 3.760869565217391,
+        "max_path_length": 5
+      },
+      "error": null
+    }
+  ]
+}

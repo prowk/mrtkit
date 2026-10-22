@@ -5,7 +5,7 @@ import { options } from './options.mjs';
 import { DiagnosticCollector } from './diagnostics.mjs';
 
 const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
-用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate|timeline|multi|correlate> [选项] <文件...|->
+用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate|timeline|multi|correlate|report> [选项] <文件...|->
   parse     输出路由 JSON Lines；--format csv 导出 CSV
   stats     输出统计 JSON
   changes   输出路径变化、起源变化、固定窗口波动提醒
@@ -14,6 +14,7 @@ const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
   timeline --prefix CIDR  输出前缀时间线与各 peer 的观测状态
   multi --manifest 配置.json --output 新目录  按采集器/视图独立回放并导出结果包
   correlate --input 结果包/index.json --window 秒  关联多观测点的同类语义变化
+  report --input 结果包/index.json --output 新目录  生成离线 HTML 复盘报告
   --continuous-observation  声明输入覆盖连续，允许计算观测不可见时长
   --observation-gap 开始秒:结束秒  标记观测中断，可重复，支持六位小数
   --prefix CIDR       精确筛选前缀（自动清除主机位）
@@ -60,6 +61,11 @@ async function execute(argv, output, diagnostic) {
   if (argv[0] === 'correlate') {
     const {correlateCommand} = await import('./correlate.mjs');
     await output(`${JSON.stringify(await correlateCommand(argv.slice(1)))}\n`);
+    return;
+  }
+  if (argv[0] === 'report') {
+    const {reportCommand} = await import('./report.mjs');
+    await output(`${JSON.stringify(await reportCommand(argv.slice(1)))}\n`);
     return;
   }
   const { config, files, initialRib, collector } = options([...argv]);

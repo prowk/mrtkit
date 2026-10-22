@@ -1,0 +1,100 @@
+{
+  "schema_version": "2.0",
+  "case": "ris-rrc23-183.90.160.0-24",
+  "matched": true,
+  "source_files": [
+    {
+      "file": "ris-rrc23-bview.20250101.0000.gz",
+      "sha256": "efc04342c70650d92c623db8f1181ef7036183bb61735f74d7ce3450b618e731",
+      "records": 1228318
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0000.gz",
+      "sha256": "6b53e356a36f23cf62b4deff5a38133b4e5e8db871a65ce73633b3821aafa1fb",
+      "records": 32669
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0005.gz",
+      "sha256": "38c98c830afd795656ec9c19fb01303fc069395487c6256d2b289a79125162ad",
+      "records": 30382
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0010.gz",
+      "sha256": "85024ff293baa4828e39291f2bf1f545d9b344189aff6117e92264057711e73f",
+      "records": 29250
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0015.gz",
+      "sha256": "89dfdcb84fd3d6dc285b48a1a468578f3a8eab314569520b6acbd0707067f2c3",
+      "records": 28785
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0020.gz",
+      "sha256": "23f9b53987248edcca3278f956ce1e094e4aece9c4cb5743c4aef59be98cc604",
+      "records": 34605
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0025.gz",
+      "sha256": "6a33afa6383dcb3b463980d919e8e979c5e5e1e462f7de3e5dccc709882f78f6",
+      "records": 31693
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0030.gz",
+      "sha256": "625b10c11f89381e44fbb1b9a3f6b4c8086b3d8de12445e0c7788fe6d6c4834c",
+      "records": 31241
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0035.gz",
+      "sha256": "9e45b07338431bed0b2f4d0cd6e5def7aa24b584c9c72a66f88643a9f3091083",
+      "records": 30500
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0040.gz",
+      "sha256": "27ae30ed57bffcc3d1ab828966e8fa101260b2440803a96133ac66483e5c9fde",
+      "records": 29799
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0045.gz",
+      "sha256": "15b4a139ca7d7ead2c41882debbc4bf9d19b1a3e06fc88a466fe2b65eac896d5",
+      "records": 31283
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0050.gz",
+      "sha256": "6d0dd7efb1a97739244b18a1ba76fa5df10b7584be77084c681ac0abe4c68168",
+      "records": 31037
+    },
+    {
+      "file": "ris-rrc23-updates.20250101.0055.gz",
+      "sha256": "9dff9243c06287f4982ffa738e6009f16690ef10fd7c69b53cbc1558b9e3d974",
+      "records": 28364
+    }
+  ],
+  "summary": {
+    "schema_version": "2.0",
+    "baseline_status": "explicit_rib",
+    "warmup_records": "121086",
+    "records": "128126",
+    "skipped_records": "0",
+    "ignored_families": "0",
+    "rib_routes": "0",
+    "announcements": "46",
+    "withdrawals": "0",
+    "path_changes": "35",
+    "attribute_changes": "46",
+    "origin_changes": "0",
+    "duplicate_announcements": "0",
+    "churn_alerts": "12",
+    "out_of_order": "0",
+    "session_resets": "221",
+    "tracked_routes": 1,
+    "active_routes": 1,
+    "mean_path_length": 3.760869565217391,
+    "max_path_length": 5
+  },
+  "anchors_checked": 3,
+  "change_notices": 93,
+  "excerpt_sha256": "7a72eda2199e03036ae983e0d135bf7e323ad8ca1cdef30f76e43dd8d4629b2d",
+  "html_rows": 46,
+  "html_change_notices": 93,
+  "interpretation": "collector_peer_effective_AS_path_observations_not_business_outage_or_causation"
+}
