@@ -21,6 +21,7 @@ priv struct Config {
   metrics_changes : Bool?
   collector : String?
   view : String?
+  correlation_keys : Bool?
 } derive(@json.FromJson)
 
 ///|
@@ -298,7 +299,13 @@ fn consume_inner(
           }
           if emit && current.config.mode == "changes" {
             for item in changes {
-              lines.push(item.to_json().stringify())
+              lines.push(
+                if current.config.correlation_keys.unwrap_or(false) {
+                  item.with_correlation_key().to_json().stringify()
+                } else {
+                  item.to_json().stringify()
+                },
+              )
             }
           }
         }
@@ -515,12 +522,22 @@ pub fn finish() -> String {
       match s.analyzer {
         Some(analyzer) => {
           if s.timeline is Some(timeline) {
+            let report = timeline.report() catch {
+              @mrt.ParseError::Invalid(pos, message) =>
+                return error_json(pos, message)
+            }
+            let enhanced = if s.config.correlation_keys.unwrap_or(false) {
+              report.with_correlation_keys() catch {
+                @mrt.ParseError::Invalid(pos, message) =>
+                  return error_json(pos, message)
+              }
+            } else {
+              report
+            }
             return Json::object({
               "summary": analyzer.summary().to_json(),
-              "timeline": timeline.report().to_json(),
-            }).stringify() catch {
-              @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
-            }
+              "timeline": enhanced.to_json(),
+            }).stringify()
           }
           if s.aggregation is Some(aggregation) {
             return Json::object({

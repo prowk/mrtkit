@@ -161,8 +161,11 @@ pub struct Change {
   after : RouteSnapshot
   diff : RouteDiff
   churn_count : Int?
+  correlation_key : String?
 } derive(ToJson)
+pub fn Change::correlation_key(Self) -> String raise ParseError
 pub fn Change::to_json(Self) -> Json
+pub fn Change::with_correlation_key(Self) -> Self raise ParseError
 
 pub struct CommunityDiff {
   before : Array[UInt]
@@ -503,6 +506,7 @@ pub struct TimelineReport {
   peers : Array[TimelinePeer]
 } derive(ToJson)
 pub fn TimelineReport::to_json(Self) -> Json
+pub fn TimelineReport::with_correlation_keys(Self) -> Self raise ParseError
 
 pub struct VisibilityInterval {
   scope : String

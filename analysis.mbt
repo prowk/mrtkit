@@ -14,6 +14,7 @@ pub struct Change {
   after : RouteSnapshot
   diff : RouteDiff
   churn_count : Int?
+  correlation_key : String?
 } derive(ToJson)
 
 ///|
@@ -201,6 +202,7 @@ fn change(
       attributes,
     ),
     churn_count,
+    correlation_key: None,
   }
 }
 

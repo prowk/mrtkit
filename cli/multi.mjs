@@ -70,6 +70,7 @@ export async function replayManifest(manifestPath,outputPath){
         from_time:manifest.window.from,to_time:manifest.window.to,window_seconds:manifest.analysis?.window_seconds??60,
         threshold:manifest.analysis?.threshold??10,capacity:manifest.analysis?.capacity??1000000,
         collector:group.collector,view:group.view,continuous_observation:group.continuous===true,
+        correlation_keys:true,
         observation_gaps:result.gaps.map(gap=>({from_time:gap.from,to_time:gap.to,from_micros:0,to_micros:0}))};
       checked(bridge.configure(JSON.stringify(config)));
       changes=await open(join(directory,result.changes_file),'wx');
@@ -103,9 +104,11 @@ export async function replayManifest(manifestPath,outputPath){
         for(const entry of report.timeline.entries)for(const change of entry.changes){await changes.writeFile(JSON.stringify(change)+'\n','utf8');noticeCount++;}
       }
       result.change_notices=noticeCount;
+      result.changes_sha256=await digest(join(directory,result.changes_file));
       checked(bridge.state_export_begin());
       const state=await open(join(directory,result.state_file),'wx');
       try{for(;;){const rows=checked(bridge.state_export_chunk(128));if(!rows.length)break;await state.writeFile(rows.map(row=>JSON.stringify(row)).join('\n')+'\n','utf8');}}finally{await state.close();}
+      result.state_sha256=await digest(join(directory,result.state_file));
       result.status='complete';
     }catch(error){result.status='partial';result.error=error.message;}
     finally{
