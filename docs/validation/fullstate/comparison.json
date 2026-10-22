@@ -1,0 +1,273 @@
+{
+  "schema_version": "2.0",
+  "type": "full_state_benchmark",
+  "complete_rib_replay_succeeded": false,
+  "scope": "Fixed RIS rrc23 full RIB plus 12 consecutive updates; no prefix or peer filter. Three fresh serial processes per configuration.",
+  "input": {
+    "files": 13,
+    "rib_records": 1228318,
+    "rib_events": 11088254,
+    "update_records": 369608,
+    "update_events": 857843,
+    "conservative_route_capacity_upper_bound": 11946097,
+    "configured_capacity": 12000000
+  },
+  "builds": {
+    "before_original": "2c16cde0d20da5b26b78f706832efcc42051423e8158d650530b1913ff98cd28",
+    "before_probe": "3aa0429e4e1e93d94ac865adadc11f7178f950051f7f57640365da746caeaf81",
+    "after": "302fe03aaec630c8ae0ee2afba234d6cdeccf4d31721394aff7d54d42b156ecc"
+  },
+  "instrumentation": {
+    "original_sha256": "2c16cde0d20da5b26b78f706832efcc42051423e8158d650530b1913ff98cd28",
+    "instrumented_sha256": "3aa0429e4e1e93d94ac865adadc11f7178f950051f7f57640365da746caeaf81",
+    "contract": "Append-only read-only state export; original analyzer unchanged; old sorted state array retained, JSON trees limited to one event."
+  },
+  "checkpoint": {
+    "before": {
+      "records": 25000,
+      "route_events": 228292,
+      "peak_rss_bytes": 873766912,
+      "seconds": 1.6522598
+    },
+    "after": {
+      "records": 25000,
+      "route_events": 228292,
+      "peak_rss_bytes": 342241280,
+      "seconds": 1.4393341
+    },
+    "rss_ratio": 0.3916848707587591
+  },
+  "full_attempt": {
+    "before": {
+      "seconds": 3.0349972,
+      "peak_rss_bytes": 1478922240,
+      "records": 44032,
+      "route_events": 401180,
+      "active_routes": 401180,
+      "cached_routes": 401180,
+      "withdrawn_routes": 0,
+      "serialization_seconds": 0,
+      "writing_seconds": 0,
+      "route_events_per_second": 131400.121225812
+    },
+    "after": {
+      "seconds": 8.6466538,
+      "peak_rss_bytes": 1476251648,
+      "records": 144640,
+      "route_events": 1324473,
+      "active_routes": 1324473,
+      "cached_routes": 1324473,
+      "withdrawn_routes": 0,
+      "serialization_seconds": 0,
+      "writing_seconds": 0,
+      "route_events_per_second": 153426.2884446698
+    },
+    "full_replay_throughput": null,
+    "complete_output_serialization_seconds": null,
+    "complete_output_writing_seconds": null,
+    "contract": "Both stop during RIB on explicit 1400 MiB RSS budget; different progress cannot be compared as complete-RIB peak memory or throughput. Zero partial output costs are not complete-export measurements."
+  },
+  "updates_only": {
+    "before": {
+      "seconds": 331.2273686,
+      "peak_rss_bytes": 583770112,
+      "records": 369608,
+      "route_events": 857843,
+      "active_routes": 41647,
+      "cached_routes": 46520,
+      "withdrawn_routes": 4873,
+      "serialization_seconds": 2.4163725,
+      "writing_seconds": 8.095521,
+      "route_events_per_second": 2589.891661506863
+    },
+    "after": {
+      "seconds": 271.0957181,
+      "peak_rss_bytes": 517550080,
+      "records": 369608,
+      "route_events": 857843,
+      "active_routes": 41647,
+      "cached_routes": 46520,
+      "withdrawn_routes": 4873,
+      "serialization_seconds": 2.1330389,
+      "writing_seconds": 7.3116843,
+      "route_events_per_second": 3164.354664146944
+    },
+    "elapsed_speedup": 1.2218096653146657,
+    "rss_ratio": 0.8865648812113217,
+    "equality_fields": [
+      "records",
+      "route_events",
+      "state_events",
+      "active_routes",
+      "cached_routes",
+      "withdrawn_routes",
+      "summary",
+      "notices",
+      "output_bytes",
+      "output_sha256",
+      "state_sha256",
+      "state_bytes"
+    ],
+    "equal": true,
+    "expected": {
+      "records": 369608,
+      "route_events": 857843,
+      "state_events": 749,
+      "active_routes": 41647,
+      "cached_routes": 46520,
+      "withdrawn_routes": 4873,
+      "summary": {
+        "schema_version": "2.0",
+        "baseline_status": "missing",
+        "warmup_records": "0",
+        "records": "369608",
+        "skipped_records": "0",
+        "ignored_families": "0",
+        "rib_routes": "0",
+        "announcements": "811031",
+        "withdrawals": "46812",
+        "path_changes": "449700",
+        "attribute_changes": "608557",
+        "origin_changes": "3480",
+        "duplicate_announcements": "33770",
+        "churn_alerts": "80003",
+        "out_of_order": "0",
+        "session_resets": "662",
+        "tracked_routes": 46520,
+        "active_routes": 41647,
+        "mean_path_length": 4.87521192161582,
+        "max_path_length": 78
+      },
+      "notices": 1141740,
+      "output_bytes": 4735570592,
+      "output_sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+      "state_sha256": {
+        "rows": 46520,
+        "sha256_sum": "71d595845963159dcd0197b54317346b6f48bc424902e6f3a5e45cdebb95c4ea",
+        "sha256_xor": "363bd4242e8645de87d7e4ae2f639af398576f59feda4e7de640a38cf8b6285c"
+      },
+      "state_bytes": 60429325
+    },
+    "contract": "All 12 full UPDATE files, no RIB and updates_only baseline. Includes decompression, parsing, state analysis, bridge serialization, buffered notice writes and final-state export; not a full-table RIB benchmark."
+  },
+  "verification": {
+    "compiled_builds_reproduced": true,
+    "baseline_probe_append_only": true,
+    "input_hashes_checked": 13,
+    "actual_completed_outputs": [
+      {
+        "scenario": "stream-before",
+        "iteration": 1,
+        "output_bytes": 4735570592,
+        "output_sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+        "state": {
+          "rows": 46520,
+          "sha256_sum": "71d595845963159dcd0197b54317346b6f48bc424902e6f3a5e45cdebb95c4ea",
+          "sha256_xor": "363bd4242e8645de87d7e4ae2f639af398576f59feda4e7de640a38cf8b6285c"
+        }
+      },
+      {
+        "scenario": "stream-before",
+        "iteration": 2,
+        "output_bytes": 4735570592,
+        "output_sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+        "state": {
+          "rows": 46520,
+          "sha256_sum": "71d595845963159dcd0197b54317346b6f48bc424902e6f3a5e45cdebb95c4ea",
+          "sha256_xor": "363bd4242e8645de87d7e4ae2f639af398576f59feda4e7de640a38cf8b6285c"
+        }
+      },
+      {
+        "scenario": "stream-before",
+        "iteration": 3,
+        "output_bytes": 4735570592,
+        "output_sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+        "state": {
+          "rows": 46520,
+          "sha256_sum": "71d595845963159dcd0197b54317346b6f48bc424902e6f3a5e45cdebb95c4ea",
+          "sha256_xor": "363bd4242e8645de87d7e4ae2f639af398576f59feda4e7de640a38cf8b6285c"
+        }
+      },
+      {
+        "scenario": "stream-after",
+        "iteration": 1,
+        "output_bytes": 4735570592,
+        "output_sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+        "state": {
+          "rows": 46520,
+          "sha256_sum": "71d595845963159dcd0197b54317346b6f48bc424902e6f3a5e45cdebb95c4ea",
+          "sha256_xor": "363bd4242e8645de87d7e4ae2f639af398576f59feda4e7de640a38cf8b6285c"
+        }
+      },
+      {
+        "scenario": "stream-after",
+        "iteration": 2,
+        "output_bytes": 4735570592,
+        "output_sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+        "state": {
+          "rows": 46520,
+          "sha256_sum": "71d595845963159dcd0197b54317346b6f48bc424902e6f3a5e45cdebb95c4ea",
+          "sha256_xor": "363bd4242e8645de87d7e4ae2f639af398576f59feda4e7de640a38cf8b6285c"
+        }
+      },
+      {
+        "scenario": "stream-after",
+        "iteration": 3,
+        "output_bytes": 4735570592,
+        "output_sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+        "state": {
+          "rows": 46520,
+          "sha256_sum": "71d595845963159dcd0197b54317346b6f48bc424902e6f3a5e45cdebb95c4ea",
+          "sha256_xor": "363bd4242e8645de87d7e4ae2f639af398576f59feda4e7de640a38cf8b6285c"
+        }
+      }
+    ]
+  },
+  "source_revision_contract": "Raw report source_revision is the harness workspace HEAD; bridge_source_revision and bridge_sha256 bind the measured protocol build. It is not a measurement of later commits.",
+  "parse_only": {
+    "before": [
+      {
+        "name": "complete_rib_parse",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 19.2681573,
+        "records_per_second": 63748.59727764419,
+        "route_events_per_second": 575470.3902069556,
+        "decompressed_mib_per_second": 43.751180908765576,
+        "peak_rss_bytes": 110268416
+      },
+      {
+        "name": "one_hour_updates_parse",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 2.1714937,
+        "records_per_second": 170209.10537295134,
+        "route_events_per_second": 395047.42749196093,
+        "decompressed_mib_per_second": 27.758582901080946,
+        "peak_rss_bytes": 72900608
+      }
+    ],
+    "after": [
+      {
+        "name": "complete_rib_parse",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 19.1009518,
+        "records_per_second": 64306.63837390553,
+        "route_events_per_second": 580507.9305000916,
+        "decompressed_mib_per_second": 44.13416905281401,
+        "peak_rss_bytes": 97079296
+      },
+      {
+        "name": "one_hour_updates_parse",
+        "active_routes": 0,
+        "cached_routes": 0,
+        "seconds": 2.2198317,
+        "records_per_second": 166502.71279574934,
+        "route_events_per_second": 386445.06247928616,
+        "decompressed_mib_per_second": 27.15412519364644,
+        "peak_rss_bytes": 73084928
+      }
+    ]
+  }
+}

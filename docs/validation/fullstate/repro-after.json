@@ -1,0 +1,515 @@
+{
+  "publication": {
+    "original_report_sha256": "6c5ddb36909ce5f2c7bbcd45cc00156efd32aef94306f57181a45d8a0451aeba",
+    "rewriting": "Only workspace absolute path prefix replaced with <workspace>; measurements retained."
+  },
+  "method": "Unfiltered complete RIB plus 12 consecutive UPDATE archives; fresh serial processes; explicit resource budget; no successful full-state claim on incomplete run.",
+  "environment": {
+    "date": "2026-10-22T10:21:35.367Z",
+    "platform": "win32",
+    "release": "10.0.26200",
+    "cpu": "AMD Ryzen 9 7940HX with Radeon Graphics        ",
+    "total_memory_bytes": 16340418560,
+    "free_memory_bytes": 4550533120,
+    "node": "v22.14.0",
+    "moon": "moon 0.1.20260920 (914d7da 2026-09-20) ~\\.moon\\bin\\moon.exe\nmoonc v0.10.14+7d59c7ec9 (2026-09-18) ~\\.moon\\bin\\moonc.exe\nmoonrun 0.1.20260920 (914d7da 2026-09-20) ~\\.moon\\bin\\moonrun.exe\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
+    "python": "Python 3.13.2"
+  },
+  "source_revision": "f63abe6de75cf075dee2d39aec81f3871fd82fbe",
+  "bridge_source_revision": "f63abe6",
+  "bridge_sha256": "302fe03aaec630c8ae0ee2afba234d6cdeccf4d31721394aff7d54d42b156ecc",
+  "bridge": "<workspace>\\.validation\\fullstate\\current-bridge.mjs",
+  "inputs": [
+    {
+      "collector": "ris-rrc23",
+      "kind": "rib",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/bview.20250101.0000.gz",
+      "file": "ris-rrc23-bview.20250101.0000.gz",
+      "complete_archive": true,
+      "bytes": 82732647,
+      "sha256": "efc04342c70650d92c623db8f1181ef7036183bb61735f74d7ce3450b618e731"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0000.gz",
+      "file": "ris-rrc23-updates.20250101.0000.gz",
+      "complete_archive": true,
+      "bytes": 767888,
+      "sha256": "6b53e356a36f23cf62b4deff5a38133b4e5e8db871a65ce73633b3821aafa1fb"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0005.gz",
+      "file": "ris-rrc23-updates.20250101.0005.gz",
+      "complete_archive": true,
+      "bytes": 716385,
+      "sha256": "38c98c830afd795656ec9c19fb01303fc069395487c6256d2b289a79125162ad"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0010.gz",
+      "file": "ris-rrc23-updates.20250101.0010.gz",
+      "complete_archive": true,
+      "bytes": 658121,
+      "sha256": "85024ff293baa4828e39291f2bf1f545d9b344189aff6117e92264057711e73f"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0015.gz",
+      "file": "ris-rrc23-updates.20250101.0015.gz",
+      "complete_archive": true,
+      "bytes": 649610,
+      "sha256": "89dfdcb84fd3d6dc285b48a1a468578f3a8eab314569520b6acbd0707067f2c3"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0020.gz",
+      "file": "ris-rrc23-updates.20250101.0020.gz",
+      "complete_archive": true,
+      "bytes": 838783,
+      "sha256": "23f9b53987248edcca3278f956ce1e094e4aece9c4cb5743c4aef59be98cc604"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0025.gz",
+      "file": "ris-rrc23-updates.20250101.0025.gz",
+      "complete_archive": true,
+      "bytes": 766487,
+      "sha256": "6a33afa6383dcb3b463980d919e8e979c5e5e1e462f7de3e5dccc709882f78f6"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0030.gz",
+      "file": "ris-rrc23-updates.20250101.0030.gz",
+      "complete_archive": true,
+      "bytes": 720582,
+      "sha256": "625b10c11f89381e44fbb1b9a3f6b4c8086b3d8de12445e0c7788fe6d6c4834c"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0035.gz",
+      "file": "ris-rrc23-updates.20250101.0035.gz",
+      "complete_archive": true,
+      "bytes": 705241,
+      "sha256": "9e45b07338431bed0b2f4d0cd6e5def7aa24b584c9c72a66f88643a9f3091083"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0040.gz",
+      "file": "ris-rrc23-updates.20250101.0040.gz",
+      "complete_archive": true,
+      "bytes": 690127,
+      "sha256": "27ae30ed57bffcc3d1ab828966e8fa101260b2440803a96133ac66483e5c9fde"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0045.gz",
+      "file": "ris-rrc23-updates.20250101.0045.gz",
+      "complete_archive": true,
+      "bytes": 713168,
+      "sha256": "15b4a139ca7d7ead2c41882debbc4bf9d19b1a3e06fc88a466fe2b65eac896d5"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0050.gz",
+      "file": "ris-rrc23-updates.20250101.0050.gz",
+      "complete_archive": true,
+      "bytes": 714390,
+      "sha256": "6d0dd7efb1a97739244b18a1ba76fa5df10b7584be77084c681ac0abe4c68168"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0055.gz",
+      "file": "ris-rrc23-updates.20250101.0055.gz",
+      "complete_archive": true,
+      "bytes": 634354,
+      "sha256": "9dff9243c06287f4982ffa738e6009f16690ef10fd7c69b53cbc1558b9e3d974"
+    }
+  ],
+  "repeats": 3,
+  "configuration": {
+    "prefix_filter": null,
+    "peer_filter": null,
+    "capacity": 12000000,
+    "rss_budget_bytes": 1468006400,
+    "from": 1735689600,
+    "to": 1735693199
+  },
+  "runs": [
+    {
+      "iteration": 1,
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--max-old-space-size=1912",
+        "scripts/fullstate_worker.mjs",
+        "<workspace>\\.validation\\fullstate\\repro-after\\config-1.json"
+      ],
+      "exit_code": 2,
+      "checkpoints": [
+        {
+          "phase": "rib",
+          "records": 25000,
+          "route_events": 228292,
+          "seconds": 1.3559333,
+          "peak_rss_bytes": 327008256,
+          "cached": null,
+          "parse_batch_ns": "36200"
+        },
+        {
+          "phase": "rib",
+          "records": 50000,
+          "route_events": 455396,
+          "seconds": 2.7357434,
+          "peak_rss_bytes": 549761024,
+          "cached": null,
+          "parse_batch_ns": "28000"
+        },
+        {
+          "phase": "rib",
+          "records": 75000,
+          "route_events": 683911,
+          "seconds": 4.1238665,
+          "peak_rss_bytes": 759865344,
+          "cached": null,
+          "parse_batch_ns": "93400"
+        },
+        {
+          "phase": "rib",
+          "records": 100000,
+          "route_events": 913898,
+          "seconds": 5.9215303,
+          "peak_rss_bytes": 967712768,
+          "cached": null,
+          "parse_batch_ns": "46500"
+        },
+        {
+          "phase": "rib",
+          "records": 125000,
+          "route_events": 1142086,
+          "seconds": 7.4382824,
+          "peak_rss_bytes": 1206009856,
+          "cached": null,
+          "parse_batch_ns": "32100"
+        },
+        {
+          "phase": "rib",
+          "records": 150000,
+          "route_events": 1372574,
+          "seconds": 8.913771,
+          "peak_rss_bytes": 1411706880,
+          "cached": null,
+          "parse_batch_ns": "31300"
+        }
+      ],
+      "complete": false,
+      "failure": {
+        "kind": "benchmark_memory_budget",
+        "message": "benchmark_rss_budget_exceeded",
+        "file": "<workspace>\\.validation\\archives\\ris-rrc23-bview.20250101.0000.gz",
+        "record": 157185,
+        "decompressed_offset": 105229136
+      },
+      "phase": "rib",
+      "records": 157184,
+      "route_events": 1436779,
+      "state_events": 0,
+      "decompressed_bytes": 105229136,
+      "seconds": 9.950561,
+      "route_events_per_second": 144391.75841442507,
+      "peak_rss_bytes": 1473441792,
+      "active_routes": 1436779,
+      "cached_routes": 1436779,
+      "withdrawn_routes": 0,
+      "summary": {
+        "schema_version": "2.0",
+        "baseline_status": "explicit_rib",
+        "warmup_records": "0",
+        "records": "0",
+        "skipped_records": "0",
+        "ignored_families": "0",
+        "rib_routes": "0",
+        "announcements": "0",
+        "withdrawals": "0",
+        "path_changes": "0",
+        "attribute_changes": "0",
+        "origin_changes": "0",
+        "duplicate_announcements": "0",
+        "churn_alerts": "0",
+        "out_of_order": "0",
+        "session_resets": "0",
+        "tracked_routes": 1436779,
+        "active_routes": 1436779,
+        "mean_path_length": 0,
+        "max_path_length": 0
+      },
+      "notices": 0,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "state_sha256": null,
+      "state_bytes": 0,
+      "serialization_seconds": 0.0550678,
+      "writing_seconds": 0,
+      "output_contract": "Only completed window changes are written. An incomplete run cannot measure complete-replay output cost.",
+      "serialization_contract": "serialization_seconds includes benchmark change handoff and host reserialization; final state not exported in resource-limited full-RIB attempts.",
+      "storage": {
+        "route_keys": 1436779,
+        "unique_attribute_sets": 218598,
+        "attribute_references": 1436779
+      }
+    },
+    {
+      "iteration": 2,
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--max-old-space-size=1912",
+        "scripts/fullstate_worker.mjs",
+        "<workspace>\\.validation\\fullstate\\repro-after\\config-2.json"
+      ],
+      "exit_code": 2,
+      "checkpoints": [
+        {
+          "phase": "rib",
+          "records": 25000,
+          "route_events": 228292,
+          "seconds": 1.3614464,
+          "peak_rss_bytes": 322867200,
+          "cached": null,
+          "parse_batch_ns": "37800"
+        },
+        {
+          "phase": "rib",
+          "records": 50000,
+          "route_events": 455396,
+          "seconds": 2.7348531,
+          "peak_rss_bytes": 544874496,
+          "cached": null,
+          "parse_batch_ns": "29200"
+        },
+        {
+          "phase": "rib",
+          "records": 75000,
+          "route_events": 683911,
+          "seconds": 4.3662934,
+          "peak_rss_bytes": 753922048,
+          "cached": null,
+          "parse_batch_ns": "66700"
+        },
+        {
+          "phase": "rib",
+          "records": 100000,
+          "route_events": 913898,
+          "seconds": 6.4000108,
+          "peak_rss_bytes": 969588736,
+          "cached": null,
+          "parse_batch_ns": "49400"
+        },
+        {
+          "phase": "rib",
+          "records": 125000,
+          "route_events": 1142086,
+          "seconds": 8.1013947,
+          "peak_rss_bytes": 1207369728,
+          "cached": null,
+          "parse_batch_ns": "41400"
+        },
+        {
+          "phase": "rib",
+          "records": 150000,
+          "route_events": 1372574,
+          "seconds": 9.7958368,
+          "peak_rss_bytes": 1413021696,
+          "cached": null,
+          "parse_batch_ns": "31800"
+        }
+      ],
+      "complete": false,
+      "failure": {
+        "kind": "benchmark_memory_budget",
+        "message": "benchmark_rss_budget_exceeded",
+        "file": "<workspace>\\.validation\\archives\\ris-rrc23-bview.20250101.0000.gz",
+        "record": 157185,
+        "decompressed_offset": 105229136
+      },
+      "phase": "rib",
+      "records": 157184,
+      "route_events": 1436779,
+      "state_events": 0,
+      "decompressed_bytes": 105229136,
+      "seconds": 10.3885337,
+      "route_events_per_second": 138304.31141596046,
+      "peak_rss_bytes": 1472155648,
+      "active_routes": 1436779,
+      "cached_routes": 1436779,
+      "withdrawn_routes": 0,
+      "summary": {
+        "schema_version": "2.0",
+        "baseline_status": "explicit_rib",
+        "warmup_records": "0",
+        "records": "0",
+        "skipped_records": "0",
+        "ignored_families": "0",
+        "rib_routes": "0",
+        "announcements": "0",
+        "withdrawals": "0",
+        "path_changes": "0",
+        "attribute_changes": "0",
+        "origin_changes": "0",
+        "duplicate_announcements": "0",
+        "churn_alerts": "0",
+        "out_of_order": "0",
+        "session_resets": "0",
+        "tracked_routes": 1436779,
+        "active_routes": 1436779,
+        "mean_path_length": 0,
+        "max_path_length": 0
+      },
+      "notices": 0,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "state_sha256": null,
+      "state_bytes": 0,
+      "serialization_seconds": 0.0576391,
+      "writing_seconds": 0,
+      "output_contract": "Only completed window changes are written. An incomplete run cannot measure complete-replay output cost.",
+      "serialization_contract": "serialization_seconds includes benchmark change handoff and host reserialization; final state not exported in resource-limited full-RIB attempts.",
+      "storage": {
+        "route_keys": 1436779,
+        "unique_attribute_sets": 218598,
+        "attribute_references": 1436779
+      }
+    },
+    {
+      "iteration": 3,
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--max-old-space-size=1912",
+        "scripts/fullstate_worker.mjs",
+        "<workspace>\\.validation\\fullstate\\repro-after\\config-3.json"
+      ],
+      "exit_code": 2,
+      "checkpoints": [
+        {
+          "phase": "rib",
+          "records": 25000,
+          "route_events": 228292,
+          "seconds": 1.4010479,
+          "peak_rss_bytes": 327602176,
+          "cached": null,
+          "parse_batch_ns": "37300"
+        },
+        {
+          "phase": "rib",
+          "records": 50000,
+          "route_events": 455396,
+          "seconds": 2.7985389,
+          "peak_rss_bytes": 549388288,
+          "cached": null,
+          "parse_batch_ns": "29500"
+        },
+        {
+          "phase": "rib",
+          "records": 75000,
+          "route_events": 683911,
+          "seconds": 4.6531247,
+          "peak_rss_bytes": 759296000,
+          "cached": null,
+          "parse_batch_ns": "64700"
+        },
+        {
+          "phase": "rib",
+          "records": 100000,
+          "route_events": 913898,
+          "seconds": 6.6466271,
+          "peak_rss_bytes": 970002432,
+          "cached": null,
+          "parse_batch_ns": "86600"
+        },
+        {
+          "phase": "rib",
+          "records": 125000,
+          "route_events": 1142086,
+          "seconds": 8.3778015,
+          "peak_rss_bytes": 1206202368,
+          "cached": null,
+          "parse_batch_ns": "40700"
+        },
+        {
+          "phase": "rib",
+          "records": 150000,
+          "route_events": 1372574,
+          "seconds": 10.0617588,
+          "peak_rss_bytes": 1413419008,
+          "cached": null,
+          "parse_batch_ns": "60400"
+        }
+      ],
+      "complete": false,
+      "failure": {
+        "kind": "benchmark_memory_budget",
+        "message": "benchmark_rss_budget_exceeded",
+        "file": "<workspace>\\.validation\\archives\\ris-rrc23-bview.20250101.0000.gz",
+        "record": 157185,
+        "decompressed_offset": 105229136
+      },
+      "phase": "rib",
+      "records": 157184,
+      "route_events": 1436779,
+      "state_events": 0,
+      "decompressed_bytes": 105229136,
+      "seconds": 10.9554932,
+      "route_events_per_second": 131146.90263328355,
+      "peak_rss_bytes": 1474465792,
+      "active_routes": 1436779,
+      "cached_routes": 1436779,
+      "withdrawn_routes": 0,
+      "summary": {
+        "schema_version": "2.0",
+        "baseline_status": "explicit_rib",
+        "warmup_records": "0",
+        "records": "0",
+        "skipped_records": "0",
+        "ignored_families": "0",
+        "rib_routes": "0",
+        "announcements": "0",
+        "withdrawals": "0",
+        "path_changes": "0",
+        "attribute_changes": "0",
+        "origin_changes": "0",
+        "duplicate_announcements": "0",
+        "churn_alerts": "0",
+        "out_of_order": "0",
+        "session_resets": "0",
+        "tracked_routes": 1436779,
+        "active_routes": 1436779,
+        "mean_path_length": 0,
+        "max_path_length": 0
+      },
+      "notices": 0,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "state_sha256": null,
+      "state_bytes": 0,
+      "serialization_seconds": 0.0605044,
+      "writing_seconds": 0,
+      "output_contract": "Only completed window changes are written. An incomplete run cannot measure complete-replay output cost.",
+      "serialization_contract": "serialization_seconds includes benchmark change handoff and host reserialization; final state not exported in resource-limited full-RIB attempts.",
+      "storage": {
+        "route_keys": 1436779,
+        "unique_attribute_sets": 218598,
+        "attribute_references": 1436779
+      }
+    }
+  ]
+}

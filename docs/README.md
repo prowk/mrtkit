@@ -11,6 +11,8 @@
 | 对变化排名、去重与复算 | [变化聚合](guides/aggregation.md) |
 | 按采集器与视图隔离回放 | [多采集器回放](guides/multi-collector.md) |
 | 关联多观测点的同类语义变化 | [跨采集器关联](guides/correlation.md) |
+| 生成本地可查看的分页复盘报告 | [离线 HTML 报告](guides/html-report.md) |
+| 核查固定真实路径变化与原始记录 | [RIS rrc23 真实案例](../cases/rrc23-path-change/README.md) |
 | 查命令、选项、筛选与分析语义 | [命令行参考](reference/cli.md) |
 | 在 MoonBit 项目中使用核心库 | [库 API](reference/api.md) |
 | 消费版本化 JSON / CSV | [输出契约](reference/output.md) |
@@ -20,6 +22,8 @@
 | 修改实现、运行测试 | [开发指南](development/contributing.md) |
 | 查看完整数据对照、回放与验收证据 | [验证记录](validation/README.md) |
 | 阅读限定提交的性能测量 | [历史性能基准](validation/performance.md) |
+| 核查全量状态资源边界与共享优化 | [全量状态基准](validation/full-state-benchmark.md) |
+| 核查 main 新增功能的交付证据 | [深化验收](validation/extended-acceptance.md) |
 
 文档按“教程 → 操作指南 → 参考 → 开发与验证”组织。参考了 [BGPKIT Parser 的快速使用与 API 入口](https://github.com/bgpkit/bgpkit-parser)和 [BGPStream 按任务划分的教程](https://bgpstream.caida.org/docs/tutorials)，内容与实现由本项目独立编写。
 

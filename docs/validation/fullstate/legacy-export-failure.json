@@ -1,0 +1,293 @@
+{
+  "publication": {
+    "contract": "Earlier unsplit legacy state() export failed with native heap exhaustion; not included in the three successful chunked-export runs."
+  },
+  "method": "Unfiltered complete RIB plus 12 consecutive UPDATE archives; fresh serial processes; explicit resource budget; no successful full-state claim on incomplete run.",
+  "environment": {
+    "date": "2026-10-22T10:07:51.045Z",
+    "platform": "win32",
+    "release": "10.0.26200",
+    "cpu": "AMD Ryzen 9 7940HX with Radeon Graphics        ",
+    "total_memory_bytes": 16340418560,
+    "free_memory_bytes": 5163188224,
+    "node": "v22.14.0",
+    "moon": "moon 0.1.20260920 (914d7da 2026-09-20) ~\\.moon\\bin\\moon.exe\nmoonc v0.10.14+7d59c7ec9 (2026-09-18) ~\\.moon\\bin\\moonc.exe\nmoonrun 0.1.20260920 (914d7da 2026-09-20) ~\\.moon\\bin\\moonrun.exe\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
+    "python": "Python 3.13.2"
+  },
+  "source_revision": "2f44c84fa665a28456c9f97105417859b56b775f",
+  "bridge_sha256": "2c16cde0d20da5b26b78f706832efcc42051423e8158d650530b1913ff98cd28",
+  "bridge": "<workspace>\\.validation\\fullstate\\before-bridge.mjs",
+  "inputs": [
+    {
+      "collector": "ris-rrc23",
+      "kind": "rib",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/bview.20250101.0000.gz",
+      "file": "ris-rrc23-bview.20250101.0000.gz",
+      "complete_archive": true,
+      "bytes": 82732647,
+      "sha256": "efc04342c70650d92c623db8f1181ef7036183bb61735f74d7ce3450b618e731"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0000.gz",
+      "file": "ris-rrc23-updates.20250101.0000.gz",
+      "complete_archive": true,
+      "bytes": 767888,
+      "sha256": "6b53e356a36f23cf62b4deff5a38133b4e5e8db871a65ce73633b3821aafa1fb"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0005.gz",
+      "file": "ris-rrc23-updates.20250101.0005.gz",
+      "complete_archive": true,
+      "bytes": 716385,
+      "sha256": "38c98c830afd795656ec9c19fb01303fc069395487c6256d2b289a79125162ad"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0010.gz",
+      "file": "ris-rrc23-updates.20250101.0010.gz",
+      "complete_archive": true,
+      "bytes": 658121,
+      "sha256": "85024ff293baa4828e39291f2bf1f545d9b344189aff6117e92264057711e73f"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0015.gz",
+      "file": "ris-rrc23-updates.20250101.0015.gz",
+      "complete_archive": true,
+      "bytes": 649610,
+      "sha256": "89dfdcb84fd3d6dc285b48a1a468578f3a8eab314569520b6acbd0707067f2c3"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0020.gz",
+      "file": "ris-rrc23-updates.20250101.0020.gz",
+      "complete_archive": true,
+      "bytes": 838783,
+      "sha256": "23f9b53987248edcca3278f956ce1e094e4aece9c4cb5743c4aef59be98cc604"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0025.gz",
+      "file": "ris-rrc23-updates.20250101.0025.gz",
+      "complete_archive": true,
+      "bytes": 766487,
+      "sha256": "6a33afa6383dcb3b463980d919e8e979c5e5e1e462f7de3e5dccc709882f78f6"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0030.gz",
+      "file": "ris-rrc23-updates.20250101.0030.gz",
+      "complete_archive": true,
+      "bytes": 720582,
+      "sha256": "625b10c11f89381e44fbb1b9a3f6b4c8086b3d8de12445e0c7788fe6d6c4834c"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0035.gz",
+      "file": "ris-rrc23-updates.20250101.0035.gz",
+      "complete_archive": true,
+      "bytes": 705241,
+      "sha256": "9e45b07338431bed0b2f4d0cd6e5def7aa24b584c9c72a66f88643a9f3091083"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0040.gz",
+      "file": "ris-rrc23-updates.20250101.0040.gz",
+      "complete_archive": true,
+      "bytes": 690127,
+      "sha256": "27ae30ed57bffcc3d1ab828966e8fa101260b2440803a96133ac66483e5c9fde"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0045.gz",
+      "file": "ris-rrc23-updates.20250101.0045.gz",
+      "complete_archive": true,
+      "bytes": 713168,
+      "sha256": "15b4a139ca7d7ead2c41882debbc4bf9d19b1a3e06fc88a466fe2b65eac896d5"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0050.gz",
+      "file": "ris-rrc23-updates.20250101.0050.gz",
+      "complete_archive": true,
+      "bytes": 714390,
+      "sha256": "6d0dd7efb1a97739244b18a1ba76fa5df10b7584be77084c681ac0abe4c68168"
+    },
+    {
+      "collector": "ris-rrc23",
+      "kind": "update",
+      "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0055.gz",
+      "file": "ris-rrc23-updates.20250101.0055.gz",
+      "complete_archive": true,
+      "bytes": 634354,
+      "sha256": "9dff9243c06287f4982ffa738e6009f16690ef10fd7c69b53cbc1558b9e3d974"
+    }
+  ],
+  "repeats": 3,
+  "configuration": {
+    "prefix_filter": null,
+    "peer_filter": null,
+    "capacity": 12000000,
+    "rss_budget_bytes": 1468006400,
+    "from": 1735689600,
+    "to": 1735693199
+  },
+  "runs": [
+    {
+      "iteration": 1,
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--max-old-space-size=1912",
+        "scripts/fullstate_worker.mjs",
+        "<workspace>\\.validation\\fullstate\\updates-before\\config-1.json"
+      ],
+      "exit_code": 134,
+      "checkpoints": [
+        {
+          "phase": "updates",
+          "records": 25000,
+          "route_events": 54648,
+          "seconds": 13.0967682,
+          "peak_rss_bytes": 292810752,
+          "cached": null,
+          "parse_batch_ns": "305000"
+        },
+        {
+          "phase": "updates",
+          "records": 50000,
+          "route_events": 111064,
+          "seconds": 27.5463248,
+          "peak_rss_bytes": 294760448,
+          "cached": null,
+          "parse_batch_ns": "1894900"
+        },
+        {
+          "phase": "updates",
+          "records": 75000,
+          "route_events": 174050,
+          "seconds": 51.4071081,
+          "peak_rss_bytes": 342548480,
+          "cached": null,
+          "parse_batch_ns": "89300"
+        },
+        {
+          "phase": "updates",
+          "records": 100000,
+          "route_events": 227368,
+          "seconds": 67.8715845,
+          "peak_rss_bytes": 350580736,
+          "cached": null,
+          "parse_batch_ns": "129100"
+        },
+        {
+          "phase": "updates",
+          "records": 125000,
+          "route_events": 282046,
+          "seconds": 84.7898351,
+          "peak_rss_bytes": 350580736,
+          "cached": null,
+          "parse_batch_ns": "16400"
+        },
+        {
+          "phase": "updates",
+          "records": 150000,
+          "route_events": 343872,
+          "seconds": 96.9066945,
+          "peak_rss_bytes": 350580736,
+          "cached": null,
+          "parse_batch_ns": "164800"
+        },
+        {
+          "phase": "updates",
+          "records": 175000,
+          "route_events": 417400,
+          "seconds": 122.1511485,
+          "peak_rss_bytes": 517459968,
+          "cached": null,
+          "parse_batch_ns": "249000"
+        },
+        {
+          "phase": "updates",
+          "records": 200000,
+          "route_events": 473165,
+          "seconds": 138.7864578,
+          "peak_rss_bytes": 517459968,
+          "cached": null,
+          "parse_batch_ns": "95100"
+        },
+        {
+          "phase": "updates",
+          "records": 225000,
+          "route_events": 530407,
+          "seconds": 155.9247579,
+          "peak_rss_bytes": 519401472,
+          "cached": null,
+          "parse_batch_ns": "172500"
+        },
+        {
+          "phase": "updates",
+          "records": 250000,
+          "route_events": 590824,
+          "seconds": 177.3976485,
+          "peak_rss_bytes": 520867840,
+          "cached": null,
+          "parse_batch_ns": "330000"
+        },
+        {
+          "phase": "updates",
+          "records": 275000,
+          "route_events": 646018,
+          "seconds": 196.2368936,
+          "peak_rss_bytes": 520867840,
+          "cached": null,
+          "parse_batch_ns": "10000"
+        },
+        {
+          "phase": "updates",
+          "records": 300000,
+          "route_events": 699341,
+          "seconds": 216.6307546,
+          "peak_rss_bytes": 520867840,
+          "cached": null,
+          "parse_batch_ns": "232300"
+        },
+        {
+          "phase": "updates",
+          "records": 325000,
+          "route_events": 762334,
+          "seconds": 243.1348836,
+          "peak_rss_bytes": 520867840,
+          "cached": null,
+          "parse_batch_ns": "44300"
+        },
+        {
+          "phase": "updates",
+          "records": 350000,
+          "route_events": 818899,
+          "seconds": 265.3762006,
+          "peak_rss_bytes": 529453056,
+          "cached": null,
+          "parse_batch_ns": "146900"
+        }
+      ],
+      "complete": false,
+      "failure": {
+        "kind": "process_failure",
+        "message": "{\"phase\":\"updates\",\"records\":25000,\"route_events\":54648,\"seconds\":13.0967682,\"peak_rss_bytes\":292810752,\"cached\":null,\"parse_batch_ns\":\"305000\"}\n{\"phase\":\"updates\",\"records\":50000,\"route_events\":111064,\"seconds\":27.5463248,\"peak_rss_bytes\":294760448,\"cached\":null,\"parse_batch_ns\":\"1894900\"}\n{\"phase\":\"updates\",\"records\":75000,\"route_events\":174050,\"seconds\":51.4071081,\"peak_rss_bytes\":342548480,\"cached\":null,\"parse_batch_ns\":\"89300\"}\n{\"phase\":\"updates\",\"records\":100000,\"route_events\":227368,\"seconds\":67.8715845,\"peak_rss_bytes\":350580736,\"cached\":null,\"parse_batch_ns\":\"129100\"}\n{\"phase\":\"updates\",\"records\":125000,\"route_events\":282046,\"seconds\":84.7898351,\"peak_rss_bytes\":350580736,\"cached\":null,\"parse_batch_ns\":\"16400\"}\n{\"phase\":\"updates\",\"records\":150000,\"route_events\":343872,\"seconds\":96.9066945,\"peak_rss_bytes\":350580736,\"cached\":null,\"parse_batch_ns\":\"164800\"}\n{\"phase\":\"updates\",\"records\":175000,\"route_events\":417400,\"seconds\":122.1511485,\"peak_rss_bytes\":517459968,\"cached\":null,\"parse_batch_ns\":\"249000\"}\n{\"phase\":\"updates\",\"records\":200000,\"route_events\":473165,\"seconds\":138.7864578,\"peak_rss_bytes\":517459968,\"cached\":null,\"parse_batch_ns\":\"95100\"}\n{\"phase\":\"updates\",\"records\":225000,\"route_events\":530407,\"seconds\":155.9247579,\"peak_rss_bytes\":519401472,\"cached\":null,\"parse_batch_ns\":\"172500\"}\n{\"phase\":\"updates\",\"records\":250000,\"route_events\":590824,\"seconds\":177.3976485,\"peak_rss_bytes\":520867840,\"cached\":null,\"parse_batch_ns\":\"330000\"}\n{\"phase\":\"updates\",\"records\":275000,\"route_events\":646018,\"seconds\":196.2368936,\"peak_rss_bytes\":520867840,\"cached\":null,\"parse_batch_ns\":\"10000\"}\n{\"phase\":\"updates\",\"records\":300000,\"route_events\":699341,\"seconds\":216.6307546,\"peak_rss_bytes\":520867840,\"cached\":null,\"parse_batch_ns\":\"232300\"}\n{\"phase\":\"updates\",\"records\":325000,\"route_events\":762334,\"seconds\":243.1348836,\"peak_rss_bytes\":520867840,\"cached\":null,\"parse_batch_ns\":\"44300\"}\n{\"phase\":\"updates\",\"records\":350000,\"route_events\":818899,\"seconds\":265.3762006,\"peak_rss_bytes\":529453056,\"cached\":null,\"parse_batch_ns\":\"146900\"}\n\r\n<--- Last few GCs --->\r\n\r\n[24628:000001A9B72B7000]   289378 ms: Mark-Compact 1909.4 (1947.3) -> 1909.3 (1949.3) MB, pooled: 0 MB, 1454.29 / 0.00 ms  (average mu = 0.077, current mu = 0.003) allocation failure; scavenge might not succeed\r\n\r\n\r\n<--- JS stacktrace --->\r\n\r\nFATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory\r\n----- Native stack trace -----\r\n\r\n 1: 00007FF68C2A20AD node::SetCppgcReference+17245\r\n 2: 00007FF68C20A4D8 v8::base::CPU::num_virtual_address_bits+92376\r\n 3: 00007FF68CD8A1B1 v8::Isolate::ReportExternalAllocationLimitReached+65\r\n 4: 00007FF68CD77096 v8::Function::Experimental_IsNopFunction+2790\r\n 5: 00007FF68CBC6920 v8::internal::StrongRootAllocatorBase::StrongRootAllocatorBase+31392\r\n 6: 00007FF68CBC0644 v8::internal::StrongRootAllocatorBase::StrongRootAllocatorBase+6084\r\n 7: 00007FF68CBBBCF5 v8::CpuProfileNode::GetScriptResourceNameStr+188069\r\n 8: 00007FF68C5413BD BIO_ssl_shutdown+189\r\n"
+      }
+    }
+  ]
+}

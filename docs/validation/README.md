@@ -6,8 +6,8 @@
 
 ## 自动测试
 
-- 51 个 MoonBit 测试分别在 JS、Wasm、Wasm GC 后端通过。
-- 73 个 Node 测试通过，包含命令行端到端验证、gzip/bz2、IPv6、旧式 ASN、扩展时间戳、ADD-PATH（含 BGP4MP_ET 子类型矩阵）、Large Communities、时间窗口、来源追溯、快照差异、聚合复算、前缀时间线和错误退出码。
+- 57 个 MoonBit 测试分别在 JS、Wasm、Wasm GC 后端通过。
+- 90 个 Node 测试通过，包含命令行端到端验证、gzip/bz2、IPv6、旧式 ASN、扩展时间戳、ADD-PATH（含 BGP4MP_ET 子类型矩阵）、Large Communities、时间窗口、来源追溯、快照差异、聚合复算、前缀时间线、错误退出码、多采集器隔离、关联和离线报告。
 - 确定性畸形输入测试覆盖 2,000 组随机修改/随机字节数据，所有调用均返回解析结果或错误，没有宿主异常。
 - 编译与测试启用 `--deny-warn`，当前没有编译警告。
 
@@ -67,6 +67,8 @@ python scripts/publish_validation.py
 样本与验证依赖只保存在被 Git 忽略的 `.validation/`，不会被提交。该流程需要网络，常规测试和演示不需要网络。
 
 性能测量方法、固定场景及优化前后比较见[性能基准](performance.md)。早期 P0/P1 证据见[历史验收](acceptance.md)，本次交付见[v0.1.0 验收](release-acceptance.md)与[标准清单](../reference/compatibility.md)。
+
+v0.1.0 之后 main 的交付见[深化验收](extended-acceptance.md)。无筛选全量状态的重复基准、资源预算失败及优化取舍见[全量状态基准](full-state-benchmark.md)，固定数据与原始位置锚点见[真实复盘案例](../../cases/rrc23-path-change/README.md)。
 
 ## 完整输入的窗口与导出验收
 

@@ -20,6 +20,8 @@
 | `Snapshot::new/ingest/diff` | 比较同源、同视图快照，区分 peer 与路由缺失 |
 | `Timeline::new/seed_peers/seed/record_batch/observe/report` | 前缀观测过程与可见性区间 |
 | `Aggregation::new/observe/report` | 对带来源的变化提醒排名和计数 |
+| `Change::correlation_key/with_correlation_key` | 生成跨观测点使用的规范语义变化键及可选 JSON 字段 |
+| `TimelineReport::with_correlation_keys` | 为时间线内变化补充相同核心语义键 |
 | `event_json/event_csv/csv_header` | 导出路由 |
 
 `record_batch` 处理元数据和会话，路由需逐条调用 `observe`，便于自行筛选。`StreamDecoder` 失败后需创建新实例。

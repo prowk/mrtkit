@@ -10,6 +10,7 @@ const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 
 const directory = resolve(option('--archives', '.validation/archives'));
 const reportPath = resolve(option('--report', '.validation/benchmark.json'));
 const bridge = option('--bridge', null);
+const onlyCases = option('--cases', null)?.split(',');
 const repeats = Number(option('--repeats', '3'));
 if (!Number.isSafeInteger(repeats) || repeats < 1 || repeats > 20) throw new Error('--repeats 必须为 1..20');
 const manifest = JSON.parse(readFileSync(join(directory, 'manifest.json'), 'utf8'));
@@ -37,6 +38,8 @@ const cases = [
   { name: 'one_hour_updates_analysis', argv: ['stats', ...updates] },
   { name: 'complete_rib_capacity_failure', argv: ['stats', '--capacity', '1000', rib], expectedExit: 2 },
 ];
+if (onlyCases && onlyCases.some(name => !cases.some(item => item.name === name))) throw new Error('--cases 包含未知场景');
+if (onlyCases) for (let i = cases.length - 1; i >= 0; i--) if (!onlyCases.includes(cases[i].name)) cases.splice(i, 1);
 if (hotDirectory) cases.push(
   {name: 'duplicate_semantic_normalization', argv: ['stats', resolve(hotDirectory, 'duplicates.mrt')]},
   {name: 'peer_session_resets', argv: ['stats', resolve(hotDirectory, 'session-resets.mrt')]},
@@ -55,6 +58,7 @@ const report = {
   bridge: bridge ? resolve(bridge) : '_build/js/release/build/bridge/bridge.js',
   bridge_sha256: createHash('sha256').update(readFileSync(bridge ? resolve(bridge) : '_build/js/release/build/bridge/bridge.js')).digest('hex'),
   source_revision: spawnSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8', windowsHide: true}).stdout.trim(),
+  bridge_source_revision: option('--bridge-revision', null),
   command: [process.execPath, ...process.argv.slice(1)], repeats, inputs, runs: [], medians: [],
 };
 async function run(argv, expectedExit = 0, worker = 'scripts/bench_worker.mjs') {
