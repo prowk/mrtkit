@@ -40,6 +40,8 @@ node cli/mrtkit.mjs multi --manifest fixtures/multi/manifest.json --output .vali
 
 `continuous` 默认 false。清单中声明的文件覆盖范围存在空洞时自动记录 `declared_file_gap`，也可通过 `gaps: [{"from": ..., "to": ...}]` 提供已知中断，端点为秒且左闭右开。文件范围和哈希不能证明部署持续可观测，连续性仍需数据来源证据。不同观测点的缺档、基线和连续性独立标记。
 
+MRT 最大秒时间戳为 4294967295；若推导缺档的半开结束为 4294967296，索引保留真实端点，并置 `timeline_gap_endpoints_clipped`。内部时间线接口会裁至最后可表示微秒；该末秒没有实际输入，因此不会据此延长已观测区间。
+
 ## 输出与失败
 
 `index.json` 包含版本、窗口、各观测点的身份、完整/部分状态、来源文件、类型、哈希、字节数、实际时间范围、记录数、基线状态、缺档及统计。详细数据按编号写入 `collector-0001.changes.jsonl`、`collector-0001.state.jsonl`；前缀模式另有 `collector-0001.timeline.json`。

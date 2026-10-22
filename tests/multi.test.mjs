@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtemp,writeFile,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {demo} from '../scripts/fixtures.mjs';
+import {demo,bgpUpdate,attributes} from '../scripts/fixtures.mjs';
 import {replayManifest,readManifest} from '../cli/multi.mjs';
 import {spawnSync} from 'node:child_process';
 
@@ -71,4 +71,15 @@ test('声明缺档与未验证连续性进入时间线，不将基线缺失伪�
   assert.equal(result.baseline_status,'missing');assert.equal(result.continuous,false);assert.equal(result.gaps.length,1);
   const report=await load(join(output,result.timeline_file));
   assert.equal(report.timeline.continuous_observation,false);assert.equal(report.timeline.gaps.length,1);
+}));
+
+test('最大 MRT 秒时间戳的缺档保留真实半开端点，内部裁剪不延长实际观测',()=>setup(async(dir)=>{
+  const time=4294967294;
+  await writeFile(join(dir,'last.mrt'),bgpUpdate(Buffer.from([24,203,0,113]),undefined,attributes([64512,1]),time));
+  const config=join(dir,'last.json');await writeFile(config,JSON.stringify({schema_version:'1.0',window:{from:time,to:time+1},analysis:{prefix:'203.0.113.0/24'},collectors:[{collector:'c',view:'v',continuous:true,files:[{kind:'update',path:'last.mrt',from:time,to:time}]}]}),'utf8');
+  const output=join(dir,'last');await replayManifest(config,output);
+  const index=await load(join(output,'index.json')),point=index.collectors[0];
+  assert.deepEqual(point.gaps,[{from:4294967295,to:4294967296,reason:'declared_file_gap'}]);
+  assert.equal(point.timeline_gap_endpoints_clipped,true);
+  const report=await load(join(output,point.timeline_file));assert.equal(report.timeline.observed_window_end,String(BigInt(time)*1000000n));
 }));

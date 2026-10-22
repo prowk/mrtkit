@@ -27,6 +27,8 @@ test('重复去重、乱序及同秒并列稳定，固定半开窗口不链式�
   const boundary=correlateObservations([[change('a',100),a],[change('b',110),b]],[a,b],{windowSeconds:10});
   assert.equal(boundary.groups.length,2);
   assert.equal(report.interpretation,'temporal_cooccurrence_not_propagation_delay_or_causation');
+  const tied=correlateObservations([[change('a',100,'10'),a],[change('a',100,'2'),a]],[a]);
+  assert.deepEqual(tied.groups[0].observations.map(event=>event.source.record),['2','10']);
 });
 
 test('关联拒绝身份冲突、缺少核心规则、超限和同来源内容冲突',()=>{

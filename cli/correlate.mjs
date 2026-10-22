@@ -56,7 +56,12 @@ function correlatePrepared(events,duplicates,points,{windowSeconds,window,inputS
   const duration=windowMicros(windowSeconds);
   points=[...points].sort((a,b)=>textCompare(pointId(a),pointId(b)));
   if(window)for(const event of events)if(event.at<BigInt(window.from)*1000000n||event.at>BigInt(window.to)*1000000n+999999n)throw new Error('变化超出结果包时间窗口');
-  events.sort((a,b)=>a.at<b.at?-1:a.at>b.at?1:textCompare(a.point,b.point)||textCompare(a.id,b.id));
+  events.sort((a,b)=>{
+    if(a.at!==b.at)return a.at<b.at?-1:1;
+    const context=textCompare(a.point,b.point)||textCompare(a.source.file,b.source.file);if(context)return context;
+    for(const field of ['record','offset']){const left=BigInt(a.source[field]),right=BigInt(b.source[field]);if(left!==right)return left<right?-1:1;}
+    return a.source.event_index-b.source.event_index||textCompare(a.kind,b.kind);
+  });
   const active=new Map(),groups=[];
   for(const event of events){
     let group=active.get(event.signature);

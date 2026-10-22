@@ -60,6 +60,7 @@ export async function replayManifest(manifestPath,outputPath){
     const name=`collector-${String(ordinal+1).padStart(4,'0')}`;
     const result={collector:group.collector,view:group.view,status:'running',continuous:group.continuous===true,
       gaps:coverageGaps(group,manifest.window),files:[],changes_file:name+'.changes.jsonl',state_file:name+'.state.jsonl'};
+    result.timeline_gap_endpoints_clipped=result.gaps.some(gap=>gap.to>4294967295);
     index.collectors.push(result);await save();
     const url=new URL('../_build/js/release/build/bridge/bridge.js',import.meta.url);url.searchParams.set('session',randomUUID());
     let bridge,changes;
@@ -71,7 +72,7 @@ export async function replayManifest(manifestPath,outputPath){
         threshold:manifest.analysis?.threshold??10,capacity:manifest.analysis?.capacity??1000000,
         collector:group.collector,view:group.view,continuous_observation:group.continuous===true,
         correlation_keys:true,
-        observation_gaps:result.gaps.map(gap=>({from_time:gap.from,to_time:gap.to,from_micros:0,to_micros:0}))};
+        observation_gaps:result.gaps.map(gap=>({from_time:gap.from,to_time:Math.min(gap.to,4294967295),from_micros:0,to_micros:gap.to>4294967295?999999:0}))};
       checked(bridge.configure(JSON.stringify(config)));
       changes=await open(join(directory,result.changes_file),'wx');
       let noticeCount=0;
@@ -101,6 +102,7 @@ export async function replayManifest(manifestPath,outputPath){
       if(report.timeline){
         result.timeline_file=name+'.timeline.json';
         await writeFile(join(directory,result.timeline_file),JSON.stringify(report,null,2)+'\n','utf8');
+        result.timeline_sha256=await digest(join(directory,result.timeline_file));
         for(const entry of report.timeline.entries)for(const change of entry.changes){await changes.writeFile(JSON.stringify(change)+'\n','utf8');noticeCount++;}
       }
       result.change_notices=noticeCount;
