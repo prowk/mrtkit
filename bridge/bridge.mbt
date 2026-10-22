@@ -19,6 +19,8 @@ priv struct Config {
   mode : String
   format : String
   metrics_changes : Bool?
+  collector : String?
+  view : String?
 } derive(@json.FromJson)
 
 ///|
@@ -212,7 +214,14 @@ fn consume_inner(
     current.pending_changes.clear()
     let batch = match origin {
       Some((file, record, offset)) =>
-        current.decoder.decode_at(data, file, record, offset)
+        match (current.config.collector, current.config.view) {
+          (Some(collector), Some(view)) =>
+            current.decoder.decode_scoped(
+              data, file, record, offset, collector, view,
+            )
+          (None, None) => current.decoder.decode_at(data, file, record, offset)
+          _ => return error_json(0, "采集器与视图须同时提供")
+        }
       None => current.decoder.decode(data)
     }
     if current.baseline {

@@ -176,6 +176,7 @@ pub struct Decoder {
 }
 pub fn Decoder::decode(Self, Bytes) -> Batch raise ParseError
 pub fn Decoder::decode_at(Self, Bytes, String, Int64, Int64) -> Batch raise ParseError
+pub fn Decoder::decode_scoped(Self, Bytes, String, Int64, Int64, String, String) -> Batch raise ParseError
 pub fn Decoder::new() -> Self
 pub fn Decoder::reset(Self) -> Unit
 
@@ -376,6 +377,8 @@ pub struct Source {
   record : Int64
   offset : Int64
   event_index : Int
+  collector : String?
+  view : String?
 } derive(Eq, Hash, ToJson)
 pub fn Source::equal(Self, Self) -> Bool
 pub fn Source::hash(Self) -> Int

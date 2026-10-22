@@ -140,6 +140,7 @@ pub struct Timeline {
   priv baselines : Map[String, (Peer, UInt64)]
   priv sessions : Map[String, (Peer, UInt64)]
   priv mut last_input : UInt64?
+  priv mut input_scope : String?
 }
 
 ///|
@@ -181,6 +182,7 @@ pub fn Timeline::new(
     baselines: Map([]),
     sessions: Map([]),
     last_input: None,
+    input_scope: None,
   }
 }
 
@@ -235,10 +237,26 @@ fn Timeline::timeline_time(self : Timeline, time : UInt64) -> Unit {
 }
 
 ///|
+/// 单条时间线只描述一个观测点；联合回放为各采集器/视图创建独立实例。
+fn Timeline::check_scope(
+  self : Timeline,
+  source : Source?,
+) -> Unit raise ParseError {
+  let scope = source_scope(source)
+  match self.input_scope {
+    Some(previous) if previous != scope =>
+      raise Invalid(0, "一条时间线不能混用不同采集器或视图")
+    None => self.input_scope = Some(scope)
+    _ => ()
+  }
+}
+
+///|
 pub fn Timeline::seed(
   self : Timeline,
   event : RouteEvent,
 ) -> Unit raise ParseError {
+  self.check_scope(event.source)
   if event.prefix != self.prefix {
     raise Invalid(0, "时间线要求精确匹配一个前缀")
   }
@@ -346,6 +364,7 @@ pub fn Timeline::observe(
   self : Timeline,
   event : RouteEvent,
 ) -> Unit raise ParseError {
+  self.check_scope(event.source)
   if event.prefix != self.prefix {
     raise Invalid(0, "时间线要求精确匹配一个前缀")
   }
@@ -359,9 +378,18 @@ pub fn Timeline::observe(
   }
   let key = snapshot_route_key(event)
   let peer = peer_key(event.peer_asn, event.peer_ip, event.outbound)
+  let analyzer_peer = scoped_peer_key(
+    event.peer_asn,
+    event.peer_ip,
+    event.outbound,
+    event.source,
+  )
   let old = self.analyzer.routes.get(key)
   let stale = old.map(fn(r) { time < r.time }).unwrap_or(false) ||
-    self.analyzer.peer_resets.get(peer).map(fn(t) { time < t }).unwrap_or(false)
+    self.analyzer.peer_resets
+    .get(analyzer_peer)
+    .map(fn(t) { time < t })
+    .unwrap_or(false)
   let changes = self.analyzer.observe(event)
   let measured = time >= self.analyzer.from_time
   if stale {
@@ -387,7 +415,7 @@ pub fn Timeline::observe(
   if !self.paths.contains(key) && self.paths.length() >= self.capacity {
     raise Invalid(0, "时间线路径数量超过容量")
   }
-  let baseline = if self.analyzer.peer_resets.contains(peer) {
+  let baseline = if self.analyzer.peer_resets.contains(analyzer_peer) {
     None
   } else {
     self.baselines.get(peer)
@@ -475,6 +503,12 @@ pub fn Timeline::record_batch(
   self : Timeline,
   batch : Batch,
 ) -> Unit raise ParseError {
+  for event in batch.events {
+    self.check_scope(event.source)
+  }
+  for state in batch.states {
+    self.check_scope(state.source)
+  }
   let time = event_time(batch.header.timestamp, batch.microseconds)
   self.timeline_time(time)
   self.analyzer.record_batch({ ..batch, states: [], })
@@ -483,7 +517,9 @@ pub fn Timeline::record_batch(
     let reset = state.old_state == 6 && state.new_state != 6
     let stale = [false, true].any(fn(direction) {
       self.analyzer.peer_latest
-      .get(peer_key(state.peer_asn, state.peer_ip, direction))
+      .get(
+        scoped_peer_key(state.peer_asn, state.peer_ip, direction, state.source),
+      )
       .map(fn(t) { t > state_time })
       .unwrap_or(false)
     })
@@ -583,7 +619,14 @@ fn Timeline::update_peer(
     }
   }
   let full_baseline = self.baselines.contains(peer) &&
-    !self.analyzer.peer_resets.contains(peer)
+    !self.analyzer.peer_resets.contains(
+      scoped_peer_key(
+        event.peer_asn,
+        event.peer_ip,
+        event.outbound,
+        event.source,
+      ),
+    )
   let next = if visible {
     "visible"
   } else if unknown || (addpath && !full_baseline) {

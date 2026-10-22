@@ -53,7 +53,14 @@ pub fn Snapshot::ingest(
     }
     let table = parse_peers(frame.payload)
     self.table = Some(table)
-    self.table_source = Some({ file, record, offset, event_index: 0, })
+    self.table_source = Some({
+      file,
+      record,
+      offset,
+      event_index: 0,
+      collector: None,
+      view: None,
+    })
     for peer in table.peers {
       if peer_asn.map(fn(asn) { asn == peer.asn }).unwrap_or(true) {
         self.peers[peer_key(peer.asn, peer.address, false)] = peer
@@ -88,7 +95,7 @@ pub fn Snapshot::ingest(
 
 ///|
 fn snapshot_route_key(event : RouteEvent) -> String {
-  peer_key(event.peer_asn, event.peer_ip, event.outbound) +
+  scoped_peer_key(event.peer_asn, event.peer_ip, event.outbound, event.source) +
   "|" +
   event.prefix +
   "|" +

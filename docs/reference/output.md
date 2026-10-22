@@ -12,6 +12,8 @@
 
 CSV 同样以 `schema_version` 开头，包含来源文件、记录号、记录偏移及事件索引。使用库的 `csv_header` 读取列定义，按列名消费，不依赖固定列号。统计中的 64 位计数保持十进制字符串。
 
+开发分支的显式观测点来源另含可选 `source.collector` 和 `source.view`，旧单观测点调用不设置时省略。CSV 在已有列之后追加 `source_collector/source_view`，缺失为空，文本按 CSV 规则转义。变化的前后状态各自保存身份；来源去重包含身份，名称中的分隔符不能产生路由键碰撞。已发布的 v0.1.0 不包含这些新增字段。
+
 Large Communities 按 [RFC 8092](https://www.rfc-editor.org/rfc/rfc8092.html) 解码为 `[全局管理员, 本地值1, 本地值2]` 三元组数组，规范排序并去重，原始编码保留在 `attributes.other` 的 code 32 中。排列和重复不产生语义变化，`diff.large_communities` 给出前后值及增删成员；CSV 使用空格分隔的 `ASN:值1:值2`。长度为零或不是 12 的倍数时抛出 `ParseError::Invalid`，这是离线格式解析错误，不将坏数据冒充真实观测到的撤回消息。
 
 ADD-PATH 按 [RFC 8050](https://datatracker.ietf.org/doc/html/rfc8050) 支持单播 RIB 子类型 8/10，以及 BGP4MP/BGP4MP_ET 子类型 8/9/10/11。事件、变化和状态键包含可选 `path_id`，无标识与标识 0 不同。仅撤回指定 ID，不影响其他路径。`--path-id` 可筛选路径；普通输入省略 JSON 字段，CSV 对应列为空。

@@ -4,6 +4,8 @@ pub struct Source {
   record : Int64
   offset : Int64
   event_index : Int
+  collector : String?
+  view : String?
 } derive(Eq, Hash, ToJson)
 
 ///|
@@ -29,13 +31,94 @@ pub fn Decoder::decode_at(
   }
   let batch = self.decode(data)
   let events = batch.events.mapi(fn(i, event) {
-    { ..event, source: Some({ file, record, offset, event_index: i, }), }
+    {
+      ..event,
+      source: Some({
+        file,
+        record,
+        offset,
+        event_index: i,
+        collector: None,
+        view: None,
+      }),
+    }
   })
   let states = batch.states.mapi(fn(i, event) {
-    { ..event, source: Some({ file, record, offset, event_index: i, }), }
+    {
+      ..event,
+      source: Some({
+        file,
+        record,
+        offset,
+        event_index: i,
+        collector: None,
+        view: None,
+      }),
+    }
   })
   let diagnostics = batch.diagnostics.map(fn(item) {
-    { ..item, source: Some({ file, record, offset, event_index: 0, }), }
+    {
+      ..item,
+      source: Some({
+        file,
+        record,
+        offset,
+        event_index: 0,
+        collector: None,
+        view: None,
+      }),
+    }
   })
   { ..batch, events, states, diagnostics, }
+}
+
+///|
+/// 一个采集器与视图使用一个独立 Decoder；本接口为事件、会话和诊断附加显式身份。
+pub fn Decoder::decode_scoped(
+  self : Decoder,
+  data : Bytes,
+  file : String,
+  record : Int64,
+  offset : Int64,
+  collector : String,
+  view : String,
+) -> Batch raise ParseError {
+  if collector == "" || view == "" {
+    raise Invalid(0, "采集器和视图身份不能为空")
+  }
+  let batch = self.decode_at(data, file, record, offset)
+  let scope = fn(source : Source?) {
+    source.map(fn(s) { { ..s, collector: Some(collector), view: Some(view), } })
+  }
+  {
+    ..batch,
+    events: batch.events.map(fn(event) {
+      { ..event, source: scope(event.source), }
+    }),
+    states: batch.states.map(fn(state) {
+      { ..state, source: scope(state.source), }
+    }),
+    diagnostics: batch.diagnostics.map(fn(item) {
+      { ..item, source: scope(item.source), }
+    }),
+  }
+}
+
+///|
+fn source_scope(source : Source?) -> String {
+  match source {
+    Some(s) if s.collector is Some(_) || s.view is Some(_) =>
+      [s.collector.to_json(), s.view.to_json()].to_json().stringify() + "|"
+    _ => ""
+  }
+}
+
+///|
+fn scoped_peer_key(
+  asn : UInt,
+  ip : String,
+  outbound : Bool,
+  source : Source?,
+) -> String {
+  source_scope(source) + peer_key(asn, ip, outbound)
 }

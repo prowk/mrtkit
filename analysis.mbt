@@ -210,7 +210,12 @@ pub fn Analyzer::observe(
   self : Analyzer,
   event : RouteEvent,
 ) -> Array[Change] raise ParseError {
-  let peer = peer_key(event.peer_asn, event.peer_ip, event.outbound)
+  let peer = scoped_peer_key(
+    event.peer_asn,
+    event.peer_ip,
+    event.outbound,
+    event.source,
+  )
   let key = peer +
     "|" +
     event.prefix +
@@ -376,8 +381,18 @@ pub fn Analyzer::observe_state(self : Analyzer, state : StateChange) -> Unit {
   }
   let measured = !self.seeding && time >= self.from_time
   if state.old_state == 6 && state.new_state != 6 {
-    let inbound = peer_key(state.peer_asn, state.peer_ip, false)
-    let outbound = peer_key(state.peer_asn, state.peer_ip, true)
+    let inbound = scoped_peer_key(
+      state.peer_asn,
+      state.peer_ip,
+      false,
+      state.source,
+    )
+    let outbound = scoped_peer_key(
+      state.peer_asn,
+      state.peer_ip,
+      true,
+      state.source,
+    )
     if [inbound, outbound].any(fn(peer) {
         self.peer_latest.get(peer).map(fn(t) { t > time }).unwrap_or(false)
       }) {

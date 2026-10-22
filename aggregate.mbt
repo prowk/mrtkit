@@ -60,7 +60,12 @@ pub fn Aggregation::observe(
   let entry = self.prefixes.get_or_init(change.prefix, fn() {
     { events: Map([]), peers: Map([]), types: Map([]), notices: 0L, }
   })
-  let peer = peer_key(change.peer_asn, change.peer_ip, change.outbound)
+  let peer = scoped_peer_key(
+    change.peer_asn,
+    change.peer_ip,
+    change.outbound,
+    change.source,
+  )
   entry.events[source] = ()
   entry.peers[peer] = ()
   self.peers[peer] = ()
