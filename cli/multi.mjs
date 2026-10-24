@@ -3,10 +3,11 @@ import {createReadStream} from 'node:fs';
 import {createHash,randomUUID} from 'node:crypto';
 import {resolve,dirname,join} from 'node:path';
 import {frames,inputChunks} from './input.mjs';
-import {validateBundle} from './validation.mjs';
+import {validateBundleData} from './validation.mjs';
 
 const uint=(value,name)=>{if(!Number.isInteger(value)||value<0||value>4294967295)throw new Error(`${name} 必须为无符号秒时间戳`);return value;};
 const checked=text=>{const value=JSON.parse(text);if(value.error)throw new Error(value.error);return value;};
+export {coverageGaps};
 async function digest(path){const hash=createHash('sha256');for await(const chunk of createReadStream(path))hash.update(chunk);return hash.digest('hex');}
 
 // 身份来自显式配置，不依据路径名称猜测采集器；每个身份拥有独立的 MoonBit 会话。
@@ -120,9 +121,9 @@ export async function replayManifest(manifestPath,outputPath){
       await save();
     }
   }
-  index.status=index.collectors.every(group=>group.status==='complete')?'complete':'partial';await save();
-  if(index.status!=='complete')throw new Error(`联合回放有部分结果，请检查 ${indexPath}`);
-  try{await validateBundle(indexPath);}catch(error){index.status='partial';index.error=error.message;await save();throw error;}
+  if(!index.collectors.every(group=>group.status==='complete')){index.status='partial';await save();throw new Error(`联合回放有部分结果，请检查 ${indexPath}`);}
+  try{await validateBundleData({...index,status:'complete'},directory);}catch(error){index.status='partial';index.error=error.message;await save();throw error;}
+  index.status='complete';await save();
   return {schema_version:'2.0',type:'collector_replay_bundle',status:'complete',index:indexPath,collectors:index.collectors.length};
 }
 

@@ -14,6 +14,10 @@ pub fn consume_at(Bytes, String, Int64, Int64) -> String
 
 pub fn consume_metrics(Bytes) -> String
 
+pub fn consume_selected(Bytes, String, Int64, Int64, String) -> String
+
+pub fn consume_selected_metrics(Bytes, String, Int64, Int64, String) -> String
+
 pub fn correlation_key_from_json(String) -> String
 
 pub fn correlation_semantics_from_json(String) -> String
@@ -28,7 +32,13 @@ pub fn end_baseline() -> String
 
 pub fn finish() -> String
 
+pub fn partition_record(Bytes) -> String
+
+pub fn path_totals() -> String
+
 pub fn reset_file() -> Unit
+
+pub fn route_count() -> Int
 
 pub fn snapshot_begin(String, String) -> String
 

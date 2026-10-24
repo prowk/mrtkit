@@ -222,6 +222,7 @@ fn consume_inner(
   data : Bytes,
   origin : (String, Int64, Int64)?,
   emit? : Bool = true,
+  event_indices? : Array[Int],
 ) -> String {
   let current = match session.val {
     Some(s) => s
@@ -232,7 +233,7 @@ fn consume_inner(
   }
   try {
     current.pending_changes.clear()
-    let batch = match origin {
+    let decoded = match origin {
       Some((file, record, offset)) =>
         match (current.config.collector, current.config.view) {
           (Some(collector), Some(view)) =>
@@ -243,6 +244,10 @@ fn consume_inner(
           _ => return error_json(0, "采集器与视图须同时提供")
         }
       None => current.decoder.decode(data)
+    }
+    let batch = match event_indices {
+      Some(indices) => decoded.with_event_indices(indices)
+      None => decoded
     }
     if current.baseline {
       if batch.header.kind != 13 || batch.skipped {
@@ -380,6 +385,76 @@ pub fn consume_at(
 }
 
 ///|
+pub fn consume_selected(
+  data : Bytes,
+  file : String,
+  record : Int64,
+  offset : Int64,
+  indices : String,
+) -> String {
+  let values : Array[Int] = @json.from_json(@json.parse(indices)) catch {
+    _ => return error_json(0, "原始事件索引 JSON 无效")
+  }
+  consume_inner(data, Some((file, record, offset)), event_indices=values)
+}
+
+///|
+pub fn consume_selected_metrics(
+  data : Bytes,
+  file : String,
+  record : Int64,
+  offset : Int64,
+  indices : String,
+) -> String {
+  let values : Array[Int] = @json.from_json(@json.parse(indices)) catch {
+    _ => return error_json(0, "原始事件索引 JSON 无效")
+  }
+  consume_inner(
+    data,
+    Some((file, record, offset)),
+    event_indices=values,
+    emit=false,
+  )
+}
+
+///|
+pub fn partition_record(data : Bytes) -> String {
+  match session.val {
+    Some(s) =>
+      s.decoder.partition_record(data).to_json().stringify() catch {
+        @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+      }
+    None => error_json(0, "会话未配置")
+  }
+}
+
+///|
+pub fn path_totals() -> String {
+  match session.val {
+    Some(s) =>
+      match s.analyzer {
+        Some(a) => {
+          let totals = a.path_totals()
+          Json::object({
+            "path_sum": totals.0.to_json(),
+            "path_samples": totals.1.to_json(),
+          }).stringify()
+        }
+        None => error_json(0, "没有分析器")
+      }
+    None => error_json(0, "会话未配置")
+  }
+}
+
+///|
+pub fn route_count() -> Int {
+  match session.val {
+    Some(s) => s.analyzer.map(fn(a) { a.route_count() }).unwrap_or(-1)
+    None => -1
+  }
+}
+
+///|
 /// 用于逐记录验证和工具集成，不累计完整档案的输出。
 pub fn decode_record(
   data : Bytes,
@@ -481,7 +556,17 @@ pub fn state_export_chunk(limit : Int) -> String {
 pub fn drain_changes() -> String {
   match session.val {
     Some(s) => {
-      let result = s.pending_changes.to_json().stringify()
+      let result = if s.config.correlation_keys.unwrap_or(false) {
+        s.pending_changes
+        .map(change => change.with_correlation_key())
+        .to_json()
+        .stringify() catch {
+          @mrt.ParseError::Invalid(pos, message) =>
+            return error_json(pos, message)
+        }
+      } else {
+        s.pending_changes.to_json().stringify()
+      }
       s.pending_changes.clear()
       result
     }

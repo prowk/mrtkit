@@ -5,7 +5,7 @@ import { options } from './options.mjs';
 import { DiagnosticCollector } from './diagnostics.mjs';
 
 const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
-用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate|timeline|multi|correlate|report> [选项] <文件...|->
+用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate|timeline|multi|replay-disk|correlate|report> [选项] <文件...|->
   parse     输出路由 JSON Lines；--format csv 导出 CSV
   stats     输出统计 JSON
   changes   输出路径变化、起源变化、固定窗口波动提醒
@@ -13,6 +13,7 @@ const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
   aggregate 输出变化最多的前缀、受影响 peer 与类型分布；--top 默认 20
   timeline --prefix CIDR  输出前缀时间线与各 peer 的观测状态
   multi --manifest 配置.json --output 新目录  按采集器/视图独立回放并导出结果包
+  replay-disk --manifest 单观测点清单 --output 新目录  按 peer 保存完整逻辑状态，限制驻留内存
   correlate --input 结果包/index.json --window 秒  关联多观测点的同类语义变化
     --external --output 新目录 --memory-mib 64 --disk-mib 8192  有界内存关联并分离导出
   report --input 结果包/index.json --output 新目录  生成离线 HTML 复盘报告
@@ -57,6 +58,11 @@ async function execute(argv, output, diagnostic) {
   if (argv[0] === 'multi') {
     const {multiCommand} = await import('./multi.mjs');
     await output(`${JSON.stringify(await multiCommand(argv.slice(1)))}\n`);
+    return;
+  }
+  if (argv[0] === 'replay-disk') {
+    const {diskReplayCommand}=await import('./disk-replay.mjs');
+    await output(`${JSON.stringify(await diskReplayCommand(argv.slice(1)))}\n`);
     return;
   }
   if (argv[0] === 'correlate') {

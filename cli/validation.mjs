@@ -103,11 +103,18 @@ async function artifact(directory,point,kind,signal){
 }
 
 // 所有入口使用同一校验：旧 schema 2.0 可缺可选哈希和关联键，键由核心重算。
-export async function validateBundle(input,{onChange=()=>{},onTimeline=()=>{},signal}={}){
+export async function validateBundle(input,options={}){
+  const path=resolve(input);
+  if((await stat(path)).size>16777216)throw new Error('结果包索引超过 16 MiB');
+  return validateBundleData(JSON.parse(await readFile(path,'utf8')),dirname(path),options);
+}
+
+// 生产者在发布 complete 状态之前验证候选索引，消费者仍从磁盘读取相同规则。
+export async function validateBundleData(index,directory,{onChange=()=>{},onTimeline=()=>{},onState,signal}={}){
   signal?.throwIfAborted();
-  const path=resolve(input),index=validateIndex(JSON.parse(await readFile(path,'utf8')));
+  validateIndex(index);
   for(const point of index.collectors){
-    const changes=await artifact(dirname(path),point,'changes',signal),timeline=await artifact(dirname(path),point,'timeline',signal),state=await artifact(dirname(path),point,'state',signal);
+    const changes=await artifact(directory,point,'changes',signal),timeline=await artifact(directory,point,'timeline',signal),state=await artifact(directory,point,'state',signal);
     if(!changes&&point.status==='complete')throw new Error('完整观测点缺少变化明细');
     let count=0;const changeHash=createHash('sha256');
     if(changes)for await(const raw of jsonLines(changes)){signal?.throwIfAborted();const change=validateChange(raw,point,index.window);addHash(changeHash,change);count++;await onChange(change,point,{timeline:Boolean(timeline)});}
@@ -124,7 +131,7 @@ export async function validateBundle(input,{onChange=()=>{},onTimeline=()=>{},si
       if(point.change_notices!==undefined&&notices!==point.change_notices)throw new Error('时间线提醒计数不一致');
       for(const entry of report.timeline.entries)await onTimeline(entry,point,{changes:Boolean(changes)});
     }
-    if(state){let rows=0,active=0;for await(const event of jsonLines(state)){signal?.throwIfAborted();if(event.schema_version!=='2.0'||!['active','withdrawn'].includes(event.action))throw new Error('最终状态版本或类型无效');validateTimestamp(event,{from:0,to:index.window.to});prefix(event);peer(event);validateSource(event.source,point);rows++;if(event.action==='active')active++;}
+    if(state){let rows=0,active=0;for await(const event of jsonLines(state)){signal?.throwIfAborted();if(event.schema_version!=='2.0'||!['active','withdrawn'].includes(event.action))throw new Error('最终状态版本或类型无效');validateTimestamp(event,{from:0,to:index.window.to});prefix(event);peer(event);validateSource(event.source,point);rows++;if(event.action==='active')active++;if(onState)await onState(event,point,rows);}
       if(point.status==='complete'&&(point.summary?.tracked_routes!==undefined&&rows!==point.summary.tracked_routes||point.summary?.active_routes!==undefined&&active!==point.summary.active_routes))throw new Error('最终状态数量不一致');}
   }
   return index;

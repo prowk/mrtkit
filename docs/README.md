@@ -6,6 +6,7 @@
 | --- | --- |
 | 安装、样本、筛选、导出、真实回放 | [完整入门教程](tutorials/getting-started.md) |
 | 加载初始 RIB，设置窗口与预热 | [基线回放](guides/replay.md) |
+| 在限定内存中保存完整逻辑路由状态 | [磁盘分区回放](guides/disk-replay.md) |
 | 比较两个同源快照 | [快照差异](guides/snapshots.md) |
 | 查看一个前缀的观测过程与缺档 | [前缀时间线](guides/timeline.md) |
 | 对变化排名、去重与复算 | [变化聚合](guides/aggregation.md) |

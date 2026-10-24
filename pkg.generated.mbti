@@ -88,7 +88,9 @@ pub struct Analyzer {
 pub fn Analyzer::new(window_seconds? : Int, threshold? : Int, capacity? : Int, from_time? : UInt, to_time? : UInt, from_micros? : Int, to_micros? : Int) -> Self raise ParseError
 pub fn Analyzer::observe(Self, RouteEvent) -> Array[Change] raise ParseError
 pub fn Analyzer::observe_state(Self, StateChange) -> Unit
+pub fn Analyzer::path_totals(Self) -> (Int64, Int64)
 pub fn Analyzer::record_batch(Self, Batch) -> Unit
+pub fn Analyzer::route_count(Self) -> Int
 pub fn Analyzer::route_state_iter(Self) -> Iter[RouteEvent]
 pub fn Analyzer::route_states(Self) -> Array[RouteEvent]
 pub fn Analyzer::seed(Self, RouteEvent) -> Unit raise ParseError
@@ -147,6 +149,7 @@ pub struct Batch {
   diagnostics : Array[Diagnostic]
 } derive(ToJson)
 pub fn Batch::to_json(Self) -> Json
+pub fn Batch::with_event_indices(Self, Array[Int]) -> Self raise ParseError
 
 pub struct BgpRecord {
   message_type : Int
@@ -192,6 +195,7 @@ pub fn Decoder::decode(Self, Bytes) -> Batch raise ParseError
 pub fn Decoder::decode_at(Self, Bytes, String, Int64, Int64) -> Batch raise ParseError
 pub fn Decoder::decode_scoped(Self, Bytes, String, Int64, Int64, String, String) -> Batch raise ParseError
 pub fn Decoder::new() -> Self
+pub fn Decoder::partition_record(Self, Bytes) -> PartitionedBatch raise ParseError
 pub fn Decoder::reset(Self) -> Unit
 
 pub struct Diagnostic {
@@ -253,6 +257,19 @@ pub struct OriginDiff {
 pub fn OriginDiff::to_json(Self) -> Json
 pub impl ToJson for OriginDiff
 
+pub struct PartitionedBatch {
+  header : Header
+  microseconds : Int?
+  skipped : Bool
+  ignored_families : Int
+  diagnostics : Array[Diagnostic]
+  route_events : Int
+  state_events : Int
+  peer_table : Bool
+  parts : Array[PeerRecord]
+} derive(ToJson)
+pub fn PartitionedBatch::to_json(Self) -> Json
+
 pub struct PathDiff {
   before : Array[AsSegment]
   after : Array[AsSegment]
@@ -265,6 +282,14 @@ pub struct Peer {
   asn : UInt
 } derive(ToJson)
 pub fn Peer::to_json(Self) -> Json
+
+pub struct PeerRecord {
+  peer : String
+  data : Bytes
+  event_indices : Array[Int]
+}
+pub fn PeerRecord::to_json(Self) -> Json
+pub impl ToJson for PeerRecord
 
 pub struct PeerTable {
   collector_id : UInt
