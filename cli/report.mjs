@@ -1,25 +1,14 @@
-import {readFile,writeFile,mkdir,stat} from 'node:fs/promises';
-import {createReadStream} from 'node:fs';
-import {createHash} from 'node:crypto';
-import {resolve,dirname,join} from 'node:path';
-import {bundlePath,jsonLines} from './bundle.mjs';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve,join} from 'node:path';
+import {validateIndex,validateBundle} from './validation.mjs';
 
 const safeJson=value=>JSON.stringify(value).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
-async function verified(directory,name,expected){const path=await bundlePath(directory,name);if(expected){const hash=createHash('sha256');for await(const chunk of createReadStream(path))hash.update(chunk);if(hash.digest('hex')!==expected)throw new Error('报告明细哈希不一致');}return path;}
 
 // 页面数据独立分块；浏览器只缓存当前页，筛选索引只保留页号和行号。
 export async function generateReport(input,output,{pageSize=200,title='MRTKit 路由观测复盘',sourceLabels=null}={}){
   if(!Number.isInteger(pageSize)||pageSize<1||pageSize>1000)throw new Error('报告页大小须为 1..1000');
   const inputPath=resolve(input),index=JSON.parse(await readFile(inputPath,'utf8'));
-  if(index.schema_version!=='2.0'||index.type!=='collector_replay_bundle'||!['complete','partial'].includes(index.status)||!Array.isArray(index.collectors))throw new Error('报告需要明确完整/部分状态的回放结果包');
-  if(!Number.isInteger(index.window?.from)||!Number.isInteger(index.window?.to)||index.window.from<0||index.window.from>index.window.to||index.window.to>4294967295)throw new Error('报告时间窗口无效');
-  const identities=new Set();
-  if(!index.collectors.length||index.collectors.length>128)throw new Error('报告需要 1..128 个明确观测点');
-  for(const point of index.collectors){
-    const identity=JSON.stringify([point.collector,point.view]);
-    if(typeof point.collector!=='string'||!point.collector.trim()||typeof point.view!=='string'||!point.view.trim()||!['complete','partial'].includes(point.status)||identities.has(identity)||!Array.isArray(point.gaps??[]))throw new Error('报告观测点身份、状态或缺档无效');
-    identities.add(identity);
-  }
+  validateIndex(index);
   const directory=resolve(output);await mkdir(directory,{recursive:false});await mkdir(join(directory,'data'));
   const manifest={schema_version:'2.0',type:'offline_route_report',title,status:'building',input_status:index.status,
     source_path_policy:sourceLabels?'explicit_archive_labels':'original_input_paths',
@@ -38,21 +27,10 @@ export async function generateReport(input,output,{pageSize=200,title='MRTKit �
   const labeled=value=>Array.isArray(value)?value.map(labeled):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).map(([key,child])=>[key,key==='file'&&value.record!==undefined&&value.offset!==undefined&&sourceLabels&&Object.hasOwn(sourceLabels,child)?sourceLabels[child]:labeled(child)])):value;
   async function add(row){if(!Number.isInteger(row.timestamp)||row.timestamp<0||row.timestamp>4294967295||typeof row.kind!=='string'||typeof row.prefix!=='string')throw new Error('报告明细缺少合法时间、前缀或类型');if(row.source&&(row.source.collector!==row.collector||row.source.view!==row.view))throw new Error('报告明细来源身份不一致');if(sourceLabels)row=labeled(row);const bytes=Buffer.byteLength(JSON.stringify(row));if(bytes>16777216)throw new Error('报告单条明细超过 16 MiB');if(pending.length&&(pending.length>=pageSize||size+bytes>1048576))await flush();pending.push(row);size+=bytes;}
   try{
-    for(const point of index.collectors){
-      const beforeCount=manifest.change_notices;
-      if(point.timeline_file){
-        const path=await verified(dirname(inputPath),point.timeline_file,point.timeline_sha256);
-        if((await stat(path)).size>67108864)throw new Error('单个时间线报告超过 64 MiB；请缩小分析窗口，或使用不缓存观测历史的变化结果包');
-        const report=JSON.parse(await readFile(path,'utf8'));
-        if(report.timeline?.schema_version!=='2.0'||!Array.isArray(report.timeline.entries))throw new Error('时间线格式无效');
-        for(const [key,value]of Object.entries(point.summary??{}))if(report.summary?.[key]!==value)throw new Error('时间线和索引统计不一致');
-        for(const entry of report.timeline.entries){manifest.change_notices+=(entry.changes??[]).length;await add({...entry,row_type:'observation',collector:point.collector,view:point.view});}
-      }else{
-        let path;try{path=await verified(dirname(inputPath),point.changes_file,point.changes_sha256);}catch(error){if(point.status==='partial'&&error.code==='ENOENT')continue;throw error;}
-        for await(const change of jsonLines(path)){manifest.change_notices++;await add({...change,row_type:'change_notice',collector:point.collector,view:point.view});}
-      }
-      if(typeof point.change_notices==='number'&&manifest.change_notices-beforeCount!==point.change_notices)throw new Error('报告提醒数量与 CLI 索引不一致');
-    }
+    await validateBundle(inputPath,{
+      onChange:async(change,point,files)=>{manifest.change_notices++;if(!files.timeline)await add({...change,row_type:'change_notice',collector:point.collector,view:point.view});},
+      onTimeline:async(entry,point,files)=>{if(!files.changes)manifest.change_notices+=entry.changes.length;await add({...entry,row_type:'observation',collector:point.collector,view:point.view});},
+    });
     await flush();manifest.status='complete';
     await writeFile(join(directory,'manifest.js'),`globalThis.MRTKitManifest=JSON.parse(${safeJson(JSON.stringify(manifest))});\n`,'utf8');
     await writeFile(join(directory,'index.html'),html,'utf8');

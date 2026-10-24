@@ -2,7 +2,7 @@
 pub struct Aggregator {
   asn : UInt
   address : String
-} derive(Eq, Hash, ToJson)
+} derive(Eq, Hash, ToJson, @json.FromJson)
 
 ///|
 pub extend Aggregator with Eq::{equal, not_equal}
@@ -12,6 +12,9 @@ pub extend Aggregator with Hash::{hash, hash_combine}
 
 ///|
 pub extend Aggregator with ToJson::{to_json}
+
+///|
+pub extend Aggregator with @json.FromJson::{from_json}
 
 ///|
 pub struct AtomicAggregateDiff {

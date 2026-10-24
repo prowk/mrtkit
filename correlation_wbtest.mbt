@@ -31,6 +31,14 @@ test "关联键忽略路径分段和观测身份，属性规则仍区分 MED 等
   }
   assert_true(a.correlation_key() != b.correlation_key())
   assert_eq(a.with_correlation_key().correlation_key, Some(a.correlation_key()))
+  assert_eq(
+    correlation_key_from_json(a.to_json().stringify()),
+    a.correlation_key(),
+  )
+  assert_true(
+    correlation_semantics_from_json(a.to_json().stringify()) !=
+    correlation_semantics_from_json(b.to_json().stringify()),
+  )
   assert_true(
     try {
       ignore({ ..a, kind: "unknown", }.correlation_key())

@@ -50,6 +50,20 @@ priv struct Session {
 let session : Ref[Session?] = Ref(None)
 
 ///|
+pub fn correlation_key_from_json(text : String) -> String {
+  @mrt.correlation_key_from_json(text) catch {
+    @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+  }
+}
+
+///|
+pub fn correlation_semantics_from_json(text : String) -> String {
+  @mrt.correlation_semantics_from_json(text) catch {
+    @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
+  }
+}
+
+///|
 let stream_decoder : Ref[@mrt.StreamDecoder] = Ref(@mrt.StreamDecoder::new())
 
 ///|

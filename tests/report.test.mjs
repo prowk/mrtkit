@@ -8,6 +8,7 @@ import vm from 'node:vm';
 import {spawnSync} from 'node:child_process';
 import {replayManifest} from '../cli/multi.mjs';
 import {generateReport} from '../cli/report.mjs';
+import {attributes} from './helpers/changes.mjs';
 
 // 在无浏览器、无网络的隔离 DOM 中执行真实生成的 app.js 和分块脚本。
 async function page(directory){
@@ -66,7 +67,7 @@ test('大量明细分页、组合筛选及恶意文本不会执行脚本或丢�
   const rows=Array.from({length:175},(_,i)=>({schema_version:'2.0',timestamp:100+i,kind:i%2?'path_change':'attribute_change',
     prefix:i%3?'203.0.113.0/24':'198.51.100.0/24',peer_asn:64512+i%2,peer_ip:'192.0.2.1',outbound:false,
     source:{collector:dangerous,view:'v',file:'route.mrt',record:String(i+1),offset:String(i*100),event_index:0},
-    before:{active:true,attributes:{note:dangerous}},after:{active:true,attributes:{note:'safe'}}}));
+    before:{timestamp:99,active:true,attributes:{...attributes([1]),med:1,note:dangerous}},after:{timestamp:100+i,active:true,attributes:{...attributes([2]),med:2,note:'safe'}}}));
   await writeFile(join(bundle,'changes.jsonl'),rows.map(row=>JSON.stringify(row)).join('\n')+'\n','utf8');
   const index={schema_version:'2.0',type:'collector_replay_bundle',status:'partial',window:{from:100,to:274},collectors:[
     {collector:dangerous,view:'v',status:'partial',baseline_status:'missing',continuous:false,gaps:[{from:110,to:120}],

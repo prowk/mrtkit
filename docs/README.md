@@ -16,6 +16,7 @@
 | 查命令、选项、筛选与分析语义 | [命令行参考](reference/cli.md) |
 | 在 MoonBit 项目中使用核心库 | [库 API](reference/api.md) |
 | 消费版本化 JSON / CSV | [输出契约](reference/output.md) |
+| 核查结果包、来源、时间及关联键 | [共享结果包校验](reference/bundle-validation.md) |
 | 理解 AS4、聚合属性与校验上下文 | [属性规则](reference/attributes.md) |
 | 核查标准条款、测试和支持边界 | [兼容与验收清单](reference/compatibility.md) |
 | 处理失败、部分输出和资源上限 | [错误契约](reference/errors.md) |

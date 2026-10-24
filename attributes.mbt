@@ -2,7 +2,7 @@
 pub struct AsSegment {
   kind : Int
   asns : Array[UInt]
-} derive(Eq, Hash, ToJson)
+} derive(Eq, Hash, ToJson, @json.FromJson)
 
 ///|
 pub extend AsSegment with Eq::{equal, not_equal}
@@ -12,6 +12,9 @@ pub extend AsSegment with Hash::{hash, hash_combine}
 
 ///|
 pub extend AsSegment with ToJson::{to_json}
+
+///|
+pub extend AsSegment with @json.FromJson::{from_json}
 
 ///|
 pub struct RawAttribute {
@@ -130,10 +133,10 @@ pub fn parse_attributes(
   let mut atomic_aggregate = false
   let mut wire_aggregator = None
   let mut as4_aggregator = None
-  let raw_attributes = []
+  let raw_attributes : Array[RawAttribute] = []
   let communities = []
   let large_communities = []
-  let other = []
+  let other : Array[RawAttribute] = []
   while c.remaining() > 0 {
     let position = c.pos
     let flags = c.u8()

@@ -23,3 +23,5 @@ ADD-PATH 按 [RFC 8050](https://datatracker.ietf.org/doc/html/rfc8050) 支持单
 新增报告同样使用版本 2.0：[快照差异](../guides/snapshots.md)输出一个含 `changes` 的对象；[变化聚合](../guides/aggregation.md)输出 `summary/aggregation`；[时间线](../guides/timeline.md)输出 `summary/timeline`。时间线区间使用十进制字符串的 Unix 微秒，可选字段未知时省略；其 `quality`、截尾标志及覆盖时间必须与时长一起消费。上述报告不改变 `parse`、`stats` 和 `changes` 的既有输出形状。
 
 未发布的 main 另支持 [multi 结果包](../guides/multi-collector.md)、[跨采集器关联](../guides/correlation.md)和[离线报告](../guides/html-report.md)。结果包索引保留每个观测点及整体的 `complete/partial`，明细使用相对路径和 SHA-256；来源身份不会靠文件名推测。`correlation_key` 仅在显式请求时增加，普通命令不强制输出。HTML 的 `status` 表示报告生成状态，`input_status` 保留输入完整性，不能相互替代。
+
+三个结果包入口共用[来源、时间、计数及语义校验规则](bundle-validation.md)。历史合法 2.0 包可以没有可选哈希与关联键；已提供的键必须匹配核心重算结果，不能仅凭前缀和变化类型相同就通过。

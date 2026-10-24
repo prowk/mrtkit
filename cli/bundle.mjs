@@ -5,7 +5,9 @@ import {resolve,relative,isAbsolute,sep} from 'node:path';
 // 结果包只允许读取自身目录中的明细，包含符号链接时也检查实际目标。
 export async function bundlePath(directory,name){
   if(typeof name!=='string'||!name)throw new Error('结果包缺少明细路径');
-  const root=await realpath(directory),path=await realpath(resolve(root,name)),part=relative(root,path);
+  const root=await realpath(directory),target=resolve(root,name),declared=relative(root,target);
+  if(isAbsolute(name)||isAbsolute(declared)||declared==='..'||declared.startsWith('..'+sep))throw new Error('结果包明细路径越出包目录');
+  const path=await realpath(target),part=relative(root,path);
   if(isAbsolute(part)||part==='..'||part.startsWith('..'+sep))throw new Error('结果包明细路径越出包目录');
   return path;
 }

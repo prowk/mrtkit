@@ -21,6 +21,7 @@
 | `Timeline::new/seed_peers/seed/record_batch/observe/report` | 前缀观测过程与可见性区间 |
 | `Aggregation::new/observe/report` | 对带来源的变化提醒排名和计数 |
 | `Change::correlation_key/with_correlation_key` | 生成跨观测点使用的规范语义变化键及可选 JSON 字段 |
+| `correlation_key_from_json/correlation_semantics_from_json` | 由结构化前后状态重算关联键与完整去重语义证据 |
 | `TimelineReport::with_correlation_keys` | 为时间线内变化补充相同核心语义键 |
 | `event_json/event_csv/csv_header` | 导出路由 |
 

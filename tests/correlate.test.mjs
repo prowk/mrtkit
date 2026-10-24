@@ -5,13 +5,11 @@ import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {correlateObservations,correlateBundle} from '../cli/correlate.mjs';
 import {replayManifest} from '../cli/multi.mjs';
+import {makeChange} from './helpers/changes.mjs';
 
 const point=(collector,extra={})=>({collector,view:'v',status:'complete',baseline_status:'explicit_rib',continuous:true,gaps:[],...extra});
 function change(collector,time,record='1',extra={}){
-  const prefix='203.0.113.0/24',kind='path_change';
-  return {schema_version:'2.0',timestamp:time,prefix,kind,peer_asn:64512,peer_ip:'192.0.2.1',outbound:false,
-    correlation_key:JSON.stringify({prefix,kind,rule:{before:[1],after:[2]}}),
-    source:{collector,view:'v',file:'input',record,offset:'0',event_index:0},...extra};
+  return makeChange(collector,time,record,extra);
 }
 
 test('重复去重、乱序及同秒并列稳定，固定半开窗口不链式扩展',()=>{
@@ -34,7 +32,8 @@ test('重复去重、乱序及同秒并列稳定，固定半开窗口不链式�
 test('关联拒绝身份冲突、缺少核心规则、超限和同来源内容冲突',()=>{
   const a=point('a');
   assert.throws(()=>correlateObservations([[change('b',100),a]],[a]),/身份/);
-  assert.throws(()=>correlateObservations([[change('a',100,'1',{correlation_key:undefined}),a]],[a]),/关联键/);
+  assert.equal(correlateObservations([[change('a',100,'1',{correlation_key:undefined}),a]],[a]).unique_observations,1);
+  assert.throws(()=>correlateObservations([[change('a',100,'1',{correlation_key:'{}'}),a]],[a]),/关联键/);
   assert.throws(()=>correlateObservations([[change('a',100),a],[change('a',101),a]],[a]),/冲突/);
   assert.throws(()=>correlateObservations([[change('a',100),a],[change('a',101,'2'),a]],[a],{capacity:1}),/容量/);
   assert.throws(()=>correlateObservations([],[a],{windowSeconds:0}),/窗口/);

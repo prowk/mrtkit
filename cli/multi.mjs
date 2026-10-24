@@ -3,6 +3,7 @@ import {createReadStream} from 'node:fs';
 import {createHash,randomUUID} from 'node:crypto';
 import {resolve,dirname,join} from 'node:path';
 import {frames,inputChunks} from './input.mjs';
+import {validateBundle} from './validation.mjs';
 
 const uint=(value,name)=>{if(!Number.isInteger(value)||value<0||value>4294967295)throw new Error(`${name} 必须为无符号秒时间戳`);return value;};
 const checked=text=>{const value=JSON.parse(text);if(value.error)throw new Error(value.error);return value;};
@@ -121,6 +122,7 @@ export async function replayManifest(manifestPath,outputPath){
   }
   index.status=index.collectors.every(group=>group.status==='complete')?'complete':'partial';await save();
   if(index.status!=='complete')throw new Error(`联合回放有部分结果，请检查 ${indexPath}`);
+  try{await validateBundle(indexPath);}catch(error){index.status='partial';index.error=error.message;await save();throw error;}
   return {schema_version:'2.0',type:'collector_replay_bundle',status:'complete',index:indexPath,collectors:index.collectors.length};
 }
 

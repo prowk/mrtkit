@@ -12,6 +12,8 @@ options(
     "js": {
       "exports": [
         "configure",
+        "correlation_key_from_json",
+        "correlation_semantics_from_json",
         "consume",
         "finish",
         "reset_file",
