@@ -2,14 +2,14 @@
   "schema_version": "2.0",
   "synthetic": true,
   "description": "One million and one hundred valid semantic notices; not network archive observations.",
-  "source_revision": "26a33a5e85bbb06c62ffcf8cfa41a3e217d60445",
+  "source_revision": "5b4beb6d3e5f690633f9eb7ddba2fa691c3cdaad",
   "source_sha256": {
     "scripts/correlation_scale.mjs": "8ea5f31392414bc1eeb29e3ce372f3b17771691bb23fec12bfca8c5741df32fa",
     "cli/correlate.mjs": "023453d10fcf0d71a66fb3454ee95c18ae1189376d53887daf2d8f68a82e2f83",
     "cli/correlate-external.mjs": "a3ccc771c5ffe138b8a36ebfb0643051e0452b99312325e5cc461b524b175fbc",
     "cli/external-sort.mjs": "5b3b1549740f09d885a56328f8f003c3552ce7d36e603f21c7ce4ce3c1383643",
-    "cli/validation.mjs": "53b61e8e6984ee84a85027cb3fea48ccd96a58ed43d2a99cec9f46b2e58ab174",
-    "_build/js/release/build/bridge/bridge.js": "27bf9e9dfda7d29b4e77133ae4b74219bad353e222a8149bd921c92992ee327d"
+    "cli/validation.mjs": "3f2421fe48181c43dfcf46b366525d9c53c26c5ed231c63e0581765022df7034",
+    "_build/js/release/build/bridge/bridge.js": "7c8cfe69f97fbc086259862f84deeed4f44aa1f4ba3b6735b7125e2062dc4814"
   },
   "environment": {
     "node": "v22.14.0",
@@ -32,19 +32,20 @@
   "groups": 1,
   "observations": 1000100,
   "groups_sha256": "0ab3b0ee304178cc2763eaed74e46244d110b9f0d925ec3477eeb398772227ba",
-  "observations_sha256": "5793c499c09b6148a6b13e1832200347a3e2ea301ff028aefce75858f5608d02",
+  "observations_sha256": "5875863919e7fe27358685e57e2a7a76fbce8443fb90a1639c8b318c1a77acef",
   "resources": {
     "sort_memory_bytes": 67108864,
     "disk_budget_bytes": 8589934592,
     "peak_new_disk_bytes": 1982261676,
-    "retained_output_bytes": 679091126,
-    "peak_rss_bytes": 265687040,
-    "seconds": 190.356802
+    "retained_output_bytes": 679091127,
+    "peak_rss_bytes": 243687424,
+    "seconds": 234.3553373
   },
-  "verification_peak_rss_bytes": 265687040,
+  "verification_peak_rss_bytes": 264060928,
   "publication": {
     "actual_input_and_output_hashes_rechecked": true,
     "source_files_verified": true,
-    "compiled_bridge_reproduced": true
+    "compiled_bridge_hash_verified": true,
+    "compiled_bridge_reproduced": false
   }
 }
