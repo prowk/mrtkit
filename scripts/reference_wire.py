@@ -7,11 +7,19 @@ class RecordingInput:
         self.stream = stream
         self.parts = []
         self.offset = 0
+        self.pending = b''
+
+    def peek(self, size):
+        if not self.pending:
+            self.pending = self.stream.read(size)
+        return self.pending
 
     def read(self, size):
         if size > 16777216:
             raise ValueError('独立对照单条记录超过 16 MiB')
-        data = self.stream.read(size)
+        data, self.pending = self.pending[:size], self.pending[size:]
+        if len(data) < size:
+            data += self.stream.read(size - len(data))
         self.parts.append(data)
         self.offset += len(data)
         return data
@@ -24,6 +32,7 @@ class ReferenceRecord(dict):
     def __init__(self, data, raw, offset, peer_frame):
         super().__init__(data)
         self.raw, self.offset, self.peer_frame = raw, offset, peer_frame
+        self.ordered_events = []
 
 
 def attribute_blocks(frame):

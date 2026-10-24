@@ -62,6 +62,22 @@ def reference_records(path):
             reader.err = 0
             recording.parts = []
             record_offset = recording.offset
+            envelope = recording.peek(12)
+            if not envelope:
+                break
+            if len(envelope) != 12:
+                raise ValueError('独立解析 MRT 信封截断')
+            envelope_type, envelope_subtype = int.from_bytes(envelope[4:6], 'big'), int.from_bytes(envelope[6:8], 'big')
+            supported_envelope = (envelope_type == 13 and envelope_subtype in (1, 2, 4, 8, 10)) or (envelope_type in (16, 17) and envelope_subtype in (0, 1, 4, 5, 6, 7, 8, 9, 10, 11))
+            if not supported_envelope:
+                # 未支持类型只验证信封与完整载荷，不交给不认识该类型的参考解析器。
+                size = int.from_bytes(envelope[8:12], 'big')
+                raw = recording.read(12) + recording.read(size)
+                if len(raw) != size + 12:
+                    raise ValueError('独立解析未支持记录载荷截断')
+                ordinal += 1
+                yield ReferenceRecord({'ordinal': ordinal, 'header': (int.from_bytes(envelope[:4], 'big'), None, envelope_type, envelope_subtype), 'events': Counter(), 'states': Counter(), 'skipped': True, 'ignored': Counter()}, raw, record_offset, peer_frame)
+                continue
             try:
                 record = next(reader)
             except StopIteration:
@@ -76,6 +92,7 @@ def reference_records(path):
             timestamp = code(data['timestamp'])
             micros = data.get('microsecond_timestamp')
             events, states = Counter(), Counter()
+            ordered_events = []
             ignored = Counter()
             blocks = attribute_blocks(raw)
             if kind == 13 and subtype == 1:
@@ -90,7 +107,9 @@ def reference_records(path):
                     hop = next((a['value']['next_hop'][0] for a in attrs if code(a['type']) == 14), None)
                     if hop:
                         values = (*values[:2], ip_key(hop), *values[3:])
-                    events[(timestamp, micros, 'rib', network, int(peer['peer_as']), ip_key(peer['peer_ip']), False, rib.get('path_id'), code(rib['originated_time']), *values)] += 1
+                    event = (timestamp, micros, 'rib', network, int(peer['peer_as']), ip_key(peer['peer_ip']), False, rib.get('path_id'), code(rib['originated_time']), *values)
+                    events[event] += 1
+                    ordered_events.append(event)
             elif kind in (16, 17) and supported:
                 if subtype in (0, 5):
                     states[(timestamp, micros, int(data['peer_as']), ip_key(data['peer_ip']), code(data['old_state']), code(data['new_state']))] += 1
@@ -105,9 +124,9 @@ def reference_records(path):
                                 route_values = (*route_values[:2], ip_key(hop), *route_values[3:])
                             for item in entries:
                                 network = prefix_key(f"{item['prefix']}/{item['length']}")
-                                events[(timestamp, micros, action, network, int(data['peer_as']), ip_key(data['peer_ip']), subtype in (6, 7, 10, 11), item.get('path_id'), None, *route_values)] += 1
-                        add('withdraw', message['withdrawn_routes'])
-                        add('announce', message['nlri'])
+                                event = (timestamp, micros, action, network, int(data['peer_as']), ip_key(data['peer_ip']), subtype in (6, 7, 10, 11), item.get('path_id'), None, *route_values)
+                                events[event] += 1
+                                ordered_events.append(event)
                         for attribute in attrs:
                             c = code(attribute['type'])
                             if c not in (14, 15):
@@ -120,8 +139,12 @@ def reference_records(path):
                                 add('announce', value['nlri'], value['next_hop'][0])
                             else:
                                 add('withdraw', value['withdrawn_routes'])
-            yield ReferenceRecord({'ordinal': ordinal, 'header': (timestamp, micros, kind, subtype), 'events': events, 'states': states,
-                                   'skipped': not supported, 'ignored': ignored}, raw, record_offset, peer_frame)
+                        add('withdraw', message['withdrawn_routes'])
+                        add('announce', message['nlri'])
+            result = ReferenceRecord({'ordinal': ordinal, 'header': (timestamp, micros, kind, subtype), 'events': events, 'states': states,
+                                      'skipped': not supported, 'ignored': ignored}, raw, record_offset, peer_frame)
+            result.ordered_events = ordered_events
+            yield result
     finally:
         reader.f.close()
 
