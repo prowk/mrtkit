@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "declared_before_measurement": true,
+  "workload": {
+    "description": "First 100000 complete notices from the fixed real unfiltered UPDATE replay output; original notice payload and order retained, source collector/view added explicitly for the bundle contract.",
+    "source_output_bytes": 4735570592,
+    "source_output_sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+    "notice_count": 100000,
+    "window": {"from": 1735689600, "to": 1735693199},
+    "input_status": "partial",
+    "detail_rows_per_page": 200,
+    "display_rows_per_page": 50,
+    "index_rows_per_chunk": 8192
+  },
+  "browser_targets": {
+    "first_screen_seconds": 3,
+    "combined_filter_seconds": 3,
+    "next_page_seconds": 1,
+    "browser_process_tree_peak_rss_bytes": 1073741824,
+    "repeat_count": 3,
+    "open_mode": "local_file_without_network"
+  },
+  "acceptance": "Measure actual browser file opening, filtering and pagination with browser version and screenshots. DOM simulator measurements alone do not satisfy browser targets. Keep targets unchanged if exceeded or blocked."
+}
