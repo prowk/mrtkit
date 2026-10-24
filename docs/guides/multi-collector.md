@@ -2,7 +2,7 @@
 
 [文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](../reference/cli.md)
 
-开发分支的 `multi` 命令接受显式输入清单，按 `(collector, view)` 创建独立 MoonBit 会话。不同观测点即使具有相同的 peer、前缀和 Path Identifier，也不会共享路由状态、基线、会话水位或重置。它不把多个档案直接拼接为一个观测点。
+`multi` 命令接受显式输入清单，按 `(collector, view)` 创建独立 MoonBit 会话。不同观测点即使具有相同的 peer、前缀和 Path Identifier，也不会共享路由状态、基线、会话水位或重置。它不把多个档案直接拼接为一个观测点。
 
 ## 可运行示例
 
@@ -37,6 +37,8 @@ node cli/mrtkit.mjs multi --manifest fixtures/multi/manifest.json --output .vali
 每个条目最多一个 RIB，位于文件列表首位，声明时间不晚于窗口；后续文件按声明开始时间非降序。每条实际记录都检查声明的时间范围，UPDATE 文件中不能夹入 RIB。记录内乱序由分析器按原有水位规则处理。输入处理前后检查文件大小及修改时间，发现变化即失败。
 
 `analysis` 可设置共享的 `prefix`、`peer_asn`、`path_id`、`capacity`、`window_seconds` 和 `threshold`。有 `prefix` 时生成逐观测点时间线；未设置时生成全前缀变化流。基线与窗口前预热仍不计窗口统计。
+
+`analysis.compact_changes: true` 启用[紧凑变化编码](../reference/compact-changes.md)，相邻同一事件的多种提醒共享属性和来源；默认为完整 JSONL。需要限制完整逻辑状态的驻留内存时，按观测点使用 [replay-disk](disk-replay.md)。
 
 `continuous` 默认 false。清单中声明的文件覆盖范围存在空洞时自动记录 `declared_file_gap`，也可通过 `gaps: [{"from": ..., "to": ...}]` 提供已知中断，端点为秒且左闭右开。文件范围和哈希不能证明部署持续可观测，连续性仍需数据来源证据。不同观测点的缺档、基线和连续性独立标记。
 

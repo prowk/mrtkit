@@ -7,7 +7,7 @@
 | 交付项 | 实现与证据 | 结论及限制 |
 | --- | --- | --- |
 | 无筛选的完整 RIB 加连续更新基准 | `fullstate_benchmark.mjs` / `fullstate_worker.mjs`；[输入、三轮测量和失败证据](full-state-benchmark.md) | 已建立可重复基准。两版均受 1400 MiB RSS 预算限制，未完成全 RIB 驻留；后续阶段的完整成本明确未知 |
-| 降低状态内存并保持语义 | `storage.mbt`、`analyzer.mbt` 的属性共享及引用回收；`storage_wbtest.mbt`、`tests/storage.test.mjs`、独立状态模型；[六轮实际输出与状态核验](fullstate/comparison.json) | 相同检查点 RSS 约降低 60.8%；全部 UPDATE 的变化字节、统计、来源和最终状态一致。保留撤回水位、波动窗口，不引入过期假设 |
+| 降低状态内存并保持语义 | `storage.mbt`、`analysis.mbt` 的属性共享及引用回收；`storage_wbtest.mbt`、`tests/storage.test.mjs`、独立状态模型；[六轮实际输出与状态核验](fullstate/comparison.json) | 相同检查点 RSS 约降低 60.8%；全部 UPDATE 的变化字节、统计、来源和最终状态一致。保留撤回水位、波动窗口，不引入过期假设 |
 | 显式观测点和独立状态 | `Decoder::decode_scoped`、`scoped_peer_key`、`cli/multi.mjs`；`scope_wbtest.mbt`、`tests/scope.test.mjs`、`tests/multi.test.mjs` | 输入明确身份、类型、时间及哈希；同名 peer、前缀、Path ID 隔离；联合结果按观测点拆分后与单独回放一致 |
 | 跨采集器关联 | `correlation.mbt`、`cli/correlate.mjs`；`correlation_wbtest.mbt`、`tests/correlate.test.mjs`；[规则与命令](../guides/correlation.md) | 核心语义键、固定半开窗口、微秒与数字记录号并列顺序、重复去重和冲突检测；保留未观测范围、缺档和基线差异，不推断传播或因果 |
 | 固定真实复盘 | [RIS rrc23 案例](../../cases/rrc23-path-change/README.md)、`reproduce_case.mjs`、`verify_case.py`、`tests/case.test.mjs`；[完整复算收据](real-case-verification.json) | 完整输入读取至 EOF，固定窗口 46 条宣告、35 次路径变化、93 条提醒；三个原始位置锚点及最终状态全部复核；四条不改写原始记录另经 mrtparse 核查 |

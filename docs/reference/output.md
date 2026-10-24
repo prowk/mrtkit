@@ -2,7 +2,7 @@
 
 [文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](cli.md)
 
-0.1.0 版工具采用 `schema_version: "2.0"`。可用 `--output-version 2.0` 固定期望版本；不支持的主版本直接失败。开发期变化输出的字符串 `before/after` 已替换为对象，不以旧版格式静默输出。工具发布版本与输出模式版本独立。后续同一模式主版本仅增加字段或可选变化种类，消费者应忽略未知字段，按需要显式检查种类；删除、改名或改变字段类型需要新主版本。
+0.2.0 版工具继续采用 `schema_version: "2.0"`。可用 `--output-version 2.0` 固定期望版本；不支持的主版本直接失败。变化的 `before/after` 为结构化对象。工具发布版本与输出模式版本独立。后续同一模式主版本仅增加字段或可选变化种类，消费者应忽略未知字段，按需要显式检查种类；删除、改名或改变字段类型需要新主版本。
 
 路由与变化保留采集秒、可选微秒、peer、方向、前缀。变化包含 `before/after` 状态对象和 `diff`：路径为 AS 分段数组，起源 AS 和下一跳为可空前后值，社区包含规范化的 `before/after/added/removed` 数组。`before` 缺失表示没有已知旧状态，空的 `diff` 表示相应事件不改变属性。属性变化的完整证据保留在状态对象中，JSON 不嵌套于字符串。
 
@@ -12,7 +12,7 @@
 
 CSV 同样以 `schema_version` 开头，包含来源文件、记录号、记录偏移及事件索引。使用库的 `csv_header` 读取列定义，按列名消费，不依赖固定列号。统计中的 64 位计数保持十进制字符串。
 
-开发分支的显式观测点来源另含可选 `source.collector` 和 `source.view`，旧单观测点调用不设置时省略。CSV 在已有列之后追加 `source_collector/source_view`，缺失为空，文本按 CSV 规则转义。变化的前后状态各自保存身份；来源去重包含身份，名称中的分隔符不能产生路由键碰撞。已发布的 v0.1.0 不包含这些新增字段。
+显式观测点来源另含可选 `source.collector` 和 `source.view`，旧单观测点调用不设置时省略。CSV 在已有列之后追加 `source_collector/source_view`，缺失为空，文本按 CSV 规则转义。变化的前后状态各自保存身份；来源去重包含身份，名称中的分隔符不能产生路由键碰撞。v0.1.0 不包含这些新增字段。
 
 Large Communities 按 [RFC 8092](https://www.rfc-editor.org/rfc/rfc8092.html) 解码为 `[全局管理员, 本地值1, 本地值2]` 三元组数组，规范排序并去重，原始编码保留在 `attributes.other` 的 code 32 中。排列和重复不产生语义变化，`diff.large_communities` 给出前后值及增删成员；CSV 使用空格分隔的 `ASN:值1:值2`。长度为零或不是 12 的倍数时抛出 `ParseError::Invalid`，这是离线格式解析错误，不将坏数据冒充真实观测到的撤回消息。
 
@@ -22,6 +22,8 @@ ADD-PATH 按 [RFC 8050](https://datatracker.ietf.org/doc/html/rfc8050) 支持单
 
 新增报告同样使用版本 2.0：[快照差异](../guides/snapshots.md)输出一个含 `changes` 的对象；[变化聚合](../guides/aggregation.md)输出 `summary/aggregation`；[时间线](../guides/timeline.md)输出 `summary/timeline`。时间线区间使用十进制字符串的 Unix 微秒，可选字段未知时省略；其 `quality`、截尾标志及覆盖时间必须与时长一起消费。上述报告不改变 `parse`、`stats` 和 `changes` 的既有输出形状。
 
-未发布的 main 另支持 [multi 结果包](../guides/multi-collector.md)、[跨采集器关联](../guides/correlation.md)和[离线报告](../guides/html-report.md)。结果包索引保留每个观测点及整体的 `complete/partial`，明细使用相对路径和 SHA-256；来源身份不会靠文件名推测。`correlation_key` 仅在显式请求时增加，普通命令不强制输出。HTML 的 `status` 表示报告生成状态，`input_status` 保留输入完整性，不能相互替代。
+本版包含 [multi 结果包](../guides/multi-collector.md)、[跨采集器关联](../guides/correlation.md)、[外部关联包](../guides/external-correlation.md)和[离线报告](../guides/html-report.md)。索引保留每个观测点及整体的 `complete/partial`，明细使用相对路径和 SHA-256；来源身份不会靠文件名推测。`correlation_key` 仅在显式请求时增加，普通命令不强制输出。HTML 的 `status` 表示报告生成状态，`input_status` 保留输入完整性，不能相互替代。
+
+结果包的 `changes_encoding` 默认为 `full_jsonl_v1`；可选 `event_refs_v1` 用自包含上下文引用保存相同提醒，并记录 `change_contexts`。消费者必须按编码读取，不能把紧凑上下文行当作一条普通提醒，规则见[紧凑编码](compact-changes.md)。旧合法 schema 2.0 缺少可选哈希和关联键时的处理见[共享校验](bundle-validation.md)。
 
 三个结果包入口共用[来源、时间、计数及语义校验规则](bundle-validation.md)。历史合法 2.0 包可以没有可选哈希与关联键；已提供的键必须匹配核心重算结果，不能仅凭前缀和变化类型相同就通过。

@@ -1,7 +1,7 @@
 # MRTKit
 
 [![CI](https://github.com/prowk/mrtkit/actions/workflows/ci.yml/badge.svg)](https://github.com/prowk/mrtkit/actions/workflows/ci.yml)
-[![Mooncakes](https://img.shields.io/badge/Mooncakes-v0.1.0-blue)](https://mooncakes.io/docs/prowk/mrtkit)
+[![Mooncakes](https://img.shields.io/badge/Mooncakes-v0.2.0-blue)](https://mooncakes.io/docs/prowk/mrtkit)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
 用 MoonBit 解析 BGP MRT 档案，查询路由并分析变化。提供无第三方依赖的协议核心库和流式 CLI，适用于离线路由研究、故障复盘与教学。
@@ -19,9 +19,7 @@ node cli/mrtkit.mjs stats --threshold 3 fixtures/demo.mrt
 node cli/mrtkit.mjs timeline --prefix 203.0.113.0/24 fixtures/demo.mrt
 ```
 
-MoonBit 项目可用 `moon add prowk/mrtkit@0.1.0` 引入核心库。完整安装、样本解读、筛选、导出和真实档案回放见[入门教程](docs/tutorials/getting-started.md)。
-
-GitHub `main` 另含尚未发布的多采集器、关联分析及 HTML 报告扩展；使用这些能力请从源码构建。Mooncakes 与 GitHub v0.1.0 发布包保持原有稳定范围。
+MoonBit 项目可用 `moon add prowk/mrtkit@0.2.0` 引入核心库。完整安装、样本解读、筛选、导出和真实档案回放见[入门教程](docs/tutorials/getting-started.md)。CLI 和离线报告从源码运行。
 
 ## 功能
 
@@ -29,7 +27,9 @@ GitHub `main` 另含尚未发布的多采集器、关联分析及 HTML 报告扩
 - 常用路径、聚合与社区属性；保留原始编码并解释 AS4 有效值，检查长度、标志和宣告必需属性。
 - 前缀、ASN、时间筛选，JSON Lines / CSV 导出，带文件、记录号和解压后偏移。
 - 初始 RIB 与连续更新回放、结构化变化、快照差异、前缀时间线和变化聚合。
-- 显式采集器/视图隔离回放、跨观测点语义变化关联，以及可筛选、分页的离线 HTML 报告。
+- 显式采集器/视图隔离回放，按 peer 磁盘分区保存完整逻辑状态。
+- 有界内存的跨观测点语义关联、分离式摘要/观测导出，以及可选紧凑变化流。
+- 离线 HTML 展示可读属性差异、关联组与来源跳转，提供倒排筛选、分页、取消和重置。
 
 从[多采集器示例](docs/guides/multi-collector.md)开始，或查看[固定真实案例](cases/rrc23-path-change/README.md)。
 
@@ -41,7 +41,9 @@ GitHub `main` 另含尚未发布的多采集器、关联分析及 HTML 报告扩
 
 两个采集器的 18 个完整档案、约 1,966 万条路由事件已通过独立解析器对照。字段、来源、哈希与复现方法见[验证记录](docs/validation/README.md)。
 
-属性共享降低了固定检查点内存成本；全 RIB 驻留仍超出本轮 1400 MiB 预算。三轮重复测量、完整 UPDATE 的输出/状态等价及限制见[全量状态基准](docs/validation/full-state-benchmark.md)。
+完整状态回放的固定数据与资源目标见[验收目标](docs/validation/state-resource-target.md)；紧凑编码的体积、耗时和内存取舍见[实测说明](docs/reference/compact-changes.md)。早期整表内存驻留失败与共享优化保留在[历史基准](docs/validation/full-state-benchmark.md)。
+
+浏览器工具禁止本地文件自动化，真实浏览器的离线布局与性能验收按用户要求保留待办；页面逻辑和分块加载已通过自动测试。
 
 ```sh
 npm test

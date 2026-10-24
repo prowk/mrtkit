@@ -26,6 +26,7 @@
 | 处理失败、部分输出和资源上限 | [错误契约](reference/errors.md) |
 | 修改实现、运行测试 | [开发指南](development/contributing.md) |
 | 查看完整数据对照、回放与验收证据 | [验证记录](validation/README.md) |
+| 核查本版交付与保留的浏览器待办 | [v0.2.0 验收](validation/v0.2.0-acceptance.md) |
 | 阅读限定提交的性能测量 | [历史性能基准](validation/performance.md) |
 | 核查早期全量状态资源边界与共享优化 | [历史全量状态基准](validation/full-state-benchmark.md) |
 | 核查早期 main 扩展的交付证据 | [历史深化验收](validation/extended-acceptance.md) |

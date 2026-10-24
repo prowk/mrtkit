@@ -2,12 +2,13 @@
 
 [文档首页](../README.md) · [入门教程](../tutorials/getting-started.md) · [命令行](../reference/cli.md)
 
-验证日期：2026-10-22。工具链：moon 0.1.20260920、moonc v0.10.14+7d59c7ec9，Node.js 22.14.0，Python 3.13.2。CI 使用官方安装器的发布标签 `0.10.14+7d59c7ec9` 固定编译器和核心库。
+验证日期：2026-10-24。工具链：moon 0.1.20260920、moonc v0.10.14+7d59c7ec9，Node.js 22.14.0，Python 3.13.2。CI 使用官方安装器的发布标签 `0.10.14+7d59c7ec9` 固定编译器和核心库。本次交付与待办状态见 [v0.2.0 验收](v0.2.0-acceptance.md)；较早测量继续绑定各自的固定源码。
 
 ## 自动测试
 
-- 57 个 MoonBit 测试分别在 JS、Wasm、Wasm GC 后端通过。
-- 90 个 Node 测试通过，包含命令行端到端验证、gzip/bz2、IPv6、旧式 ASN、扩展时间戳、ADD-PATH（含 BGP4MP_ET 子类型矩阵）、Large Communities、时间窗口、来源追溯、快照差异、聚合复算、前缀时间线、错误退出码、多采集器隔离、关联和离线报告。
+- 58 个 MoonBit 测试分别在 JS、Wasm、Wasm GC 后端通过。
+- 110 个 Node 测试通过，包含协议与 CLI、gzip/bz2、ADD-PATH、微秒、属性与来源、多观测点隔离、共享校验、完整磁盘回放、外部关联、紧凑编码及索引报告。
+- 独立对照工具的三个 Python 测试和 SQLite 状态模型的一个端到端测试通过；后者在完整和带预热的微秒窗口分别核对 1,200 个事件。
 - 确定性畸形输入测试覆盖 2,000 组随机修改/随机字节数据，所有调用均返回解析结果或错误，没有宿主异常。
 - 编译与测试启用 `--deny-warn`，当前没有编译警告。
 
@@ -66,9 +67,9 @@ python scripts/publish_validation.py
 
 样本与验证依赖只保存在被 Git 忽略的 `.validation/`，不会被提交。该流程需要网络，常规测试和演示不需要网络。
 
-性能测量方法、固定场景及优化前后比较见[性能基准](performance.md)。早期 P0/P1 证据见[历史验收](acceptance.md)，本次交付见[v0.1.0 验收](release-acceptance.md)与[标准清单](../reference/compatibility.md)。
+性能测量方法、固定场景及优化前后比较见[历史性能基准](performance.md)。早期 P0/P1 证据见[历史验收](acceptance.md)，此前公开版本见[v0.1.0 验收](release-acceptance.md)；当前交付见[v0.2.0 验收](v0.2.0-acceptance.md)与[标准清单](../reference/compatibility.md)。
 
-v0.1.0 之后 main 的交付见[深化验收](extended-acceptance.md)。无筛选全量状态的重复基准、资源预算失败及优化取舍见[全量状态基准](full-state-benchmark.md)，固定数据与原始位置锚点见[真实复盘案例](../../cases/rrc23-path-change/README.md)。
+早期 main 扩展见[历史深化验收](extended-acceptance.md)。整表驻留失败与共享优化见[历史全量状态基准](full-state-benchmark.md)，新分区方案使用预先固定的[完整回放目标](state-resource-target.md)。[独立全状态数据核对](full-state-independent.json)不等同于三轮资源验收。固定数据与原始位置锚点见[真实复盘案例](../../cases/rrc23-path-change/README.md)。
 
 ## 完整输入的窗口与导出验收
 

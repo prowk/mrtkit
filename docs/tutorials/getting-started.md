@@ -17,7 +17,7 @@ npm run build
 node cli/mrtkit.mjs --version
 ```
 
-预期工具版本为 `0.1.0`。没有 npm 依赖，无需 `npm install`；构建产物写入 `_build/`。更新源码后重新构建。常规样本演示与测试无需联网。
+预期工具版本为 `0.2.0`。没有 npm 依赖，无需 `npm install`；构建产物写入 `_build/`。更新源码后重新构建。常规样本演示与测试无需联网。
 
 ## 2. 读取第一个文件
 
@@ -84,7 +84,7 @@ python scripts/replay_acceptance.py
 
 ## 7. 使用 MoonBit 核心库
 
-在自己的 MoonBit 项目目录执行 `moon add prowk/mrtkit@0.1.0`，在使用它的包的 `moon.pkg` 中加入：
+在自己的 MoonBit 项目目录执行 `moon add prowk/mrtkit@0.2.0`，在使用它的包的 `moon.pkg` 中加入：
 
 ```moonbit
 import {
