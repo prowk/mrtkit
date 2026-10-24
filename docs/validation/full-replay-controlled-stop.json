@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0",
+  "status": "partial",
+  "reason": "operator_cancelled_for_measured_handle_churn_tuning",
+  "completed_replay": false,
+  "last_observed_stderr_progress": {
+    "records": 225000,
+    "route_events": 2064825,
+    "partitions": 32,
+    "rss": 114102272
+  },
+  "interpretation": "Progress is a lower bound before controlled termination; no EOF, full state residency or final export was completed. Budgets were not relaxed.",
+  "process_resources": [
+    {
+      "CPU": 714.546875,
+      "WorkingSet": 114581504,
+      "StartTime": "2026-10-24T15:08:23.6624647+08:00"
+    },
+    {
+      "CPU": 0.140625,
+      "WorkingSet": 39452672,
+      "StartTime": "2026-10-24T15:08:23.5654916+08:00"
+    }
+  ]
+}

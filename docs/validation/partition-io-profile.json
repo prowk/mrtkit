@@ -1,0 +1,51 @@
+{
+  "partial_input_profile": true,
+  "scope": "first 4000 complete MRT records; I/O tuning only, not complete replay success",
+  "results": [
+    {
+      "max_open": 8,
+      "records": 4000,
+      "events": 36652,
+      "seconds": 10.5143325,
+      "cpu_seconds": 11.422,
+      "decode_and_transport_seconds": 0.5530967000000637,
+      "write_seconds": 2.092582000000016,
+      "handle_opens": 36298,
+      "partitions": 18,
+      "bytes": 4451577
+    },
+    {
+      "max_open": 64,
+      "records": 4000,
+      "events": 36652,
+      "seconds": 0.5573170999999983,
+      "cpu_seconds": 0.656,
+      "decode_and_transport_seconds": 0.4370548999999839,
+      "write_seconds": 0.0197858,
+      "handle_opens": 18,
+      "partitions": 18,
+      "bytes": 4451577
+    }
+  ],
+  "actual_partition_hash_multisets_equal": true,
+  "partition_file_hashes": [
+    "008d65ff215505d28e64794f9d811e2cb9538fed746785f5d065d1ed5dca10ff",
+    "17da3aabea39a1d7a3d5a0d1e56fbbfedc417bff63086dcf53d71ee63d5fec6b",
+    "1bc1aa9975a8f1c156c8c62f56d2ce6197cdcfe3683cfe2bae936651384b4bf6",
+    "2747374473d0fe8834bb3d9252b097c5fdb085d99dcd08fb9cfc063db1c66cc9",
+    "2b10019794e4ac2ce9fb18dfc352383d20c2d1f03f1da2dc5b6d0a2abc64489d",
+    "32d111b432ed6745297dfa83ba3246fe95e6bca8e2260d6e91fb2bd47fe2f5b0",
+    "3bd3316f78eff6ca3d844c8b2d75833c79ce728537d755a8bbf6054f77c8fdb0",
+    "48ec4a39c553e337f4e5aa01bdd18675b9842e6cf82f6b79db9b7fbb17e9c66e",
+    "80f5021f8edae55606aefdd3cbca5b5940e1b16f66c9d82168246c0901d82a68",
+    "88eade9a1d1575c596c3f986c48db5af4b410f9433658e87158c0b787343572f",
+    "913eaefb6f277611ca08b9c927945ef32ff0d335a486229c8cd70312b5eadc6d",
+    "a78ccc9624d9f179889d27a5c12b74d8846edfb8e60a8130a7ea11f7b32dfdcd",
+    "b9c20b3c817e3a60d20234a6cbcd4aec6d3839b1bdd43337c2bacca03a67cb41",
+    "c055178a5b574a97953f3662cafb202bb798a4cef6ebccab74a4dca1943166d2",
+    "c0c38dbd775ab9bd8577630f26cc8c5162970583d572d7175f3a79ea38a0761a",
+    "c9f36c3a2197e70fe470a375a898d36871561173acc41635ca05f6a807d9d321",
+    "ce79c176105f756fe57d0a9929bc89abc40018188b81f0fa4d6387e6b90c0a2c",
+    "e676f93d88b223f68b02fb032d859898f7bb59fa90dd1e85d1305c20dd80df3b"
+  ]
+}

@@ -18,12 +18,12 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 async function digest(path,signal){const hash=createHash('sha256');for await(const chunk of createReadStream(path)){signal?.throwIfAborted();hash.update(chunk);}return hash.digest('hex');}
 function assertOwned(path,parent){const part=relative(resolve(parent),resolve(path));if(!part||isAbsolute(part)||part==='..'||part.startsWith('..'+sep))throw new Error('拒绝操作越界的回放临时路径');}
 
-class PeerStore {
-  constructor(directory,budget,{maxPeers=4096,maxOpen=8}={}){this.directory=directory;this.budget=budget;this.maxPeers=maxPeers;this.maxOpen=maxOpen;this.peers=new Map();this.open=new Map();this.initial=null;this.writeSeconds=0;}
+export class PeerStore {
+  constructor(directory,budget,{maxPeers=4096,maxOpen=64}={}){if(!Number.isInteger(maxOpen)||maxOpen<1||maxOpen>128)throw new Error('分区写句柄上限无效');this.directory=directory;this.budget=budget;this.maxPeers=maxPeers;this.maxOpen=maxOpen;this.peers=new Map();this.open=new Map();this.initial=null;this.writeSeconds=0;this.handleOpens=0;this.handleEvictions=0;}
   async handle(meta){
     if(this.open.has(meta.peer)){const writer=this.open.get(meta.peer);this.open.delete(meta.peer);this.open.set(meta.peer,writer);return writer;}
-    if(this.open.size>=this.maxOpen){const [key,writer]=this.open.entries().next().value;this.writeSeconds+=(await writer.close()).write_seconds;this.open.delete(key);}
-    const writer=await BufferedFile.create(meta.path,{budget:this.budget,append:meta.created});meta.created=true;this.open.set(meta.peer,writer);return writer;
+    if(this.open.size>=this.maxOpen){const [key,writer]=this.open.entries().next().value;this.writeSeconds+=(await writer.close()).write_seconds;this.open.delete(key);this.handleEvictions++;}
+    const writer=await BufferedFile.create(meta.path,{budget:this.budget,append:meta.created});this.handleOpens++;meta.created=true;this.open.set(meta.peer,writer);return writer;
   }
   async append(peer,packet,events=0,states=0){
     let meta=this.peers.get(peer);
@@ -80,7 +80,7 @@ export async function replayDisk(manifestPath,outputPath,{rssBytes=2147483648,di
         if(file.kind!=='rib'){const instant=BigInt(time)*1000000n+BigInt(batch.microseconds??0);if(instant<lower)central.warmup_records++;else if(instant<=upper){central.records++;if(batch.skipped)central.skipped_records++;central.ignored_families+=BigInt(batch.ignored_families);}}
         if(batch.peer_table){if(file.kind!=='rib'||sawTable)throw new Error('初始 RIB 只能有一个 peer 表');sawTable=true;store.initial=encodePacket({fileIndex,record:metadata.records,offset:frame.offset,indices:[],data:frame.data});}
         for(const part of batch.parts)await store.append(part.peer,encodePacket({fileIndex,record:metadata.records,offset:frame.offset,indices:part.event_indices,data:Buffer.from(part.data)}),part.event_indices.length,batch.state_events);
-        if(inputRecords%25000===0)progress({phase:'partition',records:inputRecords,route_events:inputEvents,partitions:store.peers.size,rss:process.memoryUsage().rss});
+        if(inputRecords%25000===0)progress({phase:'partition',records:inputRecords,route_events:inputEvents,partitions:store.peers.size,handle_opens:store.handleOpens,rss:process.memoryUsage().rss});
       }
       if(file.kind==='rib'&&!sawTable)throw new Error('初始 RIB 为空或缺少 peer 表');const final=await stat(file.path);if(final.size!==initial.size||final.mtimeMs!==initial.mtimeMs)throw new Error('原始输入在回放中改变');metadata.complete=true;
     }
@@ -137,7 +137,7 @@ export async function replayDisk(manifestPath,outputPath,{rssBytes=2147483648,di
     point.storage={kind:'peer_disk',original_records:inputRecords,original_route_events:inputEvents,original_state_events:inputStates,original_decompressed_bytes:inputBytes,partitions:peers.length,
       temporary_frames:peers.reduce((sum,peer)=>sum+peer.packets,0),capacity_proof:needCapacityTrace?'globally_sorted_cache_deltas':'route_event_upper_bound',bridge_sha256:sha(bridgeBytes),
       state_fingerprint:stateFingerprint.result(),portable_changes_sha256:portableChanges.digest('hex'),portable_source_labels:'input ordinal and archive basename; physical directories excluded only from portable fingerprints',
-      costs:{partition_seconds:partitionSeconds,original_decode_and_partition_seconds:Number(decodeNs)/1e9,partition_write_seconds:store.writeSeconds,
+      costs:{partition_seconds:partitionSeconds,original_decode_and_partition_seconds:Number(decodeNs)/1e9,partition_write_seconds:store.writeSeconds,spool_handle_opens:store.handleOpens,spool_handle_evictions:store.handleEvictions,
         state_merge_and_verification_seconds:Number(stateMergeNs)/1e9,notice_sort_export_and_fingerprint_seconds:Number(process.hrtime.bigint()-noticeStart)/1e9,
         redecode_and_analysis_seconds:receipts.reduce((sum,row)=>sum+row.costs.redecode_and_analysis_seconds,0),notice_serialization_seconds:receipts.reduce((sum,row)=>sum+row.costs.notice_serialization_seconds,0),
         state_serialization_and_fingerprint_seconds:receipts.reduce((sum,row)=>sum+row.costs.state_serialization_and_fingerprint_seconds,0),notice_write_seconds:receipts.reduce((sum,row)=>sum+row.changes.write_seconds,0)+changeInfo.write_seconds,
