@@ -1,0 +1,196 @@
+{
+  "schema_version": "2.0",
+  "type": "full_replay_resource_target",
+  "fixed_before_new_implementation": true,
+  "recorded_at": "2026-10-24T05:54:45.042Z",
+  "source_revision": "a58666a8449ad2041614d43a1a4bd717df9a3549",
+  "workload": {
+    "collector": "ris-rrc23",
+    "prefix_filter": null,
+    "peer_filter": null,
+    "window": {
+      "from": 1735689600,
+      "to": 1735693199
+    },
+    "sources": [
+      {
+        "collector": "ris-rrc23",
+        "kind": "rib",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/bview.20250101.0000.gz",
+        "file": "ris-rrc23-bview.20250101.0000.gz",
+        "complete_archive": true,
+        "bytes": 82732647,
+        "sha256": "efc04342c70650d92c623db8f1181ef7036183bb61735f74d7ce3450b618e731",
+        "from_time": 1735689600,
+        "to_time": 1735689600
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0000.gz",
+        "file": "ris-rrc23-updates.20250101.0000.gz",
+        "complete_archive": true,
+        "bytes": 767888,
+        "sha256": "6b53e356a36f23cf62b4deff5a38133b4e5e8db871a65ce73633b3821aafa1fb",
+        "from_time": 1735689600,
+        "to_time": 1735689899
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0005.gz",
+        "file": "ris-rrc23-updates.20250101.0005.gz",
+        "complete_archive": true,
+        "bytes": 716385,
+        "sha256": "38c98c830afd795656ec9c19fb01303fc069395487c6256d2b289a79125162ad",
+        "from_time": 1735689900,
+        "to_time": 1735690199
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0010.gz",
+        "file": "ris-rrc23-updates.20250101.0010.gz",
+        "complete_archive": true,
+        "bytes": 658121,
+        "sha256": "85024ff293baa4828e39291f2bf1f545d9b344189aff6117e92264057711e73f",
+        "from_time": 1735690200,
+        "to_time": 1735690499
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0015.gz",
+        "file": "ris-rrc23-updates.20250101.0015.gz",
+        "complete_archive": true,
+        "bytes": 649610,
+        "sha256": "89dfdcb84fd3d6dc285b48a1a468578f3a8eab314569520b6acbd0707067f2c3",
+        "from_time": 1735690500,
+        "to_time": 1735690799
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0020.gz",
+        "file": "ris-rrc23-updates.20250101.0020.gz",
+        "complete_archive": true,
+        "bytes": 838783,
+        "sha256": "23f9b53987248edcca3278f956ce1e094e4aece9c4cb5743c4aef59be98cc604",
+        "from_time": 1735690800,
+        "to_time": 1735691099
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0025.gz",
+        "file": "ris-rrc23-updates.20250101.0025.gz",
+        "complete_archive": true,
+        "bytes": 766487,
+        "sha256": "6a33afa6383dcb3b463980d919e8e979c5e5e1e462f7de3e5dccc709882f78f6",
+        "from_time": 1735691100,
+        "to_time": 1735691399
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0030.gz",
+        "file": "ris-rrc23-updates.20250101.0030.gz",
+        "complete_archive": true,
+        "bytes": 720582,
+        "sha256": "625b10c11f89381e44fbb1b9a3f6b4c8086b3d8de12445e0c7788fe6d6c4834c",
+        "from_time": 1735691400,
+        "to_time": 1735691699
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0035.gz",
+        "file": "ris-rrc23-updates.20250101.0035.gz",
+        "complete_archive": true,
+        "bytes": 705241,
+        "sha256": "9e45b07338431bed0b2f4d0cd6e5def7aa24b584c9c72a66f88643a9f3091083",
+        "from_time": 1735691700,
+        "to_time": 1735691999
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0040.gz",
+        "file": "ris-rrc23-updates.20250101.0040.gz",
+        "complete_archive": true,
+        "bytes": 690127,
+        "sha256": "27ae30ed57bffcc3d1ab828966e8fa101260b2440803a96133ac66483e5c9fde",
+        "from_time": 1735692000,
+        "to_time": 1735692299
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0045.gz",
+        "file": "ris-rrc23-updates.20250101.0045.gz",
+        "complete_archive": true,
+        "bytes": 713168,
+        "sha256": "15b4a139ca7d7ead2c41882debbc4bf9d19b1a3e06fc88a466fe2b65eac896d5",
+        "from_time": 1735692300,
+        "to_time": 1735692599
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0050.gz",
+        "file": "ris-rrc23-updates.20250101.0050.gz",
+        "complete_archive": true,
+        "bytes": 714390,
+        "sha256": "6d0dd7efb1a97739244b18a1ba76fa5df10b7584be77084c681ac0abe4c68168",
+        "from_time": 1735692600,
+        "to_time": 1735692899
+      },
+      {
+        "collector": "ris-rrc23",
+        "kind": "update",
+        "url": "https://data.ris.ripe.net/rrc23/2025.01/updates.20250101.0055.gz",
+        "file": "ris-rrc23-updates.20250101.0055.gz",
+        "complete_archive": true,
+        "bytes": 634354,
+        "sha256": "9dff9243c06287f4982ffa738e6009f16690ef10fd7c69b53cbc1558b9e3d974",
+        "from_time": 1735692900,
+        "to_time": 1735693199
+      }
+    ],
+    "expected_input_records": 1597926,
+    "expected_route_events": 11946097,
+    "expected_state_events": 749,
+    "capacity": 12000000
+  },
+  "hardware": {
+    "cpu": "AMD Ryzen 9 7940HX with Radeon Graphics",
+    "logical_cpus": 32,
+    "total_memory_bytes": 16340418560,
+    "free_memory_bytes": 4130594816,
+    "platform": "win32",
+    "release": "10.0.26200",
+    "node": "v22.14.0"
+  },
+  "budgets": {
+    "peak_rss_bytes": 2147483648,
+    "new_temporary_and_output_disk_bytes": 128849018880,
+    "seconds_per_round": 7200,
+    "repeats": 3
+  },
+  "success": [
+    "All 13 original archives hashed and decoded to EOF; no prefix or peer reduction",
+    "Full explicit baseline, warmup and inclusive analysis window completed",
+    "All logical route state retained, with disk storage allowed and no silent eviction",
+    "Complete notice output and final-state export, byte counts and fingerprints recorded",
+    "Three successful rounds within declared RSS, disk and elapsed budgets",
+    "Independent small complete in-memory reference equality plus auditable full input, counters and state verification"
+  ],
+  "cost_domains": [
+    "original framing/decompression/protocol decoding",
+    "disk partition materialization",
+    "route-state analysis and residency",
+    "change serialization and writes",
+    "final-state serialization and writes"
+  ],
+  "failure_contract": "Keep failed-round evidence and leave the full-replay completion item unchecked. Earlier 1400 MiB RIB failures remain historical failures."
+}
