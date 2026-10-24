@@ -19,14 +19,16 @@
 | 在 MoonBit 项目中使用核心库 | [库 API](reference/api.md) |
 | 消费版本化 JSON / CSV | [输出契约](reference/output.md) |
 | 核查结果包、来源、时间及关联键 | [共享结果包校验](reference/bundle-validation.md) |
+| 减少同事件多种提醒的重复属性 | [紧凑变化编码](reference/compact-changes.md) |
+| 理解报告筛选、取消和来源导航 | [报告索引](reference/report-index.md) |
 | 理解 AS4、聚合属性与校验上下文 | [属性规则](reference/attributes.md) |
 | 核查标准条款、测试和支持边界 | [兼容与验收清单](reference/compatibility.md) |
 | 处理失败、部分输出和资源上限 | [错误契约](reference/errors.md) |
 | 修改实现、运行测试 | [开发指南](development/contributing.md) |
 | 查看完整数据对照、回放与验收证据 | [验证记录](validation/README.md) |
 | 阅读限定提交的性能测量 | [历史性能基准](validation/performance.md) |
-| 核查全量状态资源边界与共享优化 | [全量状态基准](validation/full-state-benchmark.md) |
-| 核查 main 新增功能的交付证据 | [深化验收](validation/extended-acceptance.md) |
+| 核查早期全量状态资源边界与共享优化 | [历史全量状态基准](validation/full-state-benchmark.md) |
+| 核查早期 main 扩展的交付证据 | [历史深化验收](validation/extended-acceptance.md) |
 
 文档按“教程 → 操作指南 → 参考 → 开发与验证”组织。参考了 [BGPKIT Parser 的快速使用与 API 入口](https://github.com/bgpkit/bgpkit-parser)和 [BGPStream 按任务划分的教程](https://bgpstream.caida.org/docs/tutorials)，内容与实现由本项目独立编写。
 

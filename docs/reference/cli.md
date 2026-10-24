@@ -10,13 +10,14 @@
 | --- | --- |
 | `parse` | 路由 JSON Lines 或 CSV |
 | `stats` | 窗口统计 JSON |
-| `changes` | 结构化变化 JSON Lines，统计写 stderr |
+| `changes` | 结构化变化 JSON Lines，统计写 stderr；`--compact` 共享事件上下文 |
 | `snapshot-diff` | 两个同源快照的差异 JSON，需要 `--collector` |
 | `aggregate` | `summary/aggregation` JSON |
 | `timeline` | `summary/timeline` JSON，需要精确 `--prefix` |
 | `multi` | 显式清单回放结果包；用 `--manifest` 与 `--output` 指定 |
-| `correlate` | 结果包的跨采集器关联 JSON；用 `--input`、`--window`、`--capacity` 指定 |
-| `report` | 本地 HTML 与分块明细；用 `--input`、`--output`、`--page-size`、`--title` 指定 |
+| `replay-disk` | 完整逻辑状态按 peer 磁盘分区回放；`--manifest`、`--output`、RSS/磁盘/排序预算 |
+| `correlate` | 内存关联 JSON；`--external --output 新目录` 切换有界内存分离输出 |
+| `report` | 本地 HTML、明细和倒排索引；`--correlation` 可附加分离式关联结果 |
 
 | 选项 | 默认 / 约束 |
 | --- | --- |
@@ -73,7 +74,7 @@ node cli/mrtkit.mjs changes --from 1700000000 --to 1700000060 --window 60 --thre
 
 路由事件包含采集时间、可选微秒、`rib/announce/withdraw`、规范化前缀、peer ASN/IP、`outbound`、可选快照起源时间和属性。`attributes.path` 是有效路径，`wire_path/as4_path` 是原始分段。未知属性的 `value` 是字节数组。
 
-0.1.0 使用版本化输出 `schema_version: "2.0"`。变化的前后状态和路径、起源、下一跳、社区增删均为结构化对象，包含微秒及输入来源；同一更新的路径和属性变化可共享来源追溯。详见[输出契约](output.md)。
+0.2.0 继续使用版本化输出 `schema_version: "2.0"`。变化的前后状态和路径、起源、下一跳、社区增删均为结构化对象，包含微秒及输入来源；完整与[紧凑编码](compact-changes.md)由显式编码字段区分。详见[输出契约](output.md)。
 
 AS_SET 计为一个跳数，联盟段不计普通路径长度。末段为 AS_SET 时不推断唯一起源 AS。变化比较忽略集合成员顺序、连续序列分段、社区排列及同一 MP 属性携带的其他前缀。
 
