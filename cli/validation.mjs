@@ -70,6 +70,8 @@ export function validateChange(change,point,window=null){
   if(change?.schema_version!=='2.0'||!changeKinds.includes(change.kind))throw new Error('变化版本或类型无效');
   validateTimestamp(change,window);peer(change);prefix(change);validateSource(change.source,point);
   if(change.before!==undefined&&change.before!==null)snapshot(change.before,point);snapshot(change.after,point);
+  if(validateTimestamp(change.after)!==validateTimestamp(change))throw new Error('变化时间与后状态时间不一致');
+  if(change.after.source&&['file','record','offset','event_index','collector','view'].some(key=>change.after.source[key]!==change.source[key]))throw new Error('变化与后状态来源不一致');
   if(change.kind==='churn'&&(!nonnegative(change.churn_count)||change.churn_count<2))throw new Error('波动计数无效');
   const semantic=JSON.parse(core.correlation_semantics_from_json(JSON.stringify(change))),expected=semantic.key;
   if(semantic.error)throw new Error('关联键前后语义无效: '+semantic.error);
@@ -90,24 +92,25 @@ export function validateObservation(entry,point,window){
     if(validateTimestamp(change)!==validateTimestamp(entry)||['prefix','peer_asn','peer_ip','outbound','path_id'].some(key=>change[key]!==entry[key])||JSON.stringify(canonical(change.source))!==JSON.stringify(canonical(entry.source)))throw new Error('观测与嵌套变化来源或身份不一致');}
 }
 const addHash=(hash,value)=>hash.update(JSON.stringify(canonical(value))+'\n');
-async function artifact(directory,point,kind){
+async function artifact(directory,point,kind,signal){
   const name=point[kind+'_file'],expected=point[kind+'_sha256'];
   if(name===undefined){if(expected!==undefined)throw new Error('哈希缺少对应明细');return null;}
   if(expected!==undefined&&(typeof expected!=='string'||!/^[0-9a-f]{64}$/i.test(expected)))throw new Error('非法明细 SHA-256');
   let path;try{path=await bundlePath(directory,name);}catch(error){if(point.status==='partial'&&error.code==='ENOENT')return null;throw error;}
   if(!(await stat(path)).isFile())throw new Error('明细路径不是文件');
-  if(expected!==undefined){const hash=createHash('sha256');for await(const chunk of createReadStream(path))hash.update(chunk);if(hash.digest('hex')!==expected.toLowerCase())throw new Error('明细哈希不一致');}
+  if(expected!==undefined){const hash=createHash('sha256');for await(const chunk of createReadStream(path)){signal?.throwIfAborted();hash.update(chunk);}if(hash.digest('hex')!==expected.toLowerCase())throw new Error('明细哈希不一致');}
   return path;
 }
 
 // 所有入口使用同一校验：旧 schema 2.0 可缺可选哈希和关联键，键由核心重算。
-export async function validateBundle(input,{onChange=()=>{},onTimeline=()=>{}}={}){
+export async function validateBundle(input,{onChange=()=>{},onTimeline=()=>{},signal}={}){
+  signal?.throwIfAborted();
   const path=resolve(input),index=validateIndex(JSON.parse(await readFile(path,'utf8')));
   for(const point of index.collectors){
-    const changes=await artifact(dirname(path),point,'changes'),timeline=await artifact(dirname(path),point,'timeline'),state=await artifact(dirname(path),point,'state');
+    const changes=await artifact(dirname(path),point,'changes',signal),timeline=await artifact(dirname(path),point,'timeline',signal),state=await artifact(dirname(path),point,'state',signal);
     if(!changes&&point.status==='complete')throw new Error('完整观测点缺少变化明细');
     let count=0;const changeHash=createHash('sha256');
-    if(changes)for await(const raw of jsonLines(changes)){const change=validateChange(raw,point,index.window);addHash(changeHash,change);count++;await onChange(change,point,{timeline:Boolean(timeline)});}
+    if(changes)for await(const raw of jsonLines(changes)){signal?.throwIfAborted();const change=validateChange(raw,point,index.window);addHash(changeHash,change);count++;await onChange(change,point,{timeline:Boolean(timeline)});}
     const digest=changeHash.digest('hex');
     if(point.change_notices!==undefined&&changes&&count!==point.change_notices)throw new Error('提醒计数与明细不一致');
     if(timeline){
@@ -121,7 +124,7 @@ export async function validateBundle(input,{onChange=()=>{},onTimeline=()=>{}}={
       if(point.change_notices!==undefined&&notices!==point.change_notices)throw new Error('时间线提醒计数不一致');
       for(const entry of report.timeline.entries)await onTimeline(entry,point,{changes:Boolean(changes)});
     }
-    if(state){let rows=0,active=0;for await(const event of jsonLines(state)){if(event.schema_version!=='2.0'||!['active','withdrawn'].includes(event.action))throw new Error('最终状态版本或类型无效');validateTimestamp(event,{from:0,to:index.window.to});prefix(event);peer(event);validateSource(event.source,point);rows++;if(event.action==='active')active++;}
+    if(state){let rows=0,active=0;for await(const event of jsonLines(state)){signal?.throwIfAborted();if(event.schema_version!=='2.0'||!['active','withdrawn'].includes(event.action))throw new Error('最终状态版本或类型无效');validateTimestamp(event,{from:0,to:index.window.to});prefix(event);peer(event);validateSource(event.source,point);rows++;if(event.action==='active')active++;}
       if(point.status==='complete'&&(point.summary?.tracked_routes!==undefined&&rows!==point.summary.tracked_routes||point.summary?.active_routes!==undefined&&active!==point.summary.active_routes))throw new Error('最终状态数量不一致');}
   }
   return index;

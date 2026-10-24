@@ -11,6 +11,7 @@
 | 对变化排名、去重与复算 | [变化聚合](guides/aggregation.md) |
 | 按采集器与视图隔离回放 | [多采集器回放](guides/multi-collector.md) |
 | 关联多观测点的同类语义变化 | [跨采集器关联](guides/correlation.md) |
+| 在有界内存中关联大量观测并流式导出 | [外部关联](guides/external-correlation.md) |
 | 生成本地可查看的分页复盘报告 | [离线 HTML 报告](guides/html-report.md) |
 | 核查固定真实路径变化与原始记录 | [RIS rrc23 真实案例](../cases/rrc23-path-change/README.md) |
 | 查命令、选项、筛选与分析语义 | [命令行参考](reference/cli.md) |

@@ -14,6 +14,7 @@ const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
   timeline --prefix CIDR  输出前缀时间线与各 peer 的观测状态
   multi --manifest 配置.json --output 新目录  按采集器/视图独立回放并导出结果包
   correlate --input 结果包/index.json --window 秒  关联多观测点的同类语义变化
+    --external --output 新目录 --memory-mib 64 --disk-mib 8192  有界内存关联并分离导出
   report --input 结果包/index.json --output 新目录  生成离线 HTML 复盘报告
   --continuous-observation  声明输入覆盖连续，允许计算观测不可见时长
   --observation-gap 开始秒:结束秒  标记观测中断，可重复，支持六位小数

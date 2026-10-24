@@ -12,7 +12,7 @@ import {makeChange,attributes} from './helpers/changes.mjs';
 const point={collector:'a',view:'v',status:'complete',baseline_status:'explicit_rib',continuous:true,gaps:[]};
 test('同来源去重比较完整身份和规范化前后语义；输入顺序不影响冲突结论',()=>{
   const original=makeChange('a',100);
-  for(const extra of [{peer_asn:64513},{peer_ip:'2001:db8::1'},{outbound:true},{path_id:0},{microseconds:1},
+  for(const extra of [{peer_asn:64513},{peer_ip:'2001:db8::1'},{outbound:true},{path_id:0},{microseconds:1,after:{...original.after,microseconds:1}},
     {after:{...original.after,attributes:{...original.after.attributes,med:1}}}]){
     const modified={...original,...extra};
     for(const order of [[original,modified],[modified,original]])assert.throws(()=>correlateObservations(order.map(change=>[change,point]),[point]),/冲突/);

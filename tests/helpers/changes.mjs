@@ -8,7 +8,7 @@ export function makeChange(collector,time,record='1',extra={}){
   const change={schema_version:'2.0',timestamp:time,prefix:'203.0.113.0/24',kind:'path_change',peer_asn:64512,peer_ip:'192.0.2.1',outbound:false,
     source:{collector,view:'v',file:'input',record,offset:'0',event_index:0},
     before:{timestamp:Math.max(0,time-1),active:true,attributes:attributes([1])},
-    after:{timestamp:time,active:true,attributes:attributes([2])},...extra};
+    after:{timestamp:time,...(extra.microseconds===undefined?{}:{microseconds:extra.microseconds}),active:true,attributes:attributes([2])},...extra};
   if(!Object.hasOwn(extra,'correlation_key'))change.correlation_key=correlation_key_from_json(JSON.stringify(change));
   return change;
 }

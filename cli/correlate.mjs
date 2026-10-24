@@ -3,9 +3,10 @@ import {canonical,pointId,validatePoints,validateWindow,validateChange,changeEvi
 
 const textCompare=(a,b)=>a<b?-1:a>b?1:0;
 const sha=text=>createHash('sha256').update(text).digest('hex');
+export {windowMicros};
 function windowMicros(seconds){const match=/^(\d+)(?:\.(\d{1,6}))?$/.exec(String(seconds));if(!match)throw new Error('关联窗口须为正秒数，最多六位小数');const value=BigInt(match[1])*1000000n+BigInt((match[2]??'').padEnd(6,'0'));if(value<=0n||value>4294967295000000n)throw new Error('关联窗口超出范围');return value;}
 
-function observation(change,point){
+export function observation(change,point){
   change=validateChange(change,point);
   const source=change.source;
   const key=JSON.parse(change.correlation_key);
@@ -17,6 +18,31 @@ function observation(change,point){
   return {id,signature,evidence_sha256,prefix:change.prefix,kind:change.kind,at:BigInt(change.timestamp)*1000000n+BigInt(change.microseconds??0),
     point:pointId(point),collector:point.collector,view:point.view,peer_asn:change.peer_asn,peer_ip:change.peer_ip,
     outbound:change.outbound,path_id:change.path_id,source};
+}
+
+export function compareObservations(a,b){
+  const leftAt=BigInt(a.at),rightAt=BigInt(b.at);if(leftAt!==rightAt)return leftAt<rightAt?-1:1;
+  const context=textCompare(a.point,b.point)||textCompare(a.source.file,b.source.file);if(context)return context;
+  for(const field of ['record','offset']){const left=BigInt(a.source[field]),right=BigInt(b.source[field]);if(left!==right)return left<right?-1:1;}
+  return a.source.event_index-b.source.event_index||textCompare(a.kind,b.kind);
+}
+
+export function groupSummary(group,points,duration,window,id){
+  const observedPoints=group.observedPoints,collectors=[...group.collectors].sort(textCompare);
+  let end=group.first+duration;if(window)end=end<BigInt(window.to)*1000000n+1000000n?end:BigInt(window.to)*1000000n+1000000n;
+  const missing=points.filter(point=>!observedPoints.has(pointId(point))).map(point=>{
+    const quality=[];
+    if(point.status!=='complete')quality.push('partial_input');
+    if(point.baseline_status!=='explicit_rib')quality.push('baseline_'+(point.baseline_status??'unknown'));
+    if(!point.continuous)quality.push('continuity_unverified');
+    if((point.gaps??[]).some(gap=>BigInt(gap.from)*1000000n<end&&BigInt(gap.to)*1000000n>group.first))quality.push('observation_gap');
+    return {collector:point.collector,view:point.view,from:String(group.first),to:String(end),quality:[...quality,'no_matching_notice_observed']};
+  });
+  return {id,prefix:group.prefix,kind:group.kind,signature_sha256:group.signature,
+    first_observed_at:String(group.first),last_observed_at:String(group.last),window_end_exclusive:String(end),
+    observed_collectors:collectors,observed_points:observedPoints.size,affected_peers:group.affectedPeers,
+    observation_count:group.observationCount??group.observations?.length??0,
+    cross_collector:collectors.length>1,unobserved:missing};
 }
 
 // 时间接近仅表示采集观测共现；固定窗口锚定首次事件，不沿后续事件链式延长。
@@ -40,12 +66,7 @@ function correlatePrepared(events,duplicates,points,{windowSeconds,window,inputS
   const duration=windowMicros(windowSeconds);
   points=[...points].sort((a,b)=>textCompare(pointId(a),pointId(b)));
   if(window)for(const event of events)if(event.at<BigInt(window.from)*1000000n||event.at>BigInt(window.to)*1000000n+999999n)throw new Error('变化超出结果包时间窗口');
-  events.sort((a,b)=>{
-    if(a.at!==b.at)return a.at<b.at?-1:1;
-    const context=textCompare(a.point,b.point)||textCompare(a.source.file,b.source.file);if(context)return context;
-    for(const field of ['record','offset']){const left=BigInt(a.source[field]),right=BigInt(b.source[field]);if(left!==right)return left<right?-1:1;}
-    return a.source.event_index-b.source.event_index||textCompare(a.kind,b.kind);
-  });
+  events.sort(compareObservations);
   const active=new Map(),groups=[];
   for(const event of events){
     let group=active.get(event.signature);
@@ -55,19 +76,7 @@ function correlatePrepared(events,duplicates,points,{windowSeconds,window,inputS
   const result=groups.map((group,index)=>{
     const observedPoints=new Set(group.observations.map(event=>event.point)),collectors=[...new Set(group.observations.map(event=>event.collector))].sort(textCompare);
     const peers=new Set(group.observations.map(event=>JSON.stringify([event.point,event.peer_asn,event.peer_ip,event.outbound])));
-    let end=group.first+duration;if(window)end=end<BigInt(window.to)*1000000n+1000000n?end:BigInt(window.to)*1000000n+1000000n;
-    const missing=points.filter(point=>!observedPoints.has(pointId(point))).map(point=>{
-      const quality=[];
-      if(point.status!=='complete')quality.push('partial_input');
-      if(point.baseline_status!=='explicit_rib')quality.push('baseline_'+(point.baseline_status??'unknown'));
-      if(!point.continuous)quality.push('continuity_unverified');
-      if((point.gaps??[]).some(gap=>BigInt(gap.from)*1000000n<end&&BigInt(gap.to)*1000000n>group.first))quality.push('observation_gap');
-      return {collector:point.collector,view:point.view,from:String(group.first),to:String(end),quality:[...quality,'no_matching_notice_observed']};
-    });
-    return {id:`group-${index+1}`,prefix:group.prefix,kind:group.kind,signature_sha256:group.signature,
-      first_observed_at:String(group.first),last_observed_at:String(group.last),window_end_exclusive:String(end),
-      observed_collectors:collectors,observed_points:observedPoints.size,affected_peers:peers.size,
-      cross_collector:collectors.length>1,unobserved:missing,
+    return {...groupSummary({...group,observedPoints,collectors:new Set(collectors),affectedPeers:peers.size},points,duration,window,`group-${index+1}`),
       observations:group.observations.map(({at,...event})=>({...event,observed_at:String(at)}))};
   });
   return {schema_version:'2.0',type:'cross_collector_correlation',input_status:inputStatus,
@@ -88,7 +97,17 @@ export async function correlateBundle(input,options={}){
 }
 
 export async function correlateCommand(argv){
-  const options={};for(let i=0;i<argv.length;i+=2){if(!['--input','--window','--capacity'].includes(argv[i])||!argv[i+1]||options[argv[i]])throw new Error('correlate 用法: --input index.json [--window 秒] [--capacity 事件数]');options[argv[i]]=argv[i+1];}
+  const options={};let external=false;
+  for(let i=0;i<argv.length;){if(argv[i]==='--external'){if(external)throw new Error('重复 --external');external=true;i++;continue;}
+    if(!['--input','--window','--capacity','--output','--memory-mib','--disk-mib'].includes(argv[i])||!argv[i+1]||options[argv[i]])throw new Error('correlate 用法: --input index.json [--window 秒] [--capacity 事件数] [--external --output 新目录 --memory-mib 64 --disk-mib 8192]');options[argv[i]]=argv[i+1];i+=2;}
   if(!options['--input'])throw new Error('correlate 需要 --input index.json');
+  if(external||options['--output']){
+    if(!options['--output']||options['--capacity'])throw new Error('外部关联需要新输出目录，使用内存/磁盘预算而非 --capacity');
+    const {correlateExternal}=await import('./correlate-external.mjs'),controller=new AbortController(),cancel=()=>controller.abort();
+    process.once('SIGINT',cancel);process.once('SIGTERM',cancel);
+    try{return await correlateExternal(options['--input'],options['--output'],{windowSeconds:options['--window']??60,memoryBytes:Number(options['--memory-mib']??64)*1048576,diskBytes:Number(options['--disk-mib']??8192)*1048576,signal:controller.signal});}
+    finally{process.off('SIGINT',cancel);process.off('SIGTERM',cancel);}
+  }
+  if(options['--memory-mib']||options['--disk-mib'])throw new Error('内存和磁盘预算仅适用于外部关联');
   return correlateBundle(options['--input'],{windowSeconds:options['--window']??60,capacity:Number(options['--capacity']??1000000)});
 }
