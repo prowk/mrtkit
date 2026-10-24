@@ -1,0 +1,168 @@
+{
+  "scope": "codec_only_not_mrt_decoding_or_analyzer_residency",
+  "source_revision": "caa33f255266d3f47584de13666141b0aecb240a",
+  "source_sha256": {
+    "scripts/compact_benchmark.mjs": "1a94c2b5d06e24774af8d264e2a46702d9870ae4599f5f3a092e3a1eafc4f496",
+    "cli/compact-changes.mjs": "80b19347fcc75fff543e542d59b512ec5344b94c5d572a3b2f737aef1d95b715",
+    "cli/bundle.mjs": "d84678f64f4c4e3d31106b17eaf107c31918db0588b250eb8294f21c1f283f4e",
+    "cli/disk-storage.mjs": "d8626856f4e273b5bfd47e974683e6d4fb2c7445b3d8e02085d59b2d1d83a175"
+  },
+  "input": {
+    "input": "historical full-state UPDATE benchmark: stream-after/output-1.jsonl",
+    "bytes": 4735570592,
+    "sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+    "notices": 1141740
+  },
+  "target": {
+    "repeats": 3,
+    "rss_bytes": 536870912,
+    "seconds_per_encode": 1200
+  },
+  "environment": {
+    "node": "v22.14.0",
+    "cpu": "AMD Ryzen 9 7940HX with Radeon Graphics        ",
+    "total_memory_bytes": 16340418560
+  },
+  "runs": [
+    {
+      "iteration": 1,
+      "encoding": "full_jsonl_v1",
+      "notices": 1141740,
+      "contexts": 0,
+      "bytes": 4735570592,
+      "sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+      "write_seconds": 5.6638831,
+      "hash_seconds": 2.2105589,
+      "seconds": 57.6089712,
+      "verification_seconds": 92.2084122,
+      "expanded_sha256": "bedca666c5fe29df31b8c600be39bd237a71a6137cc07dcc6cb18aa8926b4529",
+      "kinds": {
+        "path_change": 449700,
+        "attribute_change": 608557,
+        "churn": 80003,
+        "origin_change": 3480
+      },
+      "peak_rss_bytes": 109735936
+    },
+    {
+      "iteration": 1,
+      "encoding": "event_refs_v1",
+      "notices": 1141740,
+      "contexts": 698617,
+      "bytes": 3071743022,
+      "sha256": "16bddcf1824c6693dd4314c2745a51b4c84db0a3023336f8fc8e4335127b8490",
+      "write_seconds": 7.2273547,
+      "hash_seconds": 1.4080465,
+      "seconds": 113.7636425,
+      "verification_seconds": 120.1848532,
+      "expanded_sha256": "bedca666c5fe29df31b8c600be39bd237a71a6137cc07dcc6cb18aa8926b4529",
+      "kinds": {
+        "path_change": 449700,
+        "attribute_change": 608557,
+        "churn": 80003,
+        "origin_change": 3480
+      },
+      "peak_rss_bytes": 109854720
+    },
+    {
+      "iteration": 2,
+      "encoding": "full_jsonl_v1",
+      "notices": 1141740,
+      "contexts": 0,
+      "bytes": 4735570592,
+      "sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+      "write_seconds": 6.3459707,
+      "hash_seconds": 2.1974863,
+      "seconds": 65.21255690000001,
+      "verification_seconds": 95.18554290000002,
+      "expanded_sha256": "bedca666c5fe29df31b8c600be39bd237a71a6137cc07dcc6cb18aa8926b4529",
+      "kinds": {
+        "path_change": 449700,
+        "attribute_change": 608557,
+        "churn": 80003,
+        "origin_change": 3480
+      },
+      "peak_rss_bytes": 109473792
+    },
+    {
+      "iteration": 2,
+      "encoding": "event_refs_v1",
+      "notices": 1141740,
+      "contexts": 698617,
+      "bytes": 3071743022,
+      "sha256": "16bddcf1824c6693dd4314c2745a51b4c84db0a3023336f8fc8e4335127b8490",
+      "write_seconds": 6.8876648,
+      "hash_seconds": 1.3948209,
+      "seconds": 98.7077809,
+      "verification_seconds": 97.6554839,
+      "expanded_sha256": "bedca666c5fe29df31b8c600be39bd237a71a6137cc07dcc6cb18aa8926b4529",
+      "kinds": {
+        "path_change": 449700,
+        "attribute_change": 608557,
+        "churn": 80003,
+        "origin_change": 3480
+      },
+      "peak_rss_bytes": 115183616
+    },
+    {
+      "iteration": 3,
+      "encoding": "full_jsonl_v1",
+      "notices": 1141740,
+      "contexts": 0,
+      "bytes": 4735570592,
+      "sha256": "f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477",
+      "write_seconds": 7.3598873,
+      "hash_seconds": 2.2491116,
+      "seconds": 60.1947514,
+      "verification_seconds": 67.01367289999999,
+      "expanded_sha256": "bedca666c5fe29df31b8c600be39bd237a71a6137cc07dcc6cb18aa8926b4529",
+      "kinds": {
+        "path_change": 449700,
+        "attribute_change": 608557,
+        "churn": 80003,
+        "origin_change": 3480
+      },
+      "peak_rss_bytes": 110669824
+    },
+    {
+      "iteration": 3,
+      "encoding": "event_refs_v1",
+      "notices": 1141740,
+      "contexts": 698617,
+      "bytes": 3071743022,
+      "sha256": "16bddcf1824c6693dd4314c2745a51b4c84db0a3023336f8fc8e4335127b8490",
+      "write_seconds": 10.7105622,
+      "hash_seconds": 1.4238829,
+      "seconds": 106.1597654,
+      "verification_seconds": 89.3923095,
+      "expanded_sha256": "bedca666c5fe29df31b8c600be39bd237a71a6137cc07dcc6cb18aa8926b4529",
+      "kinds": {
+        "path_change": 449700,
+        "attribute_change": 608557,
+        "churn": 80003,
+        "origin_change": 3480
+      },
+      "peak_rss_bytes": 116666368
+    }
+  ],
+  "complete": true,
+  "code_committed_as": "282b73b",
+  "source_byte_hashes_are_authoritative": true,
+  "concurrent_workloads": "Full disk replay and later independent reference-model processes shared the machine; results are measured elapsed times, not isolated throughput claims.",
+  "verified_output_hashes": true,
+  "summary": {
+    "full_jsonl_v1": {
+      "bytes": 4735570592,
+      "contexts": 0,
+      "median_seconds": 60.1947514,
+      "max_rss_bytes": 110669824
+    },
+    "event_refs_v1": {
+      "bytes": 3071743022,
+      "contexts": 698617,
+      "median_seconds": 106.1597654,
+      "max_rss_bytes": 116666368
+    }
+  },
+  "saved_fraction": 0.3513467992243161
+}
