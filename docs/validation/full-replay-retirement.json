@@ -1,0 +1,56 @@
+{
+  "reason": "Accepted runs 2/3 contain byte-identical state/change payloads; complete run 1 remains consumable. All six actual payloads were rehashed before deletion.",
+  "acceptance_sha256": "e4192e0bd37073f5a91e092fde48872e7de97b315726c643743b7f02c7768fad",
+  "files": [
+    {
+      "iteration": 1,
+      "kind": "state",
+      "file": "run-1\\collector-0001.state.jsonl",
+      "bytes": 12214190568,
+      "sha256": "a02a2e6b32685373e59abbde2c4140737ee810287c40b5c36c96f158d31c0c83",
+      "action": "retained"
+    },
+    {
+      "iteration": 1,
+      "kind": "changes",
+      "file": "run-1\\collector-0001.changes.jsonl",
+      "bytes": 5637148154,
+      "sha256": "535cb90d412360818008da8ae3fd13e504ac802b496ed5856fa50bffe223bb83",
+      "action": "retained"
+    },
+    {
+      "iteration": 2,
+      "kind": "state",
+      "file": "run-2\\collector-0001.state.jsonl",
+      "bytes": 12214190568,
+      "sha256": "a02a2e6b32685373e59abbde2c4140737ee810287c40b5c36c96f158d31c0c83",
+      "action": "deleted"
+    },
+    {
+      "iteration": 2,
+      "kind": "changes",
+      "file": "run-2\\collector-0001.changes.jsonl",
+      "bytes": 5637148154,
+      "sha256": "535cb90d412360818008da8ae3fd13e504ac802b496ed5856fa50bffe223bb83",
+      "action": "deleted"
+    },
+    {
+      "iteration": 3,
+      "kind": "state",
+      "file": "run-3\\collector-0001.state.jsonl",
+      "bytes": 12214190568,
+      "sha256": "a02a2e6b32685373e59abbde2c4140737ee810287c40b5c36c96f158d31c0c83",
+      "action": "deleted"
+    },
+    {
+      "iteration": 3,
+      "kind": "changes",
+      "file": "run-3\\collector-0001.changes.jsonl",
+      "bytes": 5637148154,
+      "sha256": "535cb90d412360818008da8ae3fd13e504ac802b496ed5856fa50bffe223bb83",
+      "action": "deleted"
+    }
+  ],
+  "deleted_bytes": 35702677444,
+  "measurements_and_indexes_retained": true
+}

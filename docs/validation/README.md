@@ -69,7 +69,7 @@ python scripts/publish_validation.py
 
 性能测量方法、固定场景及优化前后比较见[历史性能基准](performance.md)。早期 P0/P1 证据见[历史验收](acceptance.md)，此前公开版本见[v0.1.0 验收](release-acceptance.md)；当前交付见[v0.2.0 验收](v0.2.0-acceptance.md)与[标准清单](../reference/compatibility.md)。
 
-早期 main 扩展见[历史深化验收](extended-acceptance.md)。整表驻留失败与共享优化见[历史全量状态基准](full-state-benchmark.md)，新分区方案使用预先固定的[完整回放目标](state-resource-target.md)。[独立全状态数据核对](full-state-independent.json)不等同于三轮资源验收。固定数据与原始位置锚点见[真实复盘案例](../../cases/rrc23-path-change/README.md)。
+早期 main 扩展见[历史深化验收](extended-acceptance.md)。整表驻留失败与共享优化见[历史全量状态基准](full-state-benchmark.md)。新分区方案已通过预先固定预算的[三轮完整回放](full-replay.md)，三轮实际输出均与独立核对的数据一致；[历史独立核对](full-state-independent.json)本身不作为资源成功证据。固定数据与原始位置锚点见[真实复盘案例](../../cases/rrc23-path-change/README.md)。
 
 ## 完整输入的窗口与导出验收
 

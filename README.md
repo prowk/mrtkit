@@ -41,7 +41,7 @@ MoonBit 项目可用 `moon add prowk/mrtkit@0.2.0` 引入核心库。完整安�
 
 两个采集器的 18 个完整档案、约 1,966 万条路由事件已通过独立解析器对照。字段、来源、哈希与复现方法见[验证记录](docs/validation/README.md)。
 
-完整状态回放的固定数据与资源目标见[验收目标](docs/validation/state-resource-target.md)；紧凑编码的体积、耗时和内存取舍见[实测说明](docs/reference/compact-changes.md)。早期整表内存驻留失败与共享优化保留在[历史基准](docs/validation/full-state-benchmark.md)。
+完整 RIB 加连续十二个 UPDATE 的无筛选状态回放已通过三轮固定预算验收，最高合计 RSS 保守上界约 1.79 GiB；11,093,122 条结束状态与 1,197,552 条提醒通过独立核对，见[完整回放结果](docs/validation/full-replay.md)。紧凑编码的体积、耗时和内存取舍见[实测说明](docs/reference/compact-changes.md)。早期整表内存驻留失败与共享优化保留在[历史基准](docs/validation/full-state-benchmark.md)。
 
 浏览器工具禁止本地文件自动化，真实浏览器的离线布局与性能验收按用户要求保留待办；页面逻辑和分块加载已通过自动测试。
 

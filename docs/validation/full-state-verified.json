@@ -1,0 +1,150 @@
+{
+  "schema_version": "2.0",
+  "type": "independent_full_replay_verification",
+  "matched": true,
+  "model_source_sha256": {
+    "full_state_reference.py": "d8436f7e8bff518006bcb16f6f8ad654d766bff395d3f81ead5813dc2a711290",
+    "compare.py": "fb9a92dd3155dcc182c8fa28925469a98ccbeccda907795ad5f890b68c6cd5a5",
+    "reference_wire.py": "5a00f502d93e7823f6eedb5243b7d44012084fe7223553f447674a76215ac66f",
+    "replay_acceptance.py": "3df259513f40b92884a47d6ad7bffcf0769ef71e99c9473194cdf91a8a9dd1a6"
+  },
+  "verification_source_sha256": {
+    "full_state_reference.py": "8cd73a538d7e9fdfffc82cbfdb81c5e21fc8e0d7fc4194aea85e2ba4d1be594a",
+    "compare.py": "af3643bd60059ba848f3e0e95376f1642fd2a0a6250de2d63e6675ccfad04f12",
+    "reference_wire.py": "22fdbd7d8351b7a2b44e02adab5492b6049284b4642d0d0febfdced86857a2f3",
+    "replay_acceptance.py": "3df259513f40b92884a47d6ad7bffcf0769ef71e99c9473194cdf91a8a9dd1a6"
+  },
+  "source_snapshot_asset": "verification-sources-v0.2.0.zip",
+  "source_snapshot_sha256": "40920850c652f64366b9b314de52bb918b5a2f1850ed1d7c209e147fd17fd758",
+  "scope": "All original inputs independently modeled; every accepted run bound by actual state/change file hashes and row counts to fully verified reference data. Historical reference resource status is preserved; current resource acceptance is checked separately.",
+  "independent_reference": {
+    "complete": true,
+    "matched": true,
+    "method": "mrtparse all original inputs plus independent SQLite route model; no MoonBit execution",
+    "input_records": 1597926,
+    "route_events": 11946097,
+    "state_events": 749,
+    "counts": {
+      "records": 369608,
+      "skipped_records": 0,
+      "ignored_families": 0,
+      "announcements": 811031,
+      "path_changes": 470484,
+      "session_resets": 662,
+      "attribute_changes": 643283,
+      "churn_alerts": 80121,
+      "withdrawals": 46812,
+      "origin_changes": 3664,
+      "duplicate_announcements": 35575
+    },
+    "tracked_routes": 11093122,
+    "active_routes": 11088249,
+    "path_sum": 3953948,
+    "path_samples": 811031,
+    "max_path_length": 78,
+    "state_fingerprint": {
+      "rows": 11093122,
+      "sha256_sum": "4cdd6efde654c7a3e080be5c438247ea687bf97ba8dc3fe9c2a015750f2cc1f3",
+      "sha256_xor": "51f33c84faed278c0d885ba0f7c2e7f68d50b2aa429ab9f7930c376863a13f2f"
+    },
+    "notice_fingerprint": {
+      "rows": 1197552,
+      "sha256_sum": "02ad7947263a709e298a04d332cf5b4ddd0a0e581d21b8b5d4096560d66116a8",
+      "sha256_xor": "0dbe0a95ec9c141bbde416c52eebfdb741bcd215bf35daeaaba6ca69867a4392"
+    },
+    "seconds": 1107.8029136000005,
+    "sources": [
+      {
+        "file": "ris-rrc23-bview.20250101.0000.gz",
+        "sha256": "efc04342c70650d92c623db8f1181ef7036183bb61735f74d7ce3450b618e731"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0000.gz",
+        "sha256": "6b53e356a36f23cf62b4deff5a38133b4e5e8db871a65ce73633b3821aafa1fb"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0005.gz",
+        "sha256": "38c98c830afd795656ec9c19fb01303fc069395487c6256d2b289a79125162ad"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0010.gz",
+        "sha256": "85024ff293baa4828e39291f2bf1f545d9b344189aff6117e92264057711e73f"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0015.gz",
+        "sha256": "89dfdcb84fd3d6dc285b48a1a468578f3a8eab314569520b6acbd0707067f2c3"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0020.gz",
+        "sha256": "23f9b53987248edcca3278f956ce1e094e4aece9c4cb5743c4aef59be98cc604"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0025.gz",
+        "sha256": "6a33afa6383dcb3b463980d919e8e979c5e5e1e462f7de3e5dccc709882f78f6"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0030.gz",
+        "sha256": "625b10c11f89381e44fbb1b9a3f6b4c8086b3d8de12445e0c7788fe6d6c4834c"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0035.gz",
+        "sha256": "9e45b07338431bed0b2f4d0cd6e5def7aa24b584c9c72a66f88643a9f3091083"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0040.gz",
+        "sha256": "27ae30ed57bffcc3d1ab828966e8fa101260b2440803a96133ac66483e5c9fde"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0045.gz",
+        "sha256": "15b4a139ca7d7ead2c41882debbc4bf9d19b1a3e06fc88a466fe2b65eac896d5"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0050.gz",
+        "sha256": "6d0dd7efb1a97739244b18a1ba76fa5df10b7584be77084c681ac0abe4c68168"
+      },
+      {
+        "file": "ris-rrc23-updates.20250101.0055.gz",
+        "sha256": "9dff9243c06287f4982ffa738e6009f16690ef10fd7c69b53cbc1558b9e3d974"
+      }
+    ],
+    "source_sha256": {
+      "full_state_reference.py": "d8436f7e8bff518006bcb16f6f8ad654d766bff395d3f81ead5813dc2a711290",
+      "compare.py": "fb9a92dd3155dcc182c8fa28925469a98ccbeccda907795ad5f890b68c6cd5a5",
+      "reference_wire.py": "5a00f502d93e7823f6eedb5243b7d44012084fe7223553f447674a76215ac66f",
+      "replay_acceptance.py": "3df259513f40b92884a47d6ad7bffcf0769ef71e99c9473194cdf91a8a9dd1a6"
+    },
+    "bundle_status": "partial",
+    "resource_acceptance": false,
+    "bundle_state_sha256": "a02a2e6b32685373e59abbde2c4140737ee810287c40b5c36c96f158d31c0c83",
+    "bundle_changes_sha256": "535cb90d412360818008da8ae3fd13e504ac802b496ed5856fa50bffe223bb83"
+  },
+  "accepted_runs": [
+    {
+      "iteration": 1,
+      "current_bundle_status": "complete",
+      "resource_accepted": true,
+      "state_sha256": "a02a2e6b32685373e59abbde2c4140737ee810287c40b5c36c96f158d31c0c83",
+      "changes_sha256": "535cb90d412360818008da8ae3fd13e504ac802b496ed5856fa50bffe223bb83",
+      "independent_reference_matched": true,
+      "reference_original_bundle_status": "partial"
+    },
+    {
+      "iteration": 2,
+      "current_bundle_status": "complete",
+      "resource_accepted": true,
+      "state_sha256": "a02a2e6b32685373e59abbde2c4140737ee810287c40b5c36c96f158d31c0c83",
+      "changes_sha256": "535cb90d412360818008da8ae3fd13e504ac802b496ed5856fa50bffe223bb83",
+      "independent_reference_matched": true,
+      "reference_original_bundle_status": "partial"
+    },
+    {
+      "iteration": 3,
+      "current_bundle_status": "complete",
+      "resource_accepted": true,
+      "state_sha256": "a02a2e6b32685373e59abbde2c4140737ee810287c40b5c36c96f158d31c0c83",
+      "changes_sha256": "535cb90d412360818008da8ae3fd13e504ac802b496ed5856fa50bffe223bb83",
+      "independent_reference_matched": true,
+      "reference_original_bundle_status": "partial"
+    }
+  ]
+}

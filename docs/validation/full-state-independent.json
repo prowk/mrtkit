@@ -112,6 +112,6 @@
     "replay_acceptance.py": "3df259513f40b92884a47d6ad7bffcf0769ef71e99c9473194cdf91a8a9dd1a6"
   },
   "source_snapshot_asset": "verification-sources-v0.2.0.zip",
-  "source_snapshot_sha256": "bb5105c18c463e8153003762744ddb0f301fb1dd8c301d26eaed90092aa2e479",
+  "source_snapshot_sha256": "40920850c652f64366b9b314de52bb918b5a2f1850ed1d7c209e147fd17fd758",
   "explanation": "Complete independent data equality for the RSS-rejected attempt only. Resource acceptance remains false. New unchanged-budget three-run acceptance is separate."
 }

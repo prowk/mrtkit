@@ -28,4 +28,4 @@ node cli/mrtkit.mjs replay-disk --manifest 单观测点清单.json --output 新�
 
 ## 验证范围
 
-[组件剖析](../validation/state-components.md)提供选择磁盘分区的量化依据。`tests/disk-replay.test.mjs` 与完整内存回放逐项比较变化顺序、状态、计数和来源，还通过独立 1200 事件模型核对显式/缺基线、ADD-PATH、预热、属性和路径变化、撤回、重置及乱序。全量输入是否满足固定预算，另以[三轮完整验收目标](../validation/state-resource-target.md)的实际结果判定；小测试不能代替完整驻留验收。
+[组件剖析](../validation/state-components.md)提供选择磁盘分区的量化依据。`tests/disk-replay.test.mjs` 与完整内存回放逐项比较变化顺序、状态、计数和来源，还通过独立 1200 事件模型核对显式/缺基线、ADD-PATH、预热、属性和路径变化、撤回、重置及乱序。固定全量输入已满足预先确定的资源预算，见[三轮完整验收](../validation/full-replay.md)；该结果仍限定于记录的输入和环境。
