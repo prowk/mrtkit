@@ -17,26 +17,93 @@
     {
       "id": 0,
       "file": "data/page-000000.js",
-      "rows": 46,
-      "facets": {
-        "collectors": [
-          "[\"ris-rrc23\",\"default\"]"
-        ],
-        "prefixes": [
-          "183.90.160.0/24"
-        ],
-        "peers": [
-          "58952",
-          "27.111.229.109"
-        ],
-        "kinds": [
-          "path_change",
-          "attribute_change",
-          "churn"
-        ]
-      }
+      "start": 0,
+      "rows": 46
     }
   ],
+  "datasets": {
+    "events": {
+      "name": "data",
+      "rows": 46,
+      "pages": [
+        {
+          "id": 0,
+          "file": "data/page-000000.js",
+          "start": 0,
+          "rows": 46
+        }
+      ],
+      "indexes": [
+        {
+          "id": 0,
+          "file": "data/index-000000.js",
+          "start": 0,
+          "rows": 46
+        }
+      ],
+      "kinds": [
+        "attribute_change",
+        "churn",
+        "path_change"
+      ]
+    },
+    "groups": {
+      "name": "groups",
+      "rows": 93,
+      "pages": [
+        {
+          "id": 0,
+          "file": "groups/page-000000.js",
+          "start": 0,
+          "rows": 93
+        }
+      ],
+      "indexes": [
+        {
+          "id": 0,
+          "file": "groups/index-000000.js",
+          "start": 0,
+          "rows": 93
+        }
+      ],
+      "kinds": [
+        "attribute_change",
+        "churn",
+        "path_change"
+      ]
+    },
+    "observations": {
+      "name": "observations",
+      "rows": 93,
+      "pages": [
+        {
+          "id": 0,
+          "file": "observations/page-000000.js",
+          "start": 0,
+          "rows": 93
+        }
+      ],
+      "indexes": [
+        {
+          "id": 0,
+          "file": "observations/index-000000.js",
+          "start": 0,
+          "rows": 93
+        }
+      ],
+      "kinds": [
+        "attribute_change",
+        "churn",
+        "path_change"
+      ]
+    }
+  },
+  "filter_index": {
+    "encoding": "delta_varint_base64_postings_v1",
+    "chunk_rows": 8192,
+    "result_storage": "one_bit_per_row",
+    "detail_cache": "one_render_page"
+  },
   "collectors": [
     {
       "collector": "ris-rrc23",
@@ -69,5 +136,21 @@
       },
       "error": null
     }
-  ]
+  ],
+  "correlation": {
+    "groups": 93,
+    "observations": 93,
+    "duplicates": 0,
+    "interpretation": "temporal_cooccurrence_not_propagation_delay_or_causation",
+    "points": [
+      {
+        "collector": "ris-rrc23",
+        "view": "default",
+        "status": "complete",
+        "baseline_status": "explicit_rib",
+        "continuous": false,
+        "gaps": []
+      }
+    ]
+  }
 }

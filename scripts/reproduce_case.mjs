@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {resolve,join,basename} from 'node:path';
 import {replayManifest} from '../cli/multi.mjs';
 import {generateReport} from '../cli/report.mjs';
+import {correlateExternal} from '../cli/correlate-external.mjs';
 import {jsonLines} from '../cli/bundle.mjs';
 import {frames,inputChunks} from '../cli/input.mjs';
 
@@ -53,10 +54,11 @@ if(spec.expected_excerpt_sha256)assert.equal(sha256,spec.expected_excerpt_sha256
 await writeFile(join(output,'excerpt.mrt'),excerpt);
 let offset=0;const mapping=records.map((record,index)=>{const entry={excerpt_record:index+1,excerpt_offset:offset,bytes:record.bytes.length,original:record.source};offset+=record.bytes.length;return entry;});
 await writeFile(join(output,'excerpt-map.json'),JSON.stringify({sha256,scope:'four unchanged BGP records, not a complete baseline or continuous archive',records:mapping},null,2)+'\n','utf8');
-const html=await generateReport(join(output,'index.json'),output+'-html',{title:'RIS rrc23 · 183.90.160.0/24 路径复盘',sourceLabels:Object.fromEntries(point.files.map(file=>[file.path,basename(file.path)]))});
+const correlation=await correlateExternal(join(output,'index.json'),output+'-correlation',{windowSeconds:60,memoryBytes:65536});
+const html=await generateReport(join(output,'index.json'),output+'-html',{title:'RIS rrc23 · 183.90.160.0/24 路径复盘',correlation:correlation.index,sourceLabels:Object.fromEntries(point.files.map(file=>[file.path,basename(file.path)]))});
 const receipt={schema_version:'2.0',case:'ris-rrc23-183.90.160.0-24',matched:true,
   source_files:point.files.map(file=>({file:basename(file.path),sha256:file.sha256,records:file.records})),
   summary:point.summary,anchors_checked:spec.anchors.length,change_notices:changes.length,excerpt_sha256:sha256,
-  html_rows:html.rows,html_change_notices:html.change_notices,interpretation:spec.interpretation};
+  html_rows:html.rows,html_change_notices:html.change_notices,correlation_groups:correlation.groups,correlation_observations:correlation.observations,interpretation:spec.interpretation};
 await writeFile(join(output,'case-verification.json'),JSON.stringify(receipt,null,2)+'\n','utf8');
 console.log(JSON.stringify(receipt));

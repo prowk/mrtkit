@@ -25,9 +25,11 @@ test('固定离线报告保留完整窗口统计、所有提醒与原始来源�
   const report=JSON.parse(await readFile(directory+'/report/report.json','utf8'));
   assert.deepEqual(report.collectors[0].summary,spec.expected_summary);assert.equal(report.rows,46);assert.equal(report.change_notices,93);
   const rows=[];
-  const context=vm.createContext({MRTKitReceive:(id,items)=>rows.push(...items)});
+  const context=vm.createContext({MRTKitReceive:(_name,_type,_id,items)=>rows.push(...items)});
   for(const page of report.pages){const script=await readFile(directory+'/report/'+page.file,'utf8');assert.ok(!script.includes('C:\\\\Users\\\\'));vm.runInContext(script,context);}
   assert.equal(rows.length,report.rows);
+  assert.equal(report.correlation.observations,93);assert.equal(report.correlation.groups,93);
+  for(const dataset of Object.values(report.datasets))for(const page of [...dataset.pages,...dataset.indexes])assert.ok(!(await readFile(directory+'/report/'+page.file,'utf8')).includes('C:\\\\Users\\\\'));
   const changes=JSON.parse(JSON.stringify(rows.flatMap(row=>row.changes)));
   assert.equal(changes.length,93);
   for(const anchor of spec.anchors){

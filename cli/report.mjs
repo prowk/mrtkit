@@ -30,7 +30,8 @@ export async function generateReport(input,output,{pageSize=200,title='MRTKit è·
     });
     await events.close();manifest.rows=events.data.rows;manifest.pages=events.data.pages;
     if(correlation){const groups=await reportDataset(directory,'groups',{pageSize}),observations=await reportDataset(directory,'observations',{pageSize});
-      manifest.correlation=await reportCorrelation(resolve(correlation),inputPath,index,directory,groups,observations);await groups.close();await observations.close();manifest.datasets.groups=groups.data;manifest.datasets.observations=observations.data;
+      const visibleObservations={add:row=>observations.add(sourceLabels?labeled(row):row)};
+      manifest.correlation=await reportCorrelation(resolve(correlation),inputPath,index,directory,groups,visibleObservations);await groups.close();await observations.close();manifest.datasets.groups=groups.data;manifest.datasets.observations=observations.data;
     }
     manifest.status='complete';
     await writeFile(join(directory,'manifest.js'),`globalThis.MRTKitManifest=JSON.parse(${safeJson(JSON.stringify(manifest))});\n`,'utf8');

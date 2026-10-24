@@ -1,0 +1,78 @@
+{
+  "scope": "isolated_DOM_script_logic_only_not_browser_rendering",
+  "browser_acceptance": "deferred_by_user_after_file_protocol_policy_denial",
+  "target": "report-performance-target.json browser targets remain unmeasured",
+  "node": "v22.14.0",
+  "report_manifest_sha256": "6751bb051cd78ee6ef85f2b9cfa3279b02408d678111ad6ffb6485734f471592",
+  "source_sha256": {
+    "scripts/report_logic_benchmark.mjs": "6e48c4a9c66a8f0d6723aad446aa0e372c0054264fb9b3f65ce20df2d897f518",
+    "<report>/app.js": "35fd879aeae4f9a935166720e75fdaf113a9038a4595746c76741be47acaccaf",
+    "<report>/manifest.js": "62bfe8f5b007dad399aa543e8721a2003c23f4e45505d5e3ee2b4214d0db1a50"
+  },
+  "matched_count_independently_recounted": 12,
+  "runs": [
+    {
+      "iteration": 1,
+      "first_script_seconds": 0.0691951,
+      "filter_seconds": 0.18907329999999997,
+      "next_seconds": 0.014021900000000016,
+      "next_page_mode": "unfiltered_after_reset",
+      "matched": 12,
+      "filter_detail_pages": 8,
+      "index_loads": 14,
+      "matching_bitset_bytes": 12500,
+      "peak_rss_bytes": 131612672,
+      "rows": 100000,
+      "pages": 565,
+      "first_filter": {
+        "collector": "ris-rrc23",
+        "view": "default",
+        "prefix": "209.22.67.0/24",
+        "peer": 18106,
+        "kind": "path_change"
+      }
+    },
+    {
+      "iteration": 2,
+      "first_script_seconds": 0.028948099999999997,
+      "filter_seconds": 0.1596445,
+      "next_seconds": 0.013301199999999994,
+      "next_page_mode": "unfiltered_after_reset",
+      "matched": 12,
+      "filter_detail_pages": 8,
+      "index_loads": 14,
+      "matching_bitset_bytes": 12500,
+      "peak_rss_bytes": 131469312,
+      "rows": 100000,
+      "pages": 565,
+      "first_filter": {
+        "collector": "ris-rrc23",
+        "view": "default",
+        "prefix": "209.22.67.0/24",
+        "peer": 18106,
+        "kind": "path_change"
+      }
+    },
+    {
+      "iteration": 3,
+      "first_script_seconds": 0.029423999999999995,
+      "filter_seconds": 0.1582797,
+      "next_seconds": 0.01415469999999999,
+      "next_page_mode": "unfiltered_after_reset",
+      "matched": 12,
+      "filter_detail_pages": 8,
+      "index_loads": 14,
+      "matching_bitset_bytes": 12500,
+      "peak_rss_bytes": 131776512,
+      "rows": 100000,
+      "pages": 565,
+      "first_filter": {
+        "collector": "ris-rrc23",
+        "view": "default",
+        "prefix": "209.22.67.0/24",
+        "peer": 18106,
+        "kind": "path_change"
+      }
+    }
+  ]
+}

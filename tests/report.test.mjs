@@ -115,7 +115,8 @@ test('report 命令生成可携带的本地报告，参数与非法窗口明确�
 test('关联组覆盖、观测明细与来源跳转一致；错误绑定和篡改明确失败',()=>temporary(async root=>{
   const bundle=join(root,'bundle');await replayManifest(resolve('fixtures/multi/manifest.json'),bundle);
   const input=join(bundle,'index.json'),correlation=join(root,'correlation');await correlateExternal(input,correlation,{memoryBytes:65536});
-  const output=join(root,'report');await generateReport(input,output,{correlation:join(correlation,'index.json'),pageSize:3});
+  const sourceLabels=Object.fromEntries(JSON.parse(await readFile(input,'utf8')).collectors.flatMap(point=>point.files.map(file=>[file.path,'archive-label.mrt'])));
+  const output=join(root,'report');await generateReport(input,output,{correlation:join(correlation,'index.json'),pageSize:3,sourceLabels});
   const manifest=JSON.parse(await readFile(join(output,'report.json'),'utf8')),index=JSON.parse(await readFile(join(correlation,'index.json'),'utf8'));
   assert.equal(manifest.datasets.groups.rows,index.groups);assert.equal(manifest.datasets.observations.rows,index.unique_observations);
   const ui=await page(output);
@@ -123,6 +124,8 @@ test('关联组覆盖、观测明细与来源跳转一致；错误绑定和篡�
   assert.ok(ui.elements.get('groups').children.length>0);
   const group=ui.elements.get('groups').children[0],button=group.children.find(child=>child.tagName==='button');
   await button.onclick();assert.ok(ui.elements.get('observations').children.length>0);
+  assert.match(ui.elements.get('observations').textContent,/archive-label\.mrt/);
+  assert.ok(!ui.elements.get('observations').textContent.includes(resolve('fixtures/multi')));
   const jump=ui.elements.get('observations').children[0].children.find(child=>child.tagName==='button');await jump.onclick();
   assert.ok(ui.elements.get('details').children[0].textContent.includes('原始来源位置'));
   const before=ui.context.MRTKitMetrics.detail_loads;await ui.elements.get('apply').onclick();

@@ -1,0 +1,22 @@
+{
+  "target_sha256": "513c947ba0f9755b7ac41a49968dafd1306ed625b386027514e3452065505e53",
+  "source_sample_sha256": "5760459603ce7bbda63dd9273d807fe55c9e0f0c75c01797e6609028b8925fdb",
+  "scoped_input": {
+    "bytes": 386816393,
+    "rows": 100000,
+    "sha256": "7175320874669c0e2e177057d69b5c8fd5cb6647668ccf9699fff8c20564c57e"
+  },
+  "generation_seconds": 48.584108099999995,
+  "generation_peak_rss_bytes": 116436992,
+  "result": {
+    "schema_version": "2.0",
+    "type": "offline_route_report",
+    "status": "complete",
+    "input_status": "partial",
+    "index": "<local validation report>/index.html",
+    "rows": 100000,
+    "change_notices": 100000,
+    "pages": 565
+  },
+  "browser_validation": "deferred by user; file protocol denied by browser policy; no workaround attempted"
+}
