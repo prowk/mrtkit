@@ -20,4 +20,6 @@ node cli/mrtkit.mjs correlate --input .validation/multi/index.json --external --
 
 `node scripts/correlation_scale.mjs --output 新目录` 生成固定的 1,000,100 条合法合成变化通知，超过内存模式默认容量。预算为 512 MiB 进程 RSS、8 GiB 排序/输出磁盘和 20 分钟，实际文件和计数会重新读回核对。它是规模测试，不是真实网络档案。正式测量证据在完成验证后存入验证目录。
 
+固定提交 `26a33a5` 的测量已完成：1,000,100 条观测，约 190.36 秒，核验阶段在内的峰值 RSS 约 253.38 MiB，新增临时/输出峰值约 1.85 GiB。输入、两类输出及被测代码 SHA-256 均已复核，见[原始测量收据](../validation/correlation-scale.json)。该结果仅描述这一个固定合成负载，不表示任意文件大小、属性长度或全部关联分布的性能。
+
 关联仍只表示所选采集器观测到相同语义变化的时间共现，不推断真实传播时延或因果。
