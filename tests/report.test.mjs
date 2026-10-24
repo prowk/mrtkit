@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve,relative} from 'node:path';
 import vm from 'node:vm';
+import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {replayManifest} from '../cli/multi.mjs';
 import {generateReport} from '../cli/report.mjs';
@@ -149,4 +150,16 @@ test('多索引块筛选只加载匹配页，取消后重置不会被旧请求�
   const stale=ui.elements.get('apply').onclick();ui.elements.get('cancel').onclick();await ui.elements.get('reset').onclick();await stale;
   assert.match(ui.elements.get('status').textContent,/匹配 17,000 条/);assert.equal(metrics.cancelled,1);assert.equal(ui.elements.get('position').textContent,'1 / 340');
   await ui.elements.get('next').onclick();assert.equal(ui.elements.get('position').textContent,'2 / 340');
+}));
+
+test('关联摘要和组内观测的时间必须一致，重算文件哈希不能掩盖越界或过期摘要',()=>temporary(async root=>{
+  const bundle=join(root,'bundle');await replayManifest(resolve('fixtures/multi/manifest.json'),bundle);const input=join(bundle,'index.json'),correlation=join(root,'correlation');await correlateExternal(input,correlation,{memoryBytes:65536});
+  const original=JSON.parse(await readFile(join(correlation,'index.json'),'utf8')),rows=(await readFile(join(correlation,'groups.jsonl'),'utf8')).trim().split('\n').map(JSON.parse);
+  const mutations=[row=>row.first_observed_at='-1',row=>row.first_observed_at='999000000',row=>row.window_end_exclusive=row.last_observed_at,row=>{row.last_observed_at=String(BigInt(row.last_observed_at)+1n);}];
+  for(const [i,mutate]of mutations.entries()){
+    const changed=structuredClone(rows);mutate(changed[0]);const data=changed.map(row=>JSON.stringify(row)).join('\n')+'\n';
+    await writeFile(join(correlation,'groups.jsonl'),data,'utf8');await writeFile(join(correlation,'index.json'),JSON.stringify({...original,groups_sha256:createHash('sha256').update(data).digest('hex'),groups_bytes:Buffer.byteLength(data)}),'utf8');
+    const output=join(root,'bad-time-'+i);await assert.rejects(generateReport(input,output,{correlation:join(correlation,'index.json')}),/关联.*时间|窗口/);
+    assert.equal(JSON.parse(await readFile(join(output,'report.json'),'utf8')).status,'partial');
+  }
 }));
