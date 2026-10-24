@@ -153,12 +153,14 @@ pub fn correlation_semantics_from_json(
     .map(fn(s) {
       Json::object({
         "active": s.active.to_json(),
+        "origin_as": origin_as(s.attributes.path).to_json(),
         "attributes": semantic_attributes(s.attributes).to_json(),
       })
     })
     .unwrap_or(Json::null()),
     "after": Json::object({
       "active": change.after.active.to_json(),
+      "origin_as": origin_as(change.after.attributes.path).to_json(),
       "attributes": semantic_attributes(change.after.attributes).to_json(),
     }),
     "churn_count": change.churn_count.to_json(),
