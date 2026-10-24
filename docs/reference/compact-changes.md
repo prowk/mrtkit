@@ -1,0 +1,11 @@
+# 紧凑变化输出
+
+`changes --compact` 输出 `event_refs_v1`；`multi` 在清单的 `analysis.compact_changes` 设为 `true` 时使用同一编码。不指定时保留 `full_jsonl_v1` 完整 JSONL。结果包显式记录 `changes_encoding`，旧 schema 2.0 没有此字段时仍按完整格式读取。
+
+紧凑文件每行是一个 `schema_version: "2.0"`、`type: "compact_change_context"` 对象，包含 `context: {id, value}` 和 `notices`。公共 `value` 保存前后状态、来源、差异和路由身份；提醒只保存 `context` 引用、`kind`、可选 `churn_count` 与 `correlation_key`。相邻同一事件的不同提醒共享上下文，最多四种。相同类型再次出现会另起上下文，不删除重复提醒。
+
+上下文 ID 是规范化公共值的 SHA-256。引用只在当前行内有效，每行自包含，不依赖全文件字典或前一行。读取器拒绝未知版本、内容与 ID 冲突、缺失引用、重复类型、提醒覆盖公共字段。结果包另提供文件 SHA-256、提醒数和上下文数，检测删行或计数错误。
+
+`readChanges(path, encoding)` 流式展开为原有完整提醒，供关联、报告和共享校验复用。没有改变分析状态或提醒判定。测试对两种模式逐条比较提醒、来源、最终状态和统计，并校验时间线及下游结果。
+
+真实数据编码基准由 `node scripts/compact_benchmark.mjs --output 新目录` 执行：固定读取历史 UPDATE 完整回放的 1,141,740 条提醒（4,735,570,592 字节，SHA-256 `f93aa8792be1e3573f5fd79bb248789c5f4a7794a206a95f7212ed758fd61477`），每模式三个独立进程，展开指纹和类型计数必须一致。此项只测编码和读取，不把解析、分析器驻留成本算作压缩收益；原始大输出留在本地验证目录。

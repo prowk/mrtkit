@@ -9,6 +9,7 @@ const help = `mrtkit 0.1.0 — MoonBit BGP MRT 工具
   parse     输出路由 JSON Lines；--format csv 导出 CSV
   stats     输出统计 JSON
   changes   输出路径变化、起源变化、固定窗口波动提醒
+    --compact  共享相邻提醒的前后状态、差异与来源，输出自包含上下文引用行
   snapshot-diff --collector 名称 前快照 后快照  比较同源同视图快照
   aggregate 输出变化最多的前缀、受影响 peer 与类型分布；--top 默认 20
   timeline --prefix CIDR  输出前缀时间线与各 peer 的观测状态
@@ -75,7 +76,10 @@ async function execute(argv, output, diagnostic) {
     await output(`${JSON.stringify(await reportCommand(argv.slice(1)))}\n`);
     return;
   }
-  const { config, files, initialRib, collector } = options([...argv]);
+  const delimiter=argv.indexOf('--'),compactPositions=argv.map((value,index)=>value==='--compact'&&(delimiter<0||index<delimiter)?index:-1).filter(index=>index>=0);
+  if(compactPositions.length>1||compactPositions.length&&argv[0]!=='changes')throw new Error('--compact 仅支持 changes，且不能重复');
+  const compact=compactPositions.length===1;
+  const { config, files, initialRib, collector } = options(argv.filter((_,index)=>!compactPositions.includes(index)));
   let bridge;
   try { bridge = await import(new URL('../_build/js/release/build/bridge/bridge.js', import.meta.url)); }
   catch (error) {
@@ -105,6 +109,8 @@ async function execute(argv, output, diagnostic) {
   const diagnosticCollector = new DiagnosticCollector();
   if (config.mode === 'parse' && config.format === 'csv') await output(`${bridge.csv_header()}\n`);
   const inputs = [...(initialRib ? [{ file: initialRib, baseline: true }] : []), ...files.map(file => ({ file, baseline: false }))];
+  const encoder=compact?new (await import('./compact-changes.mjs')).ChangeEncoder(output,{encoding:'event_refs_v1'}):null;
+  try{
   for (const { file, baseline } of inputs) {
     bridge.reset_file();
     if (baseline) {
@@ -120,7 +126,7 @@ async function execute(argv, output, diagnostic) {
         if (result.skipped) skipped++;
         ignored += result.ignored_families;
         diagnosticCollector.add(result.diagnostics);
-        if (result.lines.length) await output(`${result.lines.join('\n')}\n`);
+        if (result.lines.length) {if(encoder)await encoder.pushLines(result.lines);else await output(`${result.lines.join('\n')}\n`);}
       }
       if (baseline) {
         const result = JSON.parse(bridge.end_baseline());
@@ -131,6 +137,7 @@ async function execute(argv, output, diagnostic) {
       throw new Error(`${file}: ${error.message}`);
     }
   }
+  }finally{await encoder?.close();}
   const summary = JSON.parse(bridge.finish());
   if (summary.error) throw new Error(summary.error);
   if (['stats', 'aggregate', 'timeline'].includes(config.mode)) await output(`${JSON.stringify(summary)}\n`);

@@ -4,6 +4,7 @@ import {createHash,randomUUID} from 'node:crypto';
 import {resolve,dirname,join} from 'node:path';
 import {frames,inputChunks} from './input.mjs';
 import {validateBundleData} from './validation.mjs';
+import {changeFileWriter} from './compact-changes.mjs';
 
 const uint=(value,name)=>{if(!Number.isInteger(value)||value<0||value>4294967295)throw new Error(`${name} 必须为无符号秒时间戳`);return value;};
 const checked=text=>{const value=JSON.parse(text);if(value.error)throw new Error(value.error);return value;};
@@ -16,6 +17,7 @@ export async function readManifest(path){
   if(data.schema_version!=='1.0'||!Array.isArray(data.collectors)||!data.collectors.length||data.collectors.length>128)throw new Error('manifest 需要 schema_version 1.0 及 1..128 个观测点');
   const from=uint(data.window?.from,'window.from'),to=uint(data.window?.to,'window.to');
   if(from>to)throw new Error('manifest 时间窗口倒置');
+  if(data.analysis?.compact_changes!==undefined&&typeof data.analysis.compact_changes!=='boolean')throw new Error('compact_changes 必须为布尔值');
   const identities=new Set();
   for(const group of data.collectors){
     if(typeof group.collector!=='string'||!group.collector.trim()||typeof group.view!=='string'||!group.view.trim())throw new Error('每个观测点需要非空 collector/view');
@@ -62,6 +64,7 @@ export async function replayManifest(manifestPath,outputPath){
     const name=`collector-${String(ordinal+1).padStart(4,'0')}`;
     const result={collector:group.collector,view:group.view,status:'running',continuous:group.continuous===true,
       gaps:coverageGaps(group,manifest.window),files:[],changes_file:name+'.changes.jsonl',state_file:name+'.state.jsonl'};
+    result.changes_encoding=manifest.analysis?.compact_changes?'event_refs_v1':'full_jsonl_v1';
     result.timeline_gap_endpoints_clipped=result.gaps.some(gap=>gap.to>4294967295);
     index.collectors.push(result);await save();
     const url=new URL('../_build/js/release/build/bridge/bridge.js',import.meta.url);url.searchParams.set('session',randomUUID());
@@ -76,7 +79,7 @@ export async function replayManifest(manifestPath,outputPath){
         correlation_keys:true,
         observation_gaps:result.gaps.map(gap=>({from_time:gap.from,to_time:Math.min(gap.to,4294967295),from_micros:0,to_micros:gap.to>4294967295?999999:0}))};
       checked(bridge.configure(JSON.stringify(config)));
-      changes=await open(join(directory,result.changes_file),'wx');
+      changes=await changeFileWriter(join(directory,result.changes_file),{encoding:result.changes_encoding});
       let noticeCount=0;
       for(const file of group.files){
         const sha256=await digest(file.path),initial=await stat(file.path);
@@ -92,7 +95,7 @@ export async function replayManifest(manifestPath,outputPath){
             metadata.first_timestamp=metadata.first_timestamp===null?time:Math.min(metadata.first_timestamp,time);
             metadata.last_timestamp=metadata.last_timestamp===null?time:Math.max(metadata.last_timestamp,time);
             const batch=checked(bridge.consume_at(frame.data,file.path,BigInt(metadata.records),BigInt(frame.offset)));
-            if(batch.lines.length){await changes.writeFile(batch.lines.join('\n')+'\n','utf8');noticeCount+=batch.lines.length;}
+            if(batch.lines.length){await changes.pushLines(batch.lines);noticeCount+=batch.lines.length;}
           }
           if(file.kind==='rib')checked(bridge.end_baseline());
           const final=await stat(file.path);if(final.size!==initial.size||final.mtimeMs!==initial.mtimeMs)throw new Error('输入文件在回放中发生改变');
@@ -105,10 +108,11 @@ export async function replayManifest(manifestPath,outputPath){
         result.timeline_file=name+'.timeline.json';
         await writeFile(join(directory,result.timeline_file),JSON.stringify(report,null,2)+'\n','utf8');
         result.timeline_sha256=await digest(join(directory,result.timeline_file));
-        for(const entry of report.timeline.entries)for(const change of entry.changes){await changes.writeFile(JSON.stringify(change)+'\n','utf8');noticeCount++;}
+        for(const entry of report.timeline.entries)for(const change of entry.changes){await changes.push(change);noticeCount++;}
       }
       result.change_notices=noticeCount;
-      result.changes_sha256=await digest(join(directory,result.changes_file));
+      const changeInfo=await changes.close();if(changeInfo.notices!==noticeCount)throw new Error('变化写出计数不一致');
+      result.changes_sha256=changeInfo.sha256;if(result.changes_encoding==='event_refs_v1')result.change_contexts=changeInfo.contexts;
       checked(bridge.state_export_begin());
       const state=await open(join(directory,result.state_file),'wx');
       try{for(;;){const rows=checked(bridge.state_export_chunk(128));if(!rows.length)break;await state.writeFile(rows.map(row=>JSON.stringify(row)).join('\n')+'\n','utf8');}}finally{await state.close();}

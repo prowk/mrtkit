@@ -5,6 +5,7 @@ import {dirname,resolve} from 'node:path';
 import {isIP} from 'node:net';
 import * as core from '../_build/js/release/build/bridge/bridge.js';
 import {bundlePath,jsonLines} from './bundle.mjs';
+import {readChanges,changeEncodings} from './compact-changes.mjs';
 
 export const MAX_SECOND=4294967295;
 export const changeKinds=['path_change','origin_change','attribute_change','churn'];
@@ -35,6 +36,9 @@ export function validatePoints(points){
     for(const gap of point.gaps??[])if(!nonnegative(gap.from)||!nonnegative(gap.to)||gap.from>=gap.to||gap.to>MAX_SECOND+1)throw new Error('观测缺档时间无效');
     if(point.baseline_status!==undefined&&!['explicit_rib','updates_only','missing','unknown'].includes(point.baseline_status))throw new Error('观测基线状态无效');
     if(point.change_notices!==undefined&&!nonnegative(point.change_notices))throw new Error('提醒计数无效');
+    if(!changeEncodings.includes(point.changes_encoding??'full_jsonl_v1'))throw new Error('不支持的变化编码');
+    if(point.change_contexts!==undefined&&!nonnegative(point.change_contexts))throw new Error('公共上下文计数无效');
+    if(point.status==='complete'&&point.changes_encoding==='event_refs_v1'&&point.change_contexts===undefined)throw new Error('紧凑变化缺少上下文计数');
     if(point.status==='complete'&&point.change_notices===undefined&&point.changes_file!==undefined)throw new Error('完整观测点缺少提醒计数');
     if(point.summary!==undefined&&(!point.summary||typeof point.summary!=='object'||Array.isArray(point.summary)))throw new Error('统计对象无效');
     for(const [key,value]of Object.entries(point.summary??{})){
@@ -116,10 +120,11 @@ export async function validateBundleData(index,directory,{onChange=()=>{},onTime
   for(const point of index.collectors){
     const changes=await artifact(directory,point,'changes',signal),timeline=await artifact(directory,point,'timeline',signal),state=await artifact(directory,point,'state',signal);
     if(!changes&&point.status==='complete')throw new Error('完整观测点缺少变化明细');
-    let count=0;const changeHash=createHash('sha256');
-    if(changes)for await(const raw of jsonLines(changes)){signal?.throwIfAborted();const change=validateChange(raw,point,index.window);addHash(changeHash,change);count++;await onChange(change,point,{timeline:Boolean(timeline)});}
+    let count=0;const changeHash=createHash('sha256'),encodingStats={contexts:0};
+    if(changes)for await(const raw of readChanges(changes,point.changes_encoding??'full_jsonl_v1',{stats:encodingStats})){signal?.throwIfAborted();const change=validateChange(raw,point,index.window);addHash(changeHash,change);count++;await onChange(change,point,{timeline:Boolean(timeline)});}
     const digest=changeHash.digest('hex');
     if(point.change_notices!==undefined&&changes&&count!==point.change_notices)throw new Error('提醒计数与明细不一致');
+    if(point.change_contexts!==undefined&&changes&&encodingStats.contexts!==point.change_contexts)throw new Error('上下文计数与明细不一致');
     if(timeline){
       if((await stat(timeline)).size>67108864)throw new Error('单个时间线报告超过 64 MiB');
       const report=JSON.parse(await readFile(timeline,'utf8'));
