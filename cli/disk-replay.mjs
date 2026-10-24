@@ -11,6 +11,7 @@ import {DiskBudget,externalSort} from './external-sort.mjs';
 import {BufferedFile,encodePacket,canonical,portable,stateAccumulator} from './disk-storage.mjs';
 import {jsonLines} from './bundle.mjs';
 import {validateBundleData} from './validation.mjs';
+import {ReplayRss} from './replay-resources.mjs';
 
 const checked=text=>{const value=JSON.parse(text);if(value.error)throw Object.assign(new Error(value.error),{details:value});return value;};
 const textCompare=(a,b)=>a<b?-1:a>b?1:0;
@@ -48,7 +49,8 @@ export async function replayDisk(manifestPath,outputPath,{rssBytes=2147483648,di
   const controller=new AbortController(),abort=()=>controller.abort(signal?.reason);signal?.addEventListener('abort',abort,{once:true});
   const timer=setTimeout(()=>controller.abort(new Error('完整回放超过预定时间预算')),secondsBudget*1000);timer.unref();const jobSignal=controller.signal;
   const started=process.hrtime.bigint(),temporary=new Map(),store=new PeerStore(partitionDirectory,budget,{maxPeers});
-  let stateOutput=null,changeOutput=null,childPeak=0,jointPeak=0,rootIndexBytes=0,lastOrigin=null,worker=null,phase='original_decode',stateMergeNs=0n;
+  const rss=new ReplayRss();
+  let stateOutput=null,changeOutput=null,jointPeak=0,rootIndexBytes=0,lastOrigin=null,worker=null,phase='original_decode',stateMergeNs=0n;
   const point={collector:group.collector,view:group.view,status:'running',continuous:group.continuous===true,gaps:coverageGaps(group,manifest.window),files:[],changes_file:'collector-0001.changes.jsonl',state_file:'collector-0001.state.jsonl'};
   const index={schema_version:'2.0',type:'collector_replay_bundle',status:'running',interpretation:'independent_collector_route_observations_not_business_outage',window:manifest.window,analysis:manifest.analysis??{},collectors:[point]};
   const save=async()=>{const text=JSON.stringify(index,null,2)+'\n',bytes=Buffer.byteLength(text),delta=bytes-rootIndexBytes;if(delta>0)budget.reserve(delta);else budget.release(-delta);rootIndexBytes=bytes;await writeFile(join(directory,'index.json'),text,'utf8');};
@@ -108,7 +110,7 @@ export async function replayDisk(manifestPath,outputPath,{rssBytes=2147483648,di
       let receipt;try{receipt=JSON.parse(stdout);}catch{throw new Error('peer 进程失败: '+stderr.slice(-2000));}
       for(const kind of ['changes','state','capacity_trace'])if(receipt[kind]){budget.reserve(receipt[kind].bytes);await addTemporary(paths[kind],receipt[kind].bytes);}
       if(exit!==0||!receipt.complete)throw Object.assign(new Error('peer 回放失败: '+(receipt.failure?.message??stderr)),{details:receipt});
-      childPeak=Math.max(childPeak,receipt.peak_rss_bytes);if(process.resourceUsage().maxRSS*1024+childPeak>rssBytes)throw new Error('父进程与 peer 峰值 RSS 合计上界超过预算');
+      if(rss.completePeer(process.resourceUsage().maxRSS*1024,receipt.peak_rss_bytes)>rssBytes)throw new Error('父进程与 peer 并发阶段 RSS 合计上界超过预算');
       for(const [key,value]of Object.entries(receipt.summary)){if(['schema_version','baseline_status','mean_path_length','max_path_length','warmup_records','records','skipped_records','ignored_families'].includes(key))continue;
         summary[key]=typeof value==='string'?String(BigInt(summary[key])+BigInt(value)):summary[key]+value;}
       summary.max_path_length=Math.max(summary.max_path_length,receipt.summary.max_path_length);if(receipt.summary.baseline_status==='updates_only')summary.baseline_status='updates_only';
@@ -149,14 +151,15 @@ export async function replayDisk(manifestPath,outputPath,{rssBytes=2147483648,di
     await remove(bridgePath);point.diagnostics=diagnostics.report();await save();
     phase='bundle_verification';progress({phase:'bundle_verification'});const verifyStart=process.hrtime.bigint();await validateBundleData({...index,status:'complete',collectors:[{...point,status:'complete'}]},directory,{signal:jobSignal,onState:(_event,_point,rows)=>{if(rows%250000===0)progress({phase:'verify_state',rows});}});
     point.storage.costs.bundle_verification_seconds=Number(process.hrtime.bigint()-verifyStart)/1e9;
-    const upperRss=process.resourceUsage().maxRSS*1024+childPeak;if(upperRss>rssBytes)throw new Error('完整回放合计峰值 RSS 上界超过预算');
+    if(worker!==null)throw new Error('最终校验结束时仍有 peer 子进程');
+    const rssResult=rss.result(process.resourceUsage().maxRSS*1024);if(rssResult.peak_rss_upper_bound_bytes>rssBytes)throw new Error('完整回放合计峰值 RSS 上界超过预算');
     assertOwned(scratch,directory);await rm(scratch,{recursive:true,force:true});jobSignal.throwIfAborted();
     if(Number(process.hrtime.bigint()-started)/1e9>secondsBudget)throw new Error('完整回放超过预定时间预算');
-    point.storage.resources={rss_budget_bytes:rssBytes,disk_budget_bytes:diskBytes,peak_new_disk_bytes:budget.peak,parent_peak_rss_bytes:process.resourceUsage().maxRSS*1024,peer_peak_rss_bytes:childPeak,
-      peak_rss_upper_bound_bytes:upperRss,sampled_joint_peak_rss_bytes:jointPeak,seconds:Number(process.hrtime.bigint()-started)/1e9,seconds_budget:secondsBudget};
+    point.storage.resources={rss_budget_bytes:rssBytes,disk_budget_bytes:diskBytes,peak_new_disk_bytes:budget.peak,...rssResult,
+      sampled_joint_peak_rss_bytes:jointPeak,seconds:Number(process.hrtime.bigint()-started)/1e9,seconds_budget:secondsBudget};
     point.status='complete';index.status='complete';await save();point.storage.resources.peak_new_disk_bytes=budget.peak;await save();
     return {schema_version:'2.0',type:index.type,status:'complete',index:join(directory,'index.json'),collectors:1};
-  }catch(error){point.status='partial';index.status='partial';point.error=String(error.message).slice(0,4096);point.failure={phase,origin:error.details?.failure?.origin??lastOrigin,details:error.details??null};await writeFile(join(directory,'index.json'),JSON.stringify(index,null,2)+'\n','utf8');throw error;}
+  }catch(error){point.status='partial';index.status='partial';point.error=String(error.message).slice(0,4096);point.failure={phase,origin:error.details?.failure?.origin??lastOrigin,details:error.details??null,resources:{...rss.result(process.resourceUsage().maxRSS*1024),peak_new_disk_bytes:budget.peak,seconds:Number(process.hrtime.bigint()-started)/1e9}};await writeFile(join(directory,'index.json'),JSON.stringify(index,null,2)+'\n','utf8');throw error;}
   finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);worker?.kill();await Promise.allSettled([store.close(),stateOutput?.close(),changeOutput?.close()]);assertOwned(scratch,directory);await rm(scratch,{recursive:true,force:true});}
 }
 

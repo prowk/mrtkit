@@ -17,8 +17,10 @@ const manifest={schema_version:'1.0',window:target.workload.window,analysis:{cap
   files:target.workload.sources.map(file=>({path:join(root,'.validation/archives',file.file),kind:file.kind,from:file.from_time,to:file.to_time,sha256:file.sha256,url:file.url}))}]};
 const manifestPath=join(directory,'manifest.json');await writeFile(manifestPath,JSON.stringify(manifest,null,2)+'\n','utf8');
 const report={schema_version:'2.0',type:'complete_unfiltered_state_replay_acceptance',source_revision:spawnSync('git',['rev-parse','HEAD'],{encoding:'utf8',windowsHide:true}).stdout.trim(),
+  driver_sha256:createHash('sha256').update(await readFile('scripts/full_replay_benchmark.mjs')).digest('hex'),
   snapshot_sha256:codeSha,target_sha256:createHash('sha256').update(await readFile('docs/validation/state-resource-target.json')).digest('hex'),
   method:'Three fresh serial replay processes, each with fresh serial peer children; immutable JS and compiled core snapshot. No prefix/peer reduction. Driver RSS and earlier retained output are included in conservative global budgets.',
+  rss_accounting:'max(parent lifetime peak, max serial peer jobs(parent historical peak at child exit + child lifetime peak)) + controller lifetime peak; gzip inputs do not launch an external decompressor',
   environment:{date:new Date().toISOString(),node:process.version,cpu:os.cpus()[0].model.trim(),total_memory_bytes:os.totalmem(),free_memory_bytes:os.freemem(),platform:os.platform(),release:os.release()},
   budgets:target.budgets,runs:[],complete:false};
 const reportPath=join(directory,'report.json'),save=()=>writeFile(reportPath,JSON.stringify(report,null,2)+'\n','utf8');await save();let retained=0;
