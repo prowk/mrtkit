@@ -1,0 +1,655 @@
+{
+  "schema_version": "2.0",
+  "type": "isolated_state_component_profile",
+  "source_revision": "13969e9aca4184fa1b1997144c44d2e6cb7eb734",
+  "original_bridge_sha256": "27bf9e9dfda7d29b4e77133ae4b74219bad353e222a8149bd921c92992ee327d",
+  "probe_sha256": "776c5a61b1c22b2d1278443df951027f248fe3c9f662f70871238602fe1d1a7a",
+  "environment": {
+    "date": "2026-10-24T06:05:16.149Z",
+    "node": "v22.14.0",
+    "cpu": "AMD Ryzen 9 7940HX with Radeon Graphics",
+    "total_memory_bytes": 16340418560,
+    "platform": "win32"
+  },
+  "method": "Fresh isolated process; append-only inspection accessor; full GC before and after destructive reference removal after replay. Deltas are ordered retained heap/ArrayBuffer contributions, not additive intrinsic object sizes. No production analyzer is modified. RIB checkpoint is a profile subset, not full-replay success.",
+  "runs": [
+    {
+      "iteration": 1,
+      "scenario": "rib_checkpoint",
+      "records": 25000,
+      "counts": {
+        "routes": 228292,
+        "withdrawn": 0,
+        "source_objects": 228292,
+        "attribute_sets": 42492,
+        "route_key_characters": 10284197,
+        "peer_index_groups": 22
+      },
+      "baseline": {
+        "rss": 338481152,
+        "heapTotal": 299831296,
+        "heapUsed": 260211504,
+        "external": 2405015,
+        "arrayBuffers": 296839
+      },
+      "export": {
+        "rows": 128,
+        "json_bytes": 106909,
+        "retained_heap_bytes": 345944,
+        "array_buffer_bytes": -81920
+      },
+      "steps": [
+        {
+          "component": "peer_route_index",
+          "reclaimed_heap_bytes": 18881568,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 241331664
+        },
+        {
+          "component": "attribute_pool_lookup_index",
+          "reclaimed_heap_bytes": 3583488,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 237748176
+        },
+        {
+          "component": "source_objects_and_exclusive_positions",
+          "reclaimed_heap_bytes": 17630672,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 220117504
+        },
+        {
+          "component": "withdrawn_payload_and_route_keys",
+          "reclaimed_heap_bytes": -2576,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 220120080
+        },
+        {
+          "component": "active_route_keys",
+          "reclaimed_heap_bytes": 14976976,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 205143104
+        },
+        {
+          "component": "remaining_shared_attribute_payload",
+          "reclaimed_heap_bytes": 124925592,
+          "reclaimed_array_buffer_bytes": 190100,
+          "after_heap_bytes": 80217512
+        },
+        {
+          "component": "remaining_route_events_and_watermarks",
+          "reclaimed_heap_bytes": 50873624,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 29343888
+        },
+        {
+          "component": "route_lookup_index",
+          "reclaimed_heap_bytes": 20632440,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 8711448
+        },
+        {
+          "component": "peer_watermark_indexes",
+          "reclaimed_heap_bytes": 7016,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 8704432
+        }
+      ],
+      "peak_rss_bytes": 355258368
+    },
+    {
+      "iteration": 2,
+      "scenario": "rib_checkpoint",
+      "records": 25000,
+      "counts": {
+        "routes": 228292,
+        "withdrawn": 0,
+        "source_objects": 228292,
+        "attribute_sets": 42492,
+        "route_key_characters": 10284197,
+        "peer_index_groups": 22
+      },
+      "baseline": {
+        "rss": 340119552,
+        "heapTotal": 299307008,
+        "heapUsed": 260230168,
+        "external": 2405015,
+        "arrayBuffers": 296839
+      },
+      "export": {
+        "rows": 128,
+        "json_bytes": 106909,
+        "retained_heap_bytes": 344048,
+        "array_buffer_bytes": -81920
+      },
+      "steps": [
+        {
+          "component": "peer_route_index",
+          "reclaimed_heap_bytes": 18880992,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 241350640
+        },
+        {
+          "component": "attribute_pool_lookup_index",
+          "reclaimed_heap_bytes": 3583488,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 237767152
+        },
+        {
+          "component": "source_objects_and_exclusive_positions",
+          "reclaimed_heap_bytes": 17630840,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 220136312
+        },
+        {
+          "component": "withdrawn_payload_and_route_keys",
+          "reclaimed_heap_bytes": -2576,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 220138888
+        },
+        {
+          "component": "active_route_keys",
+          "reclaimed_heap_bytes": 14973040,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 205165848
+        },
+        {
+          "component": "remaining_shared_attribute_payload",
+          "reclaimed_heap_bytes": 124926672,
+          "reclaimed_array_buffer_bytes": 190100,
+          "after_heap_bytes": 80239176
+        },
+        {
+          "component": "remaining_route_events_and_watermarks",
+          "reclaimed_heap_bytes": 50873624,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 29365552
+        },
+        {
+          "component": "route_lookup_index",
+          "reclaimed_heap_bytes": 20632440,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 8733112
+        },
+        {
+          "component": "peer_watermark_indexes",
+          "reclaimed_heap_bytes": 6872,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 8726240
+        }
+      ],
+      "peak_rss_bytes": 356519936
+    },
+    {
+      "iteration": 3,
+      "scenario": "rib_checkpoint",
+      "records": 25000,
+      "counts": {
+        "routes": 228292,
+        "withdrawn": 0,
+        "source_objects": 228292,
+        "attribute_sets": 42492,
+        "route_key_characters": 10284197,
+        "peer_index_groups": 22
+      },
+      "baseline": {
+        "rss": 338051072,
+        "heapTotal": 300093440,
+        "heapUsed": 260190888,
+        "external": 2405015,
+        "arrayBuffers": 280455
+      },
+      "export": {
+        "rows": 128,
+        "json_bytes": 106909,
+        "retained_heap_bytes": 359456,
+        "array_buffer_bytes": -65536
+      },
+      "steps": [
+        {
+          "component": "peer_route_index",
+          "reclaimed_heap_bytes": 18881272,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 241325664
+        },
+        {
+          "component": "attribute_pool_lookup_index",
+          "reclaimed_heap_bytes": 3583680,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 237741984
+        },
+        {
+          "component": "source_objects_and_exclusive_positions",
+          "reclaimed_heap_bytes": 17630840,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 220111144
+        },
+        {
+          "component": "withdrawn_payload_and_route_keys",
+          "reclaimed_heap_bytes": -2576,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 220113720
+        },
+        {
+          "component": "active_route_keys",
+          "reclaimed_heap_bytes": 14955984,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 205157736
+        },
+        {
+          "component": "remaining_shared_attribute_payload",
+          "reclaimed_heap_bytes": 124924544,
+          "reclaimed_array_buffer_bytes": 190100,
+          "after_heap_bytes": 80233192
+        },
+        {
+          "component": "remaining_route_events_and_watermarks",
+          "reclaimed_heap_bytes": 50873624,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 29359568
+        },
+        {
+          "component": "route_lookup_index",
+          "reclaimed_heap_bytes": 20632584,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 8726984
+        },
+        {
+          "component": "peer_watermark_indexes",
+          "reclaimed_heap_bytes": 7104,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 8719880
+        }
+      ],
+      "peak_rss_bytes": 354021376
+    },
+    {
+      "iteration": 1,
+      "scenario": "updates_complete",
+      "records": 369608,
+      "counts": {
+        "routes": 46520,
+        "withdrawn": 4873,
+        "source_objects": 46520,
+        "attribute_sets": 14892,
+        "route_key_characters": 2303646,
+        "peer_index_groups": 33
+      },
+      "baseline": {
+        "rss": 415375360,
+        "heapTotal": 295964672,
+        "heapUsed": 92744912,
+        "external": 2397691,
+        "arrayBuffers": 273139
+      },
+      "export": {
+        "rows": 128,
+        "json_bytes": 220759,
+        "retained_heap_bytes": 795384,
+        "array_buffer_bytes": -8
+      },
+      "steps": [
+        {
+          "component": "peer_route_index",
+          "reclaimed_heap_bytes": 3953424,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 88801136
+        },
+        {
+          "component": "attribute_pool_lookup_index",
+          "reclaimed_heap_bytes": 1329360,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 87471776
+        },
+        {
+          "component": "source_objects_and_exclusive_positions",
+          "reclaimed_heap_bytes": 4092872,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 83378904
+        },
+        {
+          "component": "withdrawn_payload_and_route_keys",
+          "reclaimed_heap_bytes": 11550888,
+          "reclaimed_array_buffer_bytes": 24768,
+          "after_heap_bytes": 71828016
+        },
+        {
+          "component": "active_route_keys",
+          "reclaimed_heap_bytes": 2821752,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 69006264
+        },
+        {
+          "component": "remaining_shared_attribute_payload",
+          "reclaimed_heap_bytes": 40260760,
+          "reclaimed_array_buffer_bytes": 215352,
+          "after_heap_bytes": 28745504
+        },
+        {
+          "component": "remaining_route_events_and_watermarks",
+          "reclaimed_heap_bytes": 15437000,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 13308504
+        },
+        {
+          "component": "route_lookup_index",
+          "reclaimed_heap_bytes": 3874624,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 9433880
+        },
+        {
+          "component": "peer_watermark_indexes",
+          "reclaimed_heap_bytes": 17776,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 9416104
+        }
+      ],
+      "peak_rss_bytes": 423333888
+    },
+    {
+      "iteration": 2,
+      "scenario": "updates_complete",
+      "records": 369608,
+      "counts": {
+        "routes": 46520,
+        "withdrawn": 4873,
+        "source_objects": 46520,
+        "attribute_sets": 14892,
+        "route_key_characters": 2303646,
+        "peer_index_groups": 33
+      },
+      "baseline": {
+        "rss": 410943488,
+        "heapTotal": 295964672,
+        "heapUsed": 92732512,
+        "external": 2397691,
+        "arrayBuffers": 273139
+      },
+      "export": {
+        "rows": 128,
+        "json_bytes": 220759,
+        "retained_heap_bytes": 759328,
+        "array_buffer_bytes": -8
+      },
+      "steps": [
+        {
+          "component": "peer_route_index",
+          "reclaimed_heap_bytes": 3953560,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 88776176
+        },
+        {
+          "component": "attribute_pool_lookup_index",
+          "reclaimed_heap_bytes": 1329192,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 87446984
+        },
+        {
+          "component": "source_objects_and_exclusive_positions",
+          "reclaimed_heap_bytes": 4092920,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 83354064
+        },
+        {
+          "component": "withdrawn_payload_and_route_keys",
+          "reclaimed_heap_bytes": 11552224,
+          "reclaimed_array_buffer_bytes": 24768,
+          "after_heap_bytes": 71801840
+        },
+        {
+          "component": "active_route_keys",
+          "reclaimed_heap_bytes": 2840328,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 68961512
+        },
+        {
+          "component": "remaining_shared_attribute_payload",
+          "reclaimed_heap_bytes": 40248432,
+          "reclaimed_array_buffer_bytes": 215352,
+          "after_heap_bytes": 28713080
+        },
+        {
+          "component": "remaining_route_events_and_watermarks",
+          "reclaimed_heap_bytes": 15437024,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 13276056
+        },
+        {
+          "component": "route_lookup_index",
+          "reclaimed_heap_bytes": 3874672,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 9401384
+        },
+        {
+          "component": "peer_watermark_indexes",
+          "reclaimed_heap_bytes": 17696,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 9383688
+        }
+      ],
+      "peak_rss_bytes": 418406400
+    },
+    {
+      "iteration": 3,
+      "scenario": "updates_complete",
+      "records": 369608,
+      "counts": {
+        "routes": 46520,
+        "withdrawn": 4873,
+        "source_objects": 46520,
+        "attribute_sets": 14892,
+        "route_key_characters": 2303646,
+        "peer_index_groups": 33
+      },
+      "baseline": {
+        "rss": 418447360,
+        "heapTotal": 263196672,
+        "heapUsed": 91831936,
+        "external": 2396211,
+        "arrayBuffers": 273131
+      },
+      "export": {
+        "rows": 128,
+        "json_bytes": 220759,
+        "retained_heap_bytes": 800696,
+        "array_buffer_bytes": 0
+      },
+      "steps": [
+        {
+          "component": "peer_route_index",
+          "reclaimed_heap_bytes": 3953560,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 87894208
+        },
+        {
+          "component": "attribute_pool_lookup_index",
+          "reclaimed_heap_bytes": 1329192,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 86565016
+        },
+        {
+          "component": "source_objects_and_exclusive_positions",
+          "reclaimed_heap_bytes": 4092920,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 82472096
+        },
+        {
+          "component": "withdrawn_payload_and_route_keys",
+          "reclaimed_heap_bytes": 11547720,
+          "reclaimed_array_buffer_bytes": 24768,
+          "after_heap_bytes": 70924376
+        },
+        {
+          "component": "active_route_keys",
+          "reclaimed_heap_bytes": 2825728,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 68098648
+        },
+        {
+          "component": "remaining_shared_attribute_payload",
+          "reclaimed_heap_bytes": 40247184,
+          "reclaimed_array_buffer_bytes": 215352,
+          "after_heap_bytes": 27851464
+        },
+        {
+          "component": "remaining_route_events_and_watermarks",
+          "reclaimed_heap_bytes": 15437440,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 12414024
+        },
+        {
+          "component": "route_lookup_index",
+          "reclaimed_heap_bytes": 3874672,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 8539352
+        },
+        {
+          "component": "peer_watermark_indexes",
+          "reclaimed_heap_bytes": 17688,
+          "reclaimed_array_buffer_bytes": 0,
+          "after_heap_bytes": 8521664
+        }
+      ],
+      "peak_rss_bytes": 423399424
+    }
+  ],
+  "publication": {
+    "fixed_commit_rebuild_matched": true,
+    "probe_append_only": true,
+    "resource_target_sha256": "369a4dfea99d482974d622e4b5fbbbf2a239c58be007323a4d5602f401dcbdb9",
+    "profile_driver_sha256": "072d6f895fc1236d054566b4abbdf17bb5dec9c71d40c5d0acfbe88145ff0af9"
+  },
+  "medians": [
+    {
+      "scenario": "rib_checkpoint",
+      "records": 25000,
+      "full_input_eof": false,
+      "counts": {
+        "routes": 228292,
+        "withdrawn": 0,
+        "source_objects": 228292,
+        "attribute_sets": 42492,
+        "route_key_characters": 10284197,
+        "peer_index_groups": 22
+      },
+      "baseline_heap_bytes": 260211504,
+      "components": [
+        {
+          "component": "peer_route_index",
+          "retained_heap_delta_bytes": 18881272,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "attribute_pool_lookup_index",
+          "retained_heap_delta_bytes": 3583488,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "source_objects_and_exclusive_positions",
+          "retained_heap_delta_bytes": 17630840,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "withdrawn_payload_and_route_keys",
+          "retained_heap_delta_bytes": -2576,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "active_route_keys",
+          "retained_heap_delta_bytes": 14973040,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "remaining_shared_attribute_payload",
+          "retained_heap_delta_bytes": 124925592,
+          "retained_array_buffer_delta_bytes": 190100
+        },
+        {
+          "component": "remaining_route_events_and_watermarks",
+          "retained_heap_delta_bytes": 50873624,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "route_lookup_index",
+          "retained_heap_delta_bytes": 20632440,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "peer_watermark_indexes",
+          "retained_heap_delta_bytes": 7016,
+          "retained_array_buffer_delta_bytes": 0
+        }
+      ],
+      "export": {
+        "rows": 128,
+        "json_bytes": 106909,
+        "retained_heap_bytes": 345944
+      }
+    },
+    {
+      "scenario": "updates_complete",
+      "records": 369608,
+      "full_input_eof": true,
+      "counts": {
+        "routes": 46520,
+        "withdrawn": 4873,
+        "source_objects": 46520,
+        "attribute_sets": 14892,
+        "route_key_characters": 2303646,
+        "peer_index_groups": 33
+      },
+      "baseline_heap_bytes": 92732512,
+      "components": [
+        {
+          "component": "peer_route_index",
+          "retained_heap_delta_bytes": 3953560,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "attribute_pool_lookup_index",
+          "retained_heap_delta_bytes": 1329192,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "source_objects_and_exclusive_positions",
+          "retained_heap_delta_bytes": 4092920,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "withdrawn_payload_and_route_keys",
+          "retained_heap_delta_bytes": 11550888,
+          "retained_array_buffer_delta_bytes": 24768
+        },
+        {
+          "component": "active_route_keys",
+          "retained_heap_delta_bytes": 2825728,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "remaining_shared_attribute_payload",
+          "retained_heap_delta_bytes": 40248432,
+          "retained_array_buffer_delta_bytes": 215352
+        },
+        {
+          "component": "remaining_route_events_and_watermarks",
+          "retained_heap_delta_bytes": 15437024,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "route_lookup_index",
+          "retained_heap_delta_bytes": 3874672,
+          "retained_array_buffer_delta_bytes": 0
+        },
+        {
+          "component": "peer_watermark_indexes",
+          "retained_heap_delta_bytes": 17696,
+          "retained_array_buffer_delta_bytes": 0
+        }
+      ],
+      "export": {
+        "rows": 128,
+        "json_bytes": 220759,
+        "retained_heap_bytes": 795384
+      }
+    }
+  ]
+}
