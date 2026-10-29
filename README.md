@@ -8,7 +8,7 @@
 
 ## 快速开始
 
-需要 [MoonBit](https://www.moonbitlang.com/download/)（**moonc ≥0.10.16**）和 Node.js 22+；读取 bz2 另需 Python 3。当前固定工具链为 `.moonbit-version` 中的 `0.10.18+6c83a7f62`，构建和测试前会检查真实编译器版本。无需安装 npm 依赖。
+需要 [MoonBit](https://www.moonbitlang.com/download/)（**moonc ≥0.10.16**）和 Node.js 22+；读取 bz2 另需 Python 3。当前固定工具链为 `moonbit-toolchain.version` 中的 `0.10.18+6c83a7f62`，构建和测试前会检查真实编译器版本。无需安装 npm 依赖。
 
 ```sh
 git clone https://github.com/prowk/mrtkit.git

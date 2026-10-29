@@ -34,7 +34,7 @@ Decoder → MRT frame → peer/RIB 或 BGP4MP
 
 ## 测试与提交
 
-编译器最低版本为 moonc 0.10.16，本地与 CI 使用 `.moonbit-version` 的固定发布标签。运行 `npm run check:toolchain` 查看并校验真实编译器版本；升级时同时复验 JS、Wasm、Wasm GC、示例和打包，不把旧测量改写为新工具链测量。
+编译器最低版本为 moonc 0.10.16，本地与 CI 使用 `moonbit-toolchain.version` 的固定发布标签。运行 `npm run check:toolchain` 查看并校验真实编译器版本；升级时同时复验 JS、Wasm、Wasm GC、示例和打包，不把旧测量改写为新工具链测量。
 
 公开 API 使用黑盒测试，协议细节使用白盒测试。Node 编码器独立生成样本，验证完整 CLI。对照依赖 `mrtparse` 仅放在 `.validation/`。功能提交包含对应测试，失败时不提交该功能。
 
