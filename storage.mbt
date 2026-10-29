@@ -2,14 +2,14 @@
 priv struct SharedAttributes {
   wire : Attributes
   semantic : Attributes
-  mut references : Int
+  mut references : Int32
 }
 
 ///|
 pub struct StorageStats {
-  route_keys : Int
-  unique_attribute_sets : Int
-  attribute_references : Int
+  route_keys : Int32
+  unique_attribute_sets : Int32
+  attribute_references : Int32
 } derive(ToJson)
 
 ///|

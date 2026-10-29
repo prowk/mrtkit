@@ -1,14 +1,14 @@
 # MRTKit
 
 [![CI](https://github.com/prowk/mrtkit/actions/workflows/ci.yml/badge.svg)](https://github.com/prowk/mrtkit/actions/workflows/ci.yml)
-[![Mooncakes](https://img.shields.io/badge/Mooncakes-v0.2.0-blue)](https://mooncakes.io/docs/prowk/mrtkit)
+[![Mooncakes](https://img.shields.io/badge/Mooncakes-v0.2.1-blue)](https://mooncakes.io/docs/prowk/mrtkit)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
 用 MoonBit 解析 BGP MRT 档案，查询路由并分析变化。提供无第三方依赖的协议核心库和流式 CLI，适用于离线路由研究、故障复盘与教学。
 
 ## 快速开始
 
-需要 [MoonBit](https://www.moonbitlang.com/download/) 和 Node.js 22+；读取 bz2 另需 Python 3。无需安装 npm 依赖。
+需要 [MoonBit](https://www.moonbitlang.com/download/)（**moonc ≥0.10.16**）和 Node.js 22+；读取 bz2 另需 Python 3。当前固定工具链为 `.moonbit-version` 中的 `0.10.18+6c83a7f62`，构建和测试前会检查真实编译器版本。无需安装 npm 依赖。
 
 ```sh
 git clone https://github.com/prowk/mrtkit.git
@@ -19,7 +19,7 @@ node cli/mrtkit.mjs stats --threshold 3 fixtures/demo.mrt
 node cli/mrtkit.mjs timeline --prefix 203.0.113.0/24 fixtures/demo.mrt
 ```
 
-MoonBit 项目可用 `moon add prowk/mrtkit@0.2.0` 引入核心库。完整安装、样本解读、筛选、导出和真实档案回放见[入门教程](docs/tutorials/getting-started.md)。CLI 和离线报告从源码运行。
+MoonBit 项目可用 `moon add prowk/mrtkit@0.2.1` 引入核心库。完整安装、样本解读、筛选、导出和真实档案回放见[入门教程](docs/tutorials/getting-started.md)。CLI 和离线报告从源码运行。
 
 ## 功能
 

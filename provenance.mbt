@@ -3,7 +3,7 @@ pub struct Source {
   file : String
   record : Int64
   offset : Int64
-  event_index : Int
+  event_index : Int32
   collector : String?
   view : String?
 } derive(Eq, Hash, ToJson)
@@ -108,14 +108,14 @@ pub fn Decoder::decode_scoped(
 fn source_scope(source : Source?) -> String {
   match source {
     Some(s) if s.collector is Some(_) || s.view is Some(_) =>
-      [s.collector.to_json(), s.view.to_json()].to_json().stringify() + "|"
+      Json([s.collector, s.view]).stringify() + "|"
     _ => ""
   }
 }
 
 ///|
 fn scoped_peer_key(
-  asn : UInt,
+  asn : UInt32,
   ip : String,
   outbound : Bool,
   source : Source?,

@@ -1,5 +1,5 @@
 ///|
-fn decimal(text : StringView, maximum : Int) -> Int raise ParseError {
+fn decimal(text : StringView, maximum : Int32) -> Int32 raise ParseError {
   if text.is_empty() {
     raise Invalid(0, "缺少十进制数字")
   }
@@ -33,7 +33,7 @@ fn ipv4_bytes(text : String) -> Bytes raise ParseError {
 }
 
 ///|
-fn hex_groups(text : StringView) -> Array[Int] raise ParseError {
+fn hex_groups(text : StringView) -> Array[Int32] raise ParseError {
   if text.is_empty() {
     return []
   }
@@ -59,7 +59,7 @@ fn hex_groups(text : StringView) -> Array[Int] raise ParseError {
 }
 
 ///|
-fn ip_bytes(text : String) -> (Int, Bytes) raise ParseError {
+fn ip_bytes(text : String) -> (Int32, Bytes) raise ParseError {
   if !text.contains(":") {
     return (1, ipv4_bytes(text))
   }

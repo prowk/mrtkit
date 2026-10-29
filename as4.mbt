@@ -47,7 +47,7 @@ fn effective_path(
   as4 : Array[AsSegment],
   aggregator : Aggregator?,
   as4_aggregator : Aggregator?,
-  width : Int,
+  width : Int32,
 ) -> Array[AsSegment] {
   if width == 4 {
     return path

@@ -1,15 +1,15 @@
 ///|
 priv struct MpRoutes {
   prefixes : Array[String]
-  path_ids : Array[UInt?]
+  path_ids : Array[UInt32?]
   next_hop : String?
   supported : Bool
-  afi : Int
-  safi : Int
+  afi : Int32
+  safi : Int32
 }
 
 ///|
-fn read_next_hop(c : Cursor, afi : Int) -> String raise ParseError {
+fn read_next_hop(c : Cursor, afi : Int32) -> String raise ParseError {
   let length = c.u8()
   if length != 4 && length != 16 && length != 32 {
     raise Invalid(c.pos - 1, "不支持的单播下一跳长度")
@@ -26,7 +26,7 @@ fn read_next_hop(c : Cursor, afi : Int) -> String raise ParseError {
 fn parse_mp(
   value : Bytes,
   reach : Bool,
-  addpath? : Bool = false,
+  addpath~ : Bool = false,
 ) -> MpRoutes raise ParseError {
   let c = Cursor::new(value)
   let afi = c.u16()
@@ -67,7 +67,7 @@ fn parse_mp(
 ///|
 fn rib_next_hop(
   attributes : Attributes,
-  afi : Int,
+  afi : Int32,
 ) -> Attributes raise ParseError {
   for attr in attributes.other {
     if attr.code == 14 {

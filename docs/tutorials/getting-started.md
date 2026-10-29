@@ -6,7 +6,7 @@ MRT 是采集器保存的 BGP 二进制记录；RIB 是某时刻的路由快照�
 
 ## 1. 安装与构建
 
-安装 [MoonBit 工具链](https://www.moonbitlang.com/download/)和 [Node.js 22 或更新版本](https://nodejs.org/)。需要 bz2 时安装 Python 3，确认 `python --version` 可运行；也可设置 `MRTKIT_PYTHON` 指向解释器。已验证编译器为 `moonc 0.10.14+7d59c7ec9`，对应 Moon `0.1.20260920`，CI 固定相同版本。
+安装 [MoonBit 工具链](https://www.moonbitlang.com/download/)和 [Node.js 22 或更新版本](https://nodejs.org/)。需要 **moonc 0.10.16 或更新版本**；当前 `.moonbit-version` 固定 `0.10.18+6c83a7f62`，对应 Moon `0.1.20261028`，CI 和代理准备工作流都从该文件读取相同发布标签。已有工具链可运行 `moon upgrade` 更新，并用 `moonc -v` 确认实际版本。需要 bz2 时安装 Python 3，确认 `python --version` 可运行；也可设置 `MRTKIT_PYTHON` 指向解释器。
 
 ```sh
 git clone https://github.com/prowk/mrtkit.git
@@ -17,7 +17,7 @@ npm run build
 node cli/mrtkit.mjs --version
 ```
 
-预期工具版本为 `0.2.0`。没有 npm 依赖，无需 `npm install`；构建产物写入 `_build/`。更新源码后重新构建。常规样本演示与测试无需联网。
+预期项目 CLI 版本为 `0.2.1`，它与 `moonc -v` 显示的编译器版本分别标注。没有 npm 依赖，无需 `npm install`；构建产物写入 `_build/`。`npm run build` 和 `npm test` 都先检查编译器最低版本。更新源码后重新构建。常规样本演示与测试无需联网。
 
 ## 2. 读取第一个文件
 
@@ -84,7 +84,7 @@ python scripts/replay_acceptance.py
 
 ## 7. 使用 MoonBit 核心库
 
-在自己的 MoonBit 项目目录执行 `moon add prowk/mrtkit@0.2.0`，在使用它的包的 `moon.pkg` 中加入：
+在自己的 MoonBit 项目目录执行 `moon add prowk/mrtkit@0.2.1`，在使用它的包的 `moon.pkg` 中加入：
 
 ```moonbit
 import {

@@ -1,11 +1,11 @@
 ///|
 pub struct Change {
   schema_version : String
-  timestamp : UInt
-  microseconds : Int?
+  timestamp : UInt32
+  microseconds : Int32?
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt
+  path_id : UInt32?
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   kind : String
@@ -13,7 +13,7 @@ pub struct Change {
   before : RouteSnapshot?
   after : RouteSnapshot
   diff : RouteDiff
-  churn_count : Int?
+  churn_count : Int32?
   correlation_key : String?
 } derive(ToJson)
 
@@ -38,10 +38,10 @@ pub struct Summary {
   churn_alerts : Int64
   out_of_order : Int64
   session_resets : Int64
-  tracked_routes : Int
-  active_routes : Int
+  tracked_routes : Int32
+  active_routes : Int32
   mean_path_length : Double
-  max_path_length : Int
+  max_path_length : Int32
 } derive(ToJson)
 
 ///|
@@ -54,7 +54,7 @@ priv struct TrackedRoute {
   shared : SharedAttributes
   time : UInt64
   window_start : UInt64
-  window_count : Int
+  window_count : Int32
 }
 
 ///|
@@ -62,8 +62,8 @@ pub struct Analyzer {
   priv routes : Map[String, TrackedRoute]
   priv attribute_pool : Map[Attributes, SharedAttributes]
   priv window : UInt64
-  priv threshold : Int
-  priv capacity : Int
+  priv threshold : Int32
+  priv capacity : Int32
   priv mut stats : Summary
   priv mut path_sum : Int64
   priv mut path_samples : Int64
@@ -77,13 +77,13 @@ pub struct Analyzer {
 
 ///|
 pub fn Analyzer::new(
-  window_seconds? : Int = 60,
-  threshold? : Int = 10,
-  capacity? : Int = 1000000,
-  from_time? : UInt = 0U,
-  to_time? : UInt = 4294967295U,
-  from_micros? : Int = 0,
-  to_micros? : Int = 999999,
+  window_seconds~ : Int32 = 60,
+  threshold~ : Int32 = 10,
+  capacity~ : Int32 = 1000000,
+  from_time~ : UInt32 = 0U,
+  to_time~ : UInt32 = 4294967295U,
+  from_micros~ : Int32 = 0,
+  to_micros~ : Int32 = 999999,
 ) -> Analyzer raise ParseError {
   if window_seconds <= 0 || threshold < 2 || capacity <= 0 {
     raise Invalid(0, "分析窗口、阈值或容量无效")
@@ -137,7 +137,7 @@ pub fn Analyzer::new(
 }
 
 ///|
-fn event_time(seconds : UInt, micros : Int?) -> UInt64 {
+fn event_time(seconds : UInt32, micros : Int32?) -> UInt64 {
   let fraction = match micros {
     Some(n) => n.to_uint64()
     None => 0UL
@@ -170,7 +170,7 @@ pub fn Analyzer::seed(
 }
 
 ///|
-fn peer_key(asn : UInt, ip : String, outbound : Bool) -> String {
+fn peer_key(asn : UInt32, ip : String, outbound : Bool) -> String {
   "\{asn}|\{ip}|\{outbound}"
 }
 
@@ -180,7 +180,7 @@ fn change(
   kind : String,
   previous : TrackedRoute?,
   attributes : Attributes,
-  churn_count? : Int,
+  churn_count? : Int32,
 ) -> Change {
   {
     schema_version: "2.0",

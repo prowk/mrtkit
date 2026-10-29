@@ -16,21 +16,21 @@ pub fn event_csv(RouteEvent) -> String
 
 pub fn event_json(RouteEvent) -> String
 
-pub fn origin_as(Array[AsSegment]) -> UInt?
+pub fn origin_as(Array[AsSegment]) -> UInt32?
 
-pub fn parse_attributes(Bytes, Int) -> Attributes raise ParseError
+pub fn parse_attributes(Bytes, Int32) -> Attributes raise ParseError
 
 pub fn parse_bgp4mp(Frame) -> BgpRecord raise ParseError
 
 pub fn parse_peers(Bytes) -> PeerTable raise ParseError
 
-pub fn parse_prefix(Bytes, Int) -> Prefix raise ParseError
+pub fn parse_prefix(Bytes, Int32) -> Prefix raise ParseError
 
 pub fn parse_prefix_text(String) -> Prefix raise ParseError
 
 pub fn parse_rib(Frame, Array[Peer]) -> Array[RouteEvent] raise ParseError
 
-pub fn path_length(Array[AsSegment]) -> Int
+pub fn path_length(Array[AsSegment]) -> Int32
 
 pub fn path_text(Array[AsSegment]) -> String
 
@@ -40,7 +40,7 @@ pub fn reconstruct_path(Array[AsSegment], Array[AsSegment]) -> Array[AsSegment]
 
 // Errors
 pub suberror ParseError {
-  Invalid(Int, String)
+  Invalid(Int32, String)
 }
 
 // Types and methods
@@ -49,15 +49,15 @@ pub struct Aggregation {
 }
 pub fn Aggregation::new() -> Self
 pub fn Aggregation::observe(Self, Change) -> Unit raise ParseError
-pub fn Aggregation::report(Self, top? : Int) -> AggregationReport raise ParseError
+pub fn Aggregation::report(Self, top? : Int32) -> AggregationReport raise ParseError
 
 pub struct AggregationReport {
   schema_version : String
   scope : String
   deduplication : String
   ordering : String
-  changed_prefixes : Int
-  affected_peers : Int
+  changed_prefixes : Int32
+  affected_peers : Int32
   change_notices : Int64
   change_types : Map[String, Int64]
   top_prefixes : Array[PrefixRanking]
@@ -65,12 +65,12 @@ pub struct AggregationReport {
 pub fn AggregationReport::to_json(Self) -> Json
 
 pub struct Aggregator {
-  asn : UInt
+  asn : UInt32
   address : String
 } derive(Eq, Hash, ToJson, @json.FromJson)
 pub fn Aggregator::equal(Self, Self) -> Bool
 pub fn Aggregator::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn Aggregator::hash(Self) -> Int
+pub fn Aggregator::hash(Self) -> Int32
 pub fn Aggregator::hash_combine(Self, Hasher) -> Unit
 pub fn Aggregator::not_equal(Self, Self) -> Bool
 pub fn Aggregator::to_json(Self) -> Json
@@ -85,12 +85,12 @@ pub impl ToJson for AggregatorDiff
 pub struct Analyzer {
   // private fields
 }
-pub fn Analyzer::new(window_seconds? : Int, threshold? : Int, capacity? : Int, from_time? : UInt, to_time? : UInt, from_micros? : Int, to_micros? : Int) -> Self raise ParseError
+pub fn Analyzer::new(window_seconds? : Int32, threshold? : Int32, capacity? : Int32, from_time? : UInt32, to_time? : UInt32, from_micros? : Int32, to_micros? : Int32) -> Self raise ParseError
 pub fn Analyzer::observe(Self, RouteEvent) -> Array[Change] raise ParseError
 pub fn Analyzer::observe_state(Self, StateChange) -> Unit
 pub fn Analyzer::path_totals(Self) -> (Int64, Int64)
 pub fn Analyzer::record_batch(Self, Batch) -> Unit
-pub fn Analyzer::route_count(Self) -> Int
+pub fn Analyzer::route_count(Self) -> Int32
 pub fn Analyzer::route_state_iter(Self) -> Iter[RouteEvent]
 pub fn Analyzer::route_states(Self) -> Array[RouteEvent]
 pub fn Analyzer::seed(Self, RouteEvent) -> Unit raise ParseError
@@ -99,12 +99,12 @@ pub fn Analyzer::storage_stats(Self) -> StorageStats
 pub fn Analyzer::summary(Self) -> Summary
 
 pub struct AsSegment {
-  kind : Int
-  asns : Array[UInt]
+  kind : Int32
+  asns : Array[UInt32]
 } derive(Eq, Hash, ToJson, @json.FromJson)
 pub fn AsSegment::equal(Self, Self) -> Bool
 pub fn AsSegment::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn AsSegment::hash(Self) -> Int
+pub fn AsSegment::hash(Self) -> Int32
 pub fn AsSegment::hash_combine(Self, Hasher) -> Unit
 pub fn AsSegment::not_equal(Self, Self) -> Bool
 pub fn AsSegment::to_json(Self) -> Json
@@ -116,56 +116,56 @@ pub struct AtomicAggregateDiff {
 pub fn AtomicAggregateDiff::to_json(Self) -> Json
 
 pub struct Attributes {
-  origin : Int?
+  origin : Int32?
   path : Array[AsSegment]
   wire_path : Array[AsSegment]
   as4_path : Array[AsSegment]
   next_hop : String?
-  med : UInt?
-  local_pref : UInt?
+  med : UInt32?
+  local_pref : UInt32?
   atomic_aggregate : Bool
   aggregator : Aggregator?
   wire_aggregator : Aggregator?
   as4_aggregator : Aggregator?
   raw_attributes : Array[RawAttribute]
-  communities : Array[UInt]
-  large_communities : Array[(UInt, UInt, UInt)]
+  communities : Array[UInt32]
+  large_communities : Array[(UInt32, UInt32, UInt32)]
   other : Array[RawAttribute]
 } derive(Eq, Hash, ToJson)
 pub fn Attributes::equal(Self, Self) -> Bool
-pub fn Attributes::hash(Self) -> Int
+pub fn Attributes::hash(Self) -> Int32
 pub fn Attributes::hash_combine(Self, Hasher) -> Unit
 pub fn Attributes::not_equal(Self, Self) -> Bool
 pub fn Attributes::to_json(Self) -> Json
 
 pub struct Batch {
   header : Header
-  microseconds : Int?
+  microseconds : Int32?
   events : Array[RouteEvent]
   states : Array[StateChange]
   skipped : Bool
-  ignored_families : Int
-  message_type : Int?
+  ignored_families : Int32
+  message_type : Int32?
   diagnostics : Array[Diagnostic]
 } derive(ToJson)
 pub fn Batch::to_json(Self) -> Json
-pub fn Batch::with_event_indices(Self, Array[Int]) -> Self raise ParseError
+pub fn Batch::with_event_indices(Self, Array[Int32]) -> Self raise ParseError
 
 pub struct BgpRecord {
-  message_type : Int
+  message_type : Int32
   events : Array[RouteEvent]
   states : Array[StateChange]
-  ignored_families : Int
-  ignored : Array[(Int, Int)]
+  ignored_families : Int32
+  ignored : Array[(Int32, Int32)]
 }
 
 pub struct Change {
   schema_version : String
-  timestamp : UInt
-  microseconds : Int?
+  timestamp : UInt32
+  microseconds : Int32?
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt
+  path_id : UInt32?
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   kind : String
@@ -173,7 +173,7 @@ pub struct Change {
   before : RouteSnapshot?
   after : RouteSnapshot
   diff : RouteDiff
-  churn_count : Int?
+  churn_count : Int32?
   correlation_key : String?
 } derive(ToJson)
 pub fn Change::correlation_key(Self) -> String raise ParseError
@@ -181,10 +181,10 @@ pub fn Change::to_json(Self) -> Json
 pub fn Change::with_correlation_key(Self) -> Self raise ParseError
 
 pub struct CommunityDiff {
-  before : Array[UInt]
-  after : Array[UInt]
-  added : Array[UInt]
-  removed : Array[UInt]
+  before : Array[UInt32]
+  after : Array[UInt32]
+  added : Array[UInt32]
+  removed : Array[UInt32]
 } derive(ToJson)
 pub fn CommunityDiff::to_json(Self) -> Json
 
@@ -200,27 +200,27 @@ pub fn Decoder::reset(Self) -> Unit
 
 pub struct Diagnostic {
   kind : String
-  mrt_type : Int
-  subtype : Int
-  afi : Int?
-  safi : Int?
+  mrt_type : Int32
+  subtype : Int32
+  afi : Int32?
+  safi : Int32?
   source : Source?
 } derive(ToJson)
 pub fn Diagnostic::to_json(Self) -> Json
 
 pub struct Frame {
   header : Header
-  microseconds : Int?
+  microseconds : Int32?
   payload : Bytes
 } derive(Eq)
 pub fn Frame::equal(Self, Self) -> Bool
 pub fn Frame::not_equal(Self, Self) -> Bool
 
 pub struct Header {
-  timestamp : UInt
-  kind : Int
-  subtype : Int
-  length : Int
+  timestamp : UInt32
+  kind : Int32
+  subtype : Int32
+  length : Int32
 } derive(Eq, ToJson)
 pub fn Header::equal(Self, Self) -> Bool
 pub fn Header::not_equal(Self, Self) -> Bool
@@ -234,37 +234,37 @@ pub fn HopDiff::to_json(Self) -> Json
 pub impl ToJson for HopDiff
 
 pub struct LargeCommunityDiff {
-  before : Array[(UInt, UInt, UInt)]
-  after : Array[(UInt, UInt, UInt)]
-  added : Array[(UInt, UInt, UInt)]
-  removed : Array[(UInt, UInt, UInt)]
+  before : Array[(UInt32, UInt32, UInt32)]
+  after : Array[(UInt32, UInt32, UInt32)]
+  added : Array[(UInt32, UInt32, UInt32)]
+  removed : Array[(UInt32, UInt32, UInt32)]
 } derive(ToJson)
 pub fn LargeCommunityDiff::to_json(Self) -> Json
 
 pub struct ObservationGap {
-  from_time : UInt
-  from_micros : Int
-  to_time : UInt
-  to_micros : Int
+  from_time : UInt32
+  from_micros : Int32
+  to_time : UInt32
+  to_micros : Int32
 } derive(ToJson)
-pub fn ObservationGap::new(UInt, UInt, from_micros? : Int, to_micros? : Int) -> Self
+pub fn ObservationGap::new(UInt32, UInt32, from_micros? : Int32, to_micros? : Int32) -> Self
 pub fn ObservationGap::to_json(Self) -> Json
 
 pub struct OriginDiff {
-  before : UInt?
-  after : UInt?
+  before : UInt32?
+  after : UInt32?
 }
 pub fn OriginDiff::to_json(Self) -> Json
 pub impl ToJson for OriginDiff
 
 pub struct PartitionedBatch {
   header : Header
-  microseconds : Int?
+  microseconds : Int32?
   skipped : Bool
-  ignored_families : Int
+  ignored_families : Int32
   diagnostics : Array[Diagnostic]
-  route_events : Int
-  state_events : Int
+  route_events : Int32
+  state_events : Int32
   peer_table : Bool
   parts : Array[PeerRecord]
 } derive(ToJson)
@@ -277,29 +277,29 @@ pub struct PathDiff {
 pub fn PathDiff::to_json(Self) -> Json
 
 pub struct Peer {
-  bgp_id : UInt
+  bgp_id : UInt32
   address : String
-  asn : UInt
+  asn : UInt32
 } derive(ToJson)
 pub fn Peer::to_json(Self) -> Json
 
 pub struct PeerRecord {
   peer : String
   data : Bytes
-  event_indices : Array[Int]
+  event_indices : Array[Int32]
 }
 pub fn PeerRecord::to_json(Self) -> Json
 pub impl ToJson for PeerRecord
 
 pub struct PeerTable {
-  collector_id : UInt
+  collector_id : UInt32
   view_name : Bytes
   peers : Array[Peer]
 }
 
 pub struct Prefix {
-  afi : Int
-  length : Int
+  afi : Int32
+  length : Int32
   address : Bytes
 } derive(Eq, ToJson)
 pub fn Prefix::contains(Self, Self) -> Bool
@@ -310,9 +310,9 @@ pub fn Prefix::to_json(Self) -> Json
 
 pub struct PrefixRanking {
   prefix : String
-  changed_events : Int
+  changed_events : Int32
   change_notices : Int64
-  affected_peers : Int
+  affected_peers : Int32
   change_types : Map[String, Int64]
 } derive(ToJson)
 pub fn PrefixRanking::to_json(Self) -> Json
@@ -321,15 +321,15 @@ pub struct Query {
   // private fields
 }
 pub fn Query::matches(Self, RouteEvent) -> Bool
-pub fn Query::new(prefix? : String, prefix_mode? : String, asn? : UInt, path_id? : UInt, from_time? : UInt, to_time? : UInt, from_micros? : Int, to_micros? : Int) -> Self raise ParseError
+pub fn Query::new(prefix? : String, prefix_mode? : String, asn? : UInt32, path_id? : UInt32, from_time? : UInt32, to_time? : UInt32, from_micros? : Int32, to_micros? : Int32) -> Self raise ParseError
 
 pub struct RawAttribute {
-  flags : Int
-  code : Int
+  flags : Int32
+  code : Int32
   value : Bytes
 } derive(Eq, Hash)
 pub fn RawAttribute::equal(Self, Self) -> Bool
-pub fn RawAttribute::hash(Self) -> Int
+pub fn RawAttribute::hash(Self) -> Int32
 pub fn RawAttribute::hash_combine(Self, Hasher) -> Unit
 pub fn RawAttribute::not_equal(Self, Self) -> Bool
 pub fn RawAttribute::to_json(Self) -> Json
@@ -349,22 +349,22 @@ pub fn RouteDiff::to_json(Self) -> Json
 pub struct RouteEvent {
   schema_version : String
   source : Source?
-  timestamp : UInt
-  microseconds : Int?
+  timestamp : UInt32
+  microseconds : Int32?
   action : String
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt
+  path_id : UInt32?
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
-  originated : UInt?
+  originated : UInt32?
   attributes : Attributes
 } derive(ToJson)
 pub fn RouteEvent::to_json(Self) -> Json
 
 pub struct RouteSnapshot {
-  timestamp : UInt
-  microseconds : Int?
+  timestamp : UInt32
+  microseconds : Int32?
   active : Bool
   attributes : Attributes
   source : Source?
@@ -375,18 +375,18 @@ pub struct Snapshot {
   // private fields
 }
 pub fn Snapshot::diff(Self, Self) -> SnapshotReport raise ParseError
-pub fn Snapshot::ingest(Self, Bytes, String, Int64, Int64, query? : Query, peer_asn? : UInt) -> Unit raise ParseError
-pub fn Snapshot::new(String, capacity? : Int) -> Self raise ParseError
+pub fn Snapshot::ingest(Self, Bytes, String, Int64, Int64, query? : Query, peer_asn? : UInt32) -> Unit raise ParseError
+pub fn Snapshot::new(String, capacity? : Int32) -> Self raise ParseError
 
 pub struct SnapshotChange {
   schema_version : String
   collector : String
   kind : String
-  peer_asn : UInt
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   prefix : String?
-  path_id : UInt?
+  path_id : UInt32?
   before : RouteEvent?
   after : RouteEvent?
   diff : RouteDiff?
@@ -401,12 +401,12 @@ pub struct SnapshotReport {
   interpretation : String
   before_source : Source?
   after_source : Source?
-  before_time : UInt?
-  after_time : UInt?
-  before_peers : Int
-  after_peers : Int
-  before_routes : Int
-  after_routes : Int
+  before_time : UInt32?
+  after_time : UInt32?
+  before_peers : Int32
+  after_peers : Int32
+  before_routes : Int32
+  after_routes : Int32
   changes : Array[SnapshotChange]
 } derive(ToJson)
 pub fn SnapshotReport::to_json(Self) -> Json
@@ -415,31 +415,31 @@ pub struct Source {
   file : String
   record : Int64
   offset : Int64
-  event_index : Int
+  event_index : Int32
   collector : String?
   view : String?
 } derive(Eq, Hash, ToJson)
 pub fn Source::equal(Self, Self) -> Bool
-pub fn Source::hash(Self) -> Int
+pub fn Source::hash(Self) -> Int32
 pub fn Source::hash_combine(Self, Hasher) -> Unit
 pub fn Source::not_equal(Self, Self) -> Bool
 pub fn Source::to_json(Self) -> Json
 
 pub struct StateChange {
   source : Source?
-  timestamp : UInt
-  microseconds : Int?
-  peer_asn : UInt
+  timestamp : UInt32
+  microseconds : Int32?
+  peer_asn : UInt32
   peer_ip : String
-  old_state : Int
-  new_state : Int
+  old_state : Int32
+  new_state : Int32
 } derive(ToJson)
 pub fn StateChange::to_json(Self) -> Json
 
 pub struct StorageStats {
-  route_keys : Int
-  unique_attribute_sets : Int
-  attribute_references : Int
+  route_keys : Int32
+  unique_attribute_sets : Int32
+  attribute_references : Int32
 } derive(ToJson)
 pub fn StorageStats::to_json(Self) -> Json
 
@@ -467,30 +467,30 @@ pub struct Summary {
   churn_alerts : Int64
   out_of_order : Int64
   session_resets : Int64
-  tracked_routes : Int
-  active_routes : Int
+  tracked_routes : Int32
+  active_routes : Int32
   mean_path_length : Double
-  max_path_length : Int
+  max_path_length : Int32
 } derive(ToJson)
 pub fn Summary::to_json(Self) -> Json
 
 pub struct Timeline {
   // private fields
 }
-pub fn Timeline::new(String, Analyzer, continuous? : Bool, gaps? : Array[ObservationGap], capacity? : Int, peer_asn? : UInt) -> Self raise ParseError
+pub fn Timeline::new(String, Analyzer, continuous? : Bool, gaps? : Array[ObservationGap], capacity? : Int32, peer_asn? : UInt32) -> Self raise ParseError
 pub fn Timeline::observe(Self, RouteEvent) -> Unit raise ParseError
 pub fn Timeline::record_batch(Self, Batch) -> Unit raise ParseError
 pub fn Timeline::report(Self) -> TimelineReport raise ParseError
 pub fn Timeline::seed(Self, RouteEvent) -> Unit raise ParseError
-pub fn Timeline::seed_peers(Self, PeerTable, UInt) -> Unit raise ParseError
+pub fn Timeline::seed_peers(Self, PeerTable, UInt32) -> Unit raise ParseError
 
 pub struct TimelineEntry {
-  timestamp : UInt
-  microseconds : Int?
+  timestamp : UInt32
+  microseconds : Int32?
   kind : String
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt?
+  path_id : UInt32?
+  peer_asn : UInt32?
   peer_ip : String?
   outbound : Bool?
   accepted : Bool
@@ -503,8 +503,8 @@ pub fn TimelineEntry::to_json(Self) -> Json
 
 pub struct TimelinePath {
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt
+  path_id : UInt32?
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   visibility : String
@@ -514,13 +514,13 @@ pub struct TimelinePath {
 pub fn TimelinePath::to_json(Self) -> Json
 
 pub struct TimelinePeer {
-  peer_asn : UInt
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   visibility : String
-  visible_paths : Int
-  not_visible_paths : Int
-  unobserved_paths : Int
+  visible_paths : Int32
+  not_visible_paths : Int32
+  unobserved_paths : Int32
   baseline_present : Bool
 } derive(ToJson)
 pub fn TimelinePeer::to_json(Self) -> Json
@@ -546,8 +546,8 @@ pub fn TimelineReport::with_correlation_keys(Self) -> Self raise ParseError
 pub struct VisibilityInterval {
   scope : String
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt
+  path_id : UInt32?
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   started_at : UInt64

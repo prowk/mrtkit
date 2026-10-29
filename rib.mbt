@@ -1,8 +1,8 @@
 ///|
 pub struct Peer {
-  bgp_id : UInt
+  bgp_id : UInt32
   address : String
-  asn : UInt
+  asn : UInt32
 } derive(ToJson)
 
 ///|
@@ -10,7 +10,7 @@ pub extend Peer with ToJson::{to_json}
 
 ///|
 pub struct PeerTable {
-  collector_id : UInt
+  collector_id : UInt32
   view_name : Bytes
   peers : Array[Peer]
 }
@@ -19,15 +19,15 @@ pub struct PeerTable {
 pub struct RouteEvent {
   schema_version : String
   source : Source?
-  timestamp : UInt
-  microseconds : Int?
+  timestamp : UInt32
+  microseconds : Int32?
   action : String
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt
+  path_id : UInt32?
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
-  originated : UInt?
+  originated : UInt32?
   attributes : Attributes
 } derive(ToJson)
 

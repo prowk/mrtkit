@@ -1,9 +1,9 @@
 ///|
 pub struct ObservationGap {
-  from_time : UInt
-  from_micros : Int
-  to_time : UInt
-  to_micros : Int
+  from_time : UInt32
+  from_micros : Int32
+  to_time : UInt32
+  to_micros : Int32
 } derive(ToJson)
 
 ///|
@@ -11,22 +11,22 @@ pub extend ObservationGap with ToJson::{to_json}
 
 ///|
 pub fn ObservationGap::new(
-  from_time : UInt,
-  to_time : UInt,
-  from_micros? : Int = 0,
-  to_micros? : Int = 0,
+  from_time : UInt32,
+  to_time : UInt32,
+  from_micros~ : Int32 = 0,
+  to_micros~ : Int32 = 0,
 ) -> ObservationGap {
   { from_time, to_time, from_micros, to_micros, }
 }
 
 ///|
 pub struct TimelineEntry {
-  timestamp : UInt
-  microseconds : Int?
+  timestamp : UInt32
+  microseconds : Int32?
   kind : String
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt?
+  path_id : UInt32?
+  peer_asn : UInt32?
   peer_ip : String?
   outbound : Bool?
   accepted : Bool
@@ -43,8 +43,8 @@ pub extend TimelineEntry with ToJson::{to_json}
 pub struct VisibilityInterval {
   scope : String
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt
+  path_id : UInt32?
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   started_at : UInt64
@@ -66,8 +66,8 @@ pub extend VisibilityInterval with ToJson::{to_json}
 ///|
 pub struct TimelinePath {
   prefix : String
-  path_id : UInt?
-  peer_asn : UInt
+  path_id : UInt32?
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   visibility : String
@@ -80,13 +80,13 @@ pub extend TimelinePath with ToJson::{to_json}
 
 ///|
 pub struct TimelinePeer {
-  peer_asn : UInt
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   visibility : String
-  visible_paths : Int
-  not_visible_paths : Int
-  unobserved_paths : Int
+  visible_paths : Int32
+  not_visible_paths : Int32
+  unobserved_paths : Int32
   baseline_present : Bool
 } derive(ToJson)
 
@@ -130,8 +130,8 @@ pub struct Timeline {
   priv prefix : String
   priv continuous : Bool
   priv gaps : Array[ObservationGap]
-  priv capacity : Int
-  priv peer_asn : UInt?
+  priv capacity : Int32
+  priv peer_asn : UInt32?
   priv entries : Array[TimelineEntry]
   priv intervals : Array[VisibilityInterval]
   priv peer_intervals : Array[VisibilityInterval]
@@ -147,10 +147,10 @@ pub struct Timeline {
 pub fn Timeline::new(
   prefix : String,
   analyzer : Analyzer,
-  continuous? : Bool = false,
-  gaps? : Array[ObservationGap] = [],
-  capacity? : Int = 1000000,
-  peer_asn? : UInt,
+  continuous~ : Bool = false,
+  gaps~ : Array[ObservationGap] = [],
+  capacity~ : Int32 = 1000000,
+  peer_asn? : UInt32,
 ) -> Timeline raise ParseError {
   if capacity < 1 {
     raise Invalid(0, "时间线容量必须为正数")
@@ -190,7 +190,7 @@ pub fn Timeline::new(
 pub fn Timeline::seed_peers(
   self : Timeline,
   table : PeerTable,
-  timestamp : UInt,
+  timestamp : UInt32,
 ) -> Unit raise ParseError {
   if event_time(timestamp, None) > self.analyzer.from_time {
     raise Invalid(0, "初始 peer 表晚于时间线窗口")
@@ -299,7 +299,7 @@ fn Timeline::interval(
   until : UInt64,
   closed_by : String,
   end_source : Source?,
-  scope? : String = "path",
+  scope~ : String = "path",
 ) -> VisibilityInterval? {
   let since = match trace.invisible_since {
     Some(t) => t
@@ -591,7 +591,7 @@ pub fn Timeline::record_batch(
 fn Timeline::update_peer(
   self : Timeline,
   event : RouteEvent,
-  seeding? : Bool = false,
+  seeding~ : Bool = false,
 ) -> Unit {
   let peer = peer_key(event.peer_asn, event.peer_ip, event.outbound)
   let time = event_time(event.timestamp, event.microseconds)

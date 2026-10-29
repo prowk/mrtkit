@@ -1,9 +1,9 @@
 ///|
 /// 低四位按接收规则忽略；原始编码仍保存在 raw_attributes 中。
 fn validate_attribute_flags(
-  flags : Int,
-  code : Int,
-  position : Int,
+  flags : Int32,
+  code : Int32,
+  position : Int32,
 ) -> Unit raise ParseError {
   let optional = (flags & 128) != 0
   let transitive = (flags & 64) != 0

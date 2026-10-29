@@ -3,17 +3,17 @@ priv struct Config {
   output_version : String?
   prefix : String?
   prefix_mode : String?
-  asn : UInt?
-  peer_asn : UInt?
-  path_id : UInt?
-  from_time : UInt
-  to_time : UInt
-  from_micros : Int?
-  to_micros : Int?
-  window_seconds : Int
-  threshold : Int
-  capacity : Int
-  top : Int?
+  asn : UInt32?
+  peer_asn : UInt32?
+  path_id : UInt32?
+  from_time : UInt32
+  to_time : UInt32
+  from_micros : Int32?
+  to_micros : Int32?
+  window_seconds : Int32
+  threshold : Int32
+  capacity : Int32
+  top : Int32?
   continuous_observation : Bool?
   observation_gaps : Array[WireGap]?
   mode : String
@@ -26,10 +26,10 @@ priv struct Config {
 
 ///|
 priv struct WireGap {
-  from_time : UInt
-  to_time : UInt
-  from_micros : Int
-  to_micros : Int
+  from_time : UInt32
+  to_time : UInt32
+  from_micros : Int32
+  to_micros : Int32
 } derive(@json.FromJson)
 
 ///|
@@ -80,8 +80,8 @@ pub fn stream_metrics(data : Bytes) -> String {
       events += batch.events.length()
     }
     Json::object({
-      "records": batches.length().to_json(),
-      "route_events": events.to_json(),
+      "records": Json(batches.length()),
+      "route_events": Json(events),
     }).stringify()
   } catch {
     @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
@@ -102,11 +102,8 @@ pub fn stream_end() -> String {
 let snapshots : Ref[(@mrt.Snapshot, @mrt.Snapshot)?] = Ref(None)
 
 ///|
-fn error_json(position : Int, message : String) -> String {
-  Json::object({
-    "error": Json::string(message),
-    "position": position.to_json(),
-  }).stringify()
+fn error_json(position : Int32, message : String) -> String {
+  Json::object({ "error": Json::string(message), "position": Json(position) }).stringify()
 }
 
 ///|
@@ -221,8 +218,8 @@ pub fn configure(text : String) -> String {
 fn consume_inner(
   data : Bytes,
   origin : (String, Int64, Int64)?,
-  emit? : Bool = true,
-  event_indices? : Array[Int],
+  emit~ : Bool = true,
+  event_indices? : Array[Int32],
 ) -> String {
   let current = match session.val {
     Some(s) => s
@@ -341,12 +338,12 @@ fn consume_inner(
       }
     }
     Json::object({
-      "lines": lines.to_json(),
-      "skipped": batch.skipped.to_json(),
-      "ignored_families": batch.ignored_families.to_json(),
-      "diagnostics": batch.diagnostics.to_json(),
-      "route_events": batch.events.length().to_json(),
-      "state_events": batch.states.length().to_json(),
+      "lines": Json(lines),
+      "skipped": Json(batch.skipped),
+      "ignored_families": Json(batch.ignored_families),
+      "diagnostics": Json(batch.diagnostics),
+      "route_events": Json(batch.events.length()),
+      "state_events": Json(batch.states.length()),
     }).stringify()
   } catch {
     @mrt.ParseError::Invalid(pos, message) => {
@@ -355,8 +352,8 @@ fn consume_inner(
         .unwrap_or(Json::null())
       session.val = None
       Json::object({
-        "error": message.to_json(),
-        "position": pos.to_json(),
+        "error": Json(message),
+        "position": Json(pos),
         "summary": summary,
       }).stringify()
     }
@@ -392,7 +389,7 @@ pub fn consume_selected(
   offset : Int64,
   indices : String,
 ) -> String {
-  let values : Array[Int] = @json.from_json(@json.parse(indices)) catch {
+  let values : Array[Int32] = @json.from_json(@json.parse(indices)) catch {
     _ => return error_json(0, "原始事件索引 JSON 无效")
   }
   consume_inner(data, Some((file, record, offset)), event_indices=values)
@@ -406,7 +403,7 @@ pub fn consume_selected_metrics(
   offset : Int64,
   indices : String,
 ) -> String {
-  let values : Array[Int] = @json.from_json(@json.parse(indices)) catch {
+  let values : Array[Int32] = @json.from_json(@json.parse(indices)) catch {
     _ => return error_json(0, "原始事件索引 JSON 无效")
   }
   consume_inner(
@@ -436,8 +433,8 @@ pub fn path_totals() -> String {
         Some(a) => {
           let totals = a.path_totals()
           Json::object({
-            "path_sum": totals.0.to_json(),
-            "path_samples": totals.1.to_json(),
+            "path_sum": Json(totals.0),
+            "path_samples": Json(totals.1),
           }).stringify()
         }
         None => error_json(0, "没有分析器")
@@ -447,7 +444,7 @@ pub fn path_totals() -> String {
 }
 
 ///|
-pub fn route_count() -> Int {
+pub fn route_count() -> Int32 {
   match session.val {
     Some(s) => s.analyzer.map(fn(a) { a.route_count() }).unwrap_or(-1)
     None => -1
@@ -478,7 +475,7 @@ pub fn csv_header() -> String {
 
 ///|
 pub fn canonical_prefix(text : String) -> String {
-  Json::object({ "prefix": @mrt.parse_prefix_text(text).text().to_json() }).stringify() catch {
+  Json::object({ "prefix": Json(@mrt.parse_prefix_text(text).text()) }).stringify() catch {
     @mrt.ParseError::Invalid(pos, message) => error_json(pos, message)
   }
 }
@@ -488,7 +485,7 @@ pub fn state() -> String {
   match session.val {
     Some(s) =>
       match s.analyzer {
-        Some(analyzer) => analyzer.route_states().to_json().stringify()
+        Some(analyzer) => Json(analyzer.route_states()).stringify()
         None => "[]"
       }
     None => error_json(0, "会话不可用")
@@ -525,7 +522,7 @@ pub fn state_export_begin() -> String {
 }
 
 ///|
-pub fn state_export_chunk(limit : Int) -> String {
+pub fn state_export_chunk(limit : Int32) -> String {
   if limit < 1 || limit > 1024 {
     return error_json(0, "状态分块须为 1..1024")
   }
@@ -543,7 +540,7 @@ pub fn state_export_chunk(limit : Int) -> String {
           if rows.is_empty() {
             s.state_export = None
           }
-          rows.to_json().stringify()
+          Json(rows).stringify()
         }
         None => error_json(0, "请先开始状态分块导出")
       }
@@ -557,15 +554,12 @@ pub fn drain_changes() -> String {
   match session.val {
     Some(s) => {
       let result = if s.config.correlation_keys.unwrap_or(false) {
-        s.pending_changes
-        .map(change => change.with_correlation_key())
-        .to_json()
-        .stringify() catch {
+        Json(s.pending_changes.map(change => change.with_correlation_key())).stringify() catch {
           @mrt.ParseError::Invalid(pos, message) =>
             return error_json(pos, message)
         }
       } else {
-        s.pending_changes.to_json().stringify()
+        Json(s.pending_changes).stringify()
       }
       s.pending_changes.clear()
       result

@@ -22,6 +22,7 @@ with zipfile.ZipFile(path) as archive:
     assert not forbidden, forbidden
     assert len(names) == len(set(names)), 'ZIP 条目重复'
     required = [str(file.relative_to(root)).replace('\\', '/') for file in (root / 'cli').iterdir() if file.suffix in ('.mjs', '.js', '.html')]
+    required += ['scripts/check_toolchain.mjs', '.moonbit-version', 'package.json']
     for name in required:
         assert name in names, f'缺少运行文件 {name}'
         # 打包器可能规范化换行；源文件与打包文本必须逐字相同。

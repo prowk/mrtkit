@@ -1,7 +1,7 @@
 ///|
 pub struct RouteSnapshot {
-  timestamp : UInt
-  microseconds : Int?
+  timestamp : UInt32
+  microseconds : Int32?
   active : Bool
   attributes : Attributes
   source : Source?
@@ -21,15 +21,15 @@ pub extend PathDiff with ToJson::{to_json}
 
 ///|
 pub struct OriginDiff {
-  before : UInt?
-  after : UInt?
+  before : UInt32?
+  after : UInt32?
 }
 
 ///|
 pub impl ToJson for OriginDiff with fn to_json(self) {
   Json::object({
-    "before": self.before.map(fn(n) { n.to_json() }).unwrap_or(Json::null()),
-    "after": self.after.map(fn(n) { n.to_json() }).unwrap_or(Json::null()),
+    "before": self.before.map(fn(n) { Json(n) }).unwrap_or(Json::null()),
+    "after": self.after.map(fn(n) { Json(n) }).unwrap_or(Json::null()),
   })
 }
 
@@ -45,8 +45,8 @@ pub struct HopDiff {
 ///|
 pub impl ToJson for HopDiff with fn to_json(self) {
   Json::object({
-    "before": self.before.map(fn(n) { n.to_json() }).unwrap_or(Json::null()),
-    "after": self.after.map(fn(n) { n.to_json() }).unwrap_or(Json::null()),
+    "before": self.before.map(fn(n) { Json(n) }).unwrap_or(Json::null()),
+    "after": self.after.map(fn(n) { Json(n) }).unwrap_or(Json::null()),
   })
 }
 
@@ -55,10 +55,10 @@ pub extend HopDiff with ToJson::{to_json}
 
 ///|
 pub struct CommunityDiff {
-  before : Array[UInt]
-  after : Array[UInt]
-  added : Array[UInt]
-  removed : Array[UInt]
+  before : Array[UInt32]
+  after : Array[UInt32]
+  added : Array[UInt32]
+  removed : Array[UInt32]
 } derive(ToJson)
 
 ///|
@@ -79,7 +79,7 @@ pub struct RouteDiff {
 pub extend RouteDiff with ToJson::{to_json}
 
 ///|
-fn unique_communities(values : Array[UInt]) -> Array[UInt] {
+fn unique_communities(values : Array[UInt32]) -> Array[UInt32] {
   let mut ordered = true
   for i = 1; i < values.length(); i = i + 1 {
     if values[i - 1] >= values[i] {
@@ -158,10 +158,10 @@ fn route_diff(a : Attributes, b : Attributes) -> RouteDiff {
 
 ///|
 pub struct LargeCommunityDiff {
-  before : Array[(UInt, UInt, UInt)]
-  after : Array[(UInt, UInt, UInt)]
-  added : Array[(UInt, UInt, UInt)]
-  removed : Array[(UInt, UInt, UInt)]
+  before : Array[(UInt32, UInt32, UInt32)]
+  after : Array[(UInt32, UInt32, UInt32)]
+  added : Array[(UInt32, UInt32, UInt32)]
+  removed : Array[(UInt32, UInt32, UInt32)]
 } derive(ToJson)
 
 ///|
@@ -169,8 +169,8 @@ pub extend LargeCommunityDiff with ToJson::{to_json}
 
 ///|
 fn unique_large_communities(
-  values : Array[(UInt, UInt, UInt)],
-) -> Array[(UInt, UInt, UInt)] {
+  values : Array[(UInt32, UInt32, UInt32)],
+) -> Array[(UInt32, UInt32, UInt32)] {
   let mut ordered = true
   for i = 1; i < values.length(); i = i + 1 {
     if values[i - 1].compare(values[i]) >= 0 {

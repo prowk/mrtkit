@@ -2,24 +2,24 @@
 pub struct Query {
   priv prefix : Prefix?
   priv prefix_mode : String
-  priv asn : UInt?
-  priv path_id : UInt?
-  priv from_time : UInt?
-  priv to_time : UInt?
-  priv from_micros : Int
-  priv to_micros : Int
+  priv asn : UInt32?
+  priv path_id : UInt32?
+  priv from_time : UInt32?
+  priv to_time : UInt32?
+  priv from_micros : Int32
+  priv to_micros : Int32
 }
 
 ///|
 pub fn Query::new(
   prefix? : String,
-  prefix_mode? : String = "exact",
-  asn? : UInt,
-  path_id? : UInt,
-  from_time? : UInt,
-  to_time? : UInt,
-  from_micros? : Int = 0,
-  to_micros? : Int = 999999,
+  prefix_mode~ : String = "exact",
+  asn? : UInt32,
+  path_id? : UInt32,
+  from_time? : UInt32,
+  to_time? : UInt32,
+  from_micros~ : Int32 = 0,
+  to_micros~ : Int32 = 999999,
 ) -> Query raise ParseError {
   match (from_time, to_time) {
     (Some(a), Some(b)) if a > b =>

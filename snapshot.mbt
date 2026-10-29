@@ -6,15 +6,15 @@ pub struct Snapshot {
   priv mut table_source : Source?
   priv peers : Map[String, Peer]
   priv routes : Map[String, RouteEvent]
-  priv capacity : Int
-  priv mut first_time : UInt?
-  priv mut last_time : UInt?
+  priv capacity : Int32
+  priv mut first_time : UInt32?
+  priv mut last_time : UInt32?
 }
 
 ///|
 pub fn Snapshot::new(
   collector : String,
-  capacity? : Int = 1000000,
+  capacity~ : Int32 = 1000000,
 ) -> Snapshot raise ParseError {
   if collector == "" || capacity < 1 {
     raise Invalid(0, "快照需要采集器名称和正数容量")
@@ -41,7 +41,7 @@ pub fn Snapshot::ingest(
   record : Int64,
   offset : Int64,
   query? : Query,
-  peer_asn? : UInt,
+  peer_asn? : UInt32,
 ) -> Unit raise ParseError {
   let frame = read_frame(data)
   if frame.header.kind != 13 || ![1, 2, 4, 8, 10].contains(frame.header.subtype) {
@@ -107,11 +107,11 @@ pub struct SnapshotChange {
   schema_version : String
   collector : String
   kind : String
-  peer_asn : UInt
+  peer_asn : UInt32
   peer_ip : String
   outbound : Bool
   prefix : String?
-  path_id : UInt?
+  path_id : UInt32?
   before : RouteEvent?
   after : RouteEvent?
   diff : RouteDiff?
@@ -129,12 +129,12 @@ pub struct SnapshotReport {
   interpretation : String
   before_source : Source?
   after_source : Source?
-  before_time : UInt?
-  after_time : UInt?
-  before_peers : Int
-  after_peers : Int
-  before_routes : Int
-  after_routes : Int
+  before_time : UInt32?
+  after_time : UInt32?
+  before_peers : Int32
+  after_peers : Int32
+  before_routes : Int32
+  after_routes : Int32
   changes : Array[SnapshotChange]
 } derive(ToJson)
 

@@ -15,16 +15,22 @@ jobs:
           python-version: '3.13'
       - name: 安装 MoonBit
         run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- '0.10.14+7d59c7ec9'
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- "$(cat .moonbit-version)"
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - name: 格式与接口检查
         run: |
-          moon version
+          moon version --all
+          npm run check:toolchain
           moon fmt --check
           moon info
           git diff --exit-code -- '*.mbti'
       - name: JS 库和 CLI 测试
         run: npm test
+      - name: README 示例
+        run: |
+          node cli/mrtkit.mjs parse fixtures/demo.mrt
+          node cli/mrtkit.mjs stats --threshold 3 fixtures/demo.mrt
+          node cli/mrtkit.mjs timeline --prefix 203.0.113.0/24 fixtures/demo.mrt
       - name: 独立对照工具契约
         run: |
           python -m pip install --target .validation/deps -r requirements-validation.txt

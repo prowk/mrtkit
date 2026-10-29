@@ -1,9 +1,9 @@
 ///|
 pub struct Header {
-  timestamp : UInt
-  kind : Int
-  subtype : Int
-  length : Int
+  timestamp : UInt32
+  kind : Int32
+  subtype : Int32
+  length : Int32
 } derive(Eq, ToJson)
 
 ///|
@@ -15,7 +15,7 @@ pub extend Header with ToJson::{to_json}
 ///|
 pub struct Frame {
   header : Header
-  microseconds : Int?
+  microseconds : Int32?
   payload : Bytes
 } derive(Eq)
 

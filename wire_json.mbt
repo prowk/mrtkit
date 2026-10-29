@@ -1,26 +1,26 @@
 ///|
 priv struct WireRawAttribute {
-  flags : Int
-  code : Int
-  value : Array[Int]
+  flags : Int32
+  code : Int32
+  value : Array[Int32]
 } derive(@json.FromJson)
 
 ///|
 priv struct WireAttributes {
-  origin : Int?
+  origin : Int32?
   path : Array[AsSegment]
   wire_path : Array[AsSegment]
   as4_path : Array[AsSegment]
   next_hop : String?
-  med : UInt?
-  local_pref : UInt?
+  med : UInt32?
+  local_pref : UInt32?
   atomic_aggregate : Bool
   aggregator : Aggregator?
   wire_aggregator : Aggregator?
   as4_aggregator : Aggregator?
   raw_attributes : Array[WireRawAttribute]
-  communities : Array[UInt]
-  large_communities : Array[(UInt, UInt, UInt)]
+  communities : Array[UInt32]
+  large_communities : Array[(UInt32, UInt32, UInt32)]
   other : Array[WireRawAttribute]
 } derive(@json.FromJson)
 
@@ -87,7 +87,7 @@ priv struct WireSemanticChange {
   kind : String
   before : WireSemanticSnapshot?
   after : WireSemanticSnapshot
-  churn_count : Int?
+  churn_count : Int32?
 } derive(@json.FromJson)
 
 ///|
@@ -152,17 +152,17 @@ pub fn correlation_semantics_from_json(
     "before": change.before
     .map(fn(s) {
       Json::object({
-        "active": s.active.to_json(),
-        "origin_as": origin_as(s.attributes.path).to_json(),
+        "active": Json(s.active),
+        "origin_as": Json(origin_as(s.attributes.path)),
         "attributes": semantic_attributes(s.attributes).to_json(),
       })
     })
     .unwrap_or(Json::null()),
     "after": Json::object({
-      "active": change.after.active.to_json(),
-      "origin_as": origin_as(change.after.attributes.path).to_json(),
+      "active": Json(change.after.active),
+      "origin_as": Json(origin_as(change.after.attributes.path)),
       "attributes": semantic_attributes(change.after.attributes).to_json(),
     }),
-    "churn_count": change.churn_count.to_json(),
+    "churn_count": Json(change.churn_count),
   }).stringify()
 }

@@ -2,15 +2,15 @@
 pub struct PeerRecord {
   peer : String
   data : Bytes
-  event_indices : Array[Int]
+  event_indices : Array[Int32]
 }
 
 ///|
 pub impl ToJson for PeerRecord with fn to_json(self) {
   Json::object({
-    "peer": self.peer.to_json(),
-    "data": self.data.to_array().map(fn(b) { b.to_int() }).to_json(),
-    "event_indices": self.event_indices.to_json(),
+    "peer": Json(self.peer),
+    "data": Json(self.data.to_array().map(fn(b) { b.to_int() })),
+    "event_indices": Json(self.event_indices),
   })
 }
 
@@ -20,12 +20,12 @@ pub extend PeerRecord with ToJson::{to_json}
 ///|
 pub struct PartitionedBatch {
   header : Header
-  microseconds : Int?
+  microseconds : Int32?
   skipped : Bool
-  ignored_families : Int
+  ignored_families : Int32
   diagnostics : Array[Diagnostic]
-  route_events : Int
-  state_events : Int
+  route_events : Int32
+  state_events : Int32
   peer_table : Bool
   parts : Array[PeerRecord]
 } derive(ToJson)
@@ -34,8 +34,8 @@ pub struct PartitionedBatch {
 pub extend PartitionedBatch with ToJson::{to_json}
 
 ///|
-fn partition_peer(asn : UInt, ip : String) -> String {
-  Json::array([asn.to_json(), ip.to_json()]).stringify()
+fn partition_peer(asn : UInt32, ip : String) -> String {
+  Json::array([Json(asn), Json(ip)]).stringify()
 }
 
 ///|
@@ -59,7 +59,7 @@ pub fn Decoder::partition_record(
     if count != batch.events.length() {
       raise Invalid(0, "分区条目数不一致")
     }
-    let groups : Map[String, Array[(Int, Int, Int)]] = Map([])
+    let groups : Map[String, Array[(Int32, Int32, Int32)]] = Map([])
     for index = 0; index < count; index = index + 1 {
       let start = 12 + c.pos
       ignore(c.u16())
@@ -131,7 +131,7 @@ pub fn Decoder::partition_record(
 /// 临时帧重新解码后恢复原始记录内索引；文件、记录号和偏移保持原始档案位置。
 pub fn Batch::with_event_indices(
   self : Batch,
-  indices : Array[Int],
+  indices : Array[Int32],
 ) -> Batch raise ParseError {
   if indices.length() != self.events.length() {
     raise Invalid(0, "原始事件索引数量不一致")
@@ -161,6 +161,6 @@ pub fn Analyzer::path_totals(self : Analyzer) -> (Int64, Int64) {
 }
 
 ///|
-pub fn Analyzer::route_count(self : Analyzer) -> Int {
+pub fn Analyzer::route_count(self : Analyzer) -> Int32 {
   self.routes.length()
 }

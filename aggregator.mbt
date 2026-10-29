@@ -1,6 +1,6 @@
 ///|
 pub struct Aggregator {
-  asn : UInt
+  asn : UInt32
   address : String
 } derive(Eq, Hash, ToJson, @json.FromJson)
 
@@ -43,7 +43,7 @@ pub impl ToJson for AggregatorDiff with fn to_json(self) {
 pub extend AggregatorDiff with ToJson::{to_json}
 
 ///|
-fn read_aggregator(c : Cursor, width : Int) -> Aggregator raise ParseError {
+fn read_aggregator(c : Cursor, width : Int32) -> Aggregator raise ParseError {
   if c.remaining() != width + 4 {
     raise Invalid(c.pos, "AGGREGATOR 长度与 ASN 编码宽度不匹配")
   }
@@ -56,7 +56,7 @@ fn read_aggregator(c : Cursor, width : Int) -> Aggregator raise ParseError {
 fn effective_aggregator(
   wire : Aggregator?,
   as4 : Aggregator?,
-  width : Int,
+  width : Int32,
 ) -> Aggregator? {
   match (wire, as4) {
     (Some(old), Some(new)) if width == 2 && old.asn == 23456U => Some(new)

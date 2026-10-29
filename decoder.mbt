@@ -1,12 +1,12 @@
 ///|
 pub struct Batch {
   header : Header
-  microseconds : Int?
+  microseconds : Int32?
   events : Array[RouteEvent]
   states : Array[StateChange]
   skipped : Bool
-  ignored_families : Int
-  message_type : Int?
+  ignored_families : Int32
+  message_type : Int32?
   diagnostics : Array[Diagnostic]
 } derive(ToJson)
 
@@ -91,7 +91,7 @@ pub fn Decoder::decode(self : Decoder, data : Bytes) -> Batch raise ParseError {
 pub struct StreamDecoder {
   priv decoder : Decoder
   priv mut pending : @buffer.Buffer
-  priv mut expected : Int
+  priv mut expected : Int32
   priv mut header_ready : Bool
   priv mut failed : Bool
 }

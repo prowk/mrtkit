@@ -1,8 +1,8 @@
 ///|
 fn sample_event(
-  timestamp : UInt,
+  timestamp : UInt32,
   action : String,
-  asns : Array[UInt],
+  asns : Array[UInt32],
 ) -> RouteEvent {
   {
     schema_version: "2.0",

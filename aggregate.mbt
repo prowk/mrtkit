@@ -17,9 +17,9 @@ pub struct Aggregation {
 ///|
 pub struct PrefixRanking {
   prefix : String
-  changed_events : Int
+  changed_events : Int32
   change_notices : Int64
-  affected_peers : Int
+  affected_peers : Int32
   change_types : Map[String, Int64]
 } derive(ToJson)
 
@@ -32,8 +32,8 @@ pub struct AggregationReport {
   scope : String
   deduplication : String
   ordering : String
-  changed_prefixes : Int
-  affected_peers : Int
+  changed_prefixes : Int32
+  affected_peers : Int32
   change_notices : Int64
   change_types : Map[String, Int64]
   top_prefixes : Array[PrefixRanking]
@@ -78,7 +78,7 @@ pub fn Aggregation::observe(
 ///|
 pub fn Aggregation::report(
   self : Aggregation,
-  top? : Int = 20,
+  top~ : Int32 = 20,
 ) -> AggregationReport raise ParseError {
   if top < 1 {
     raise Invalid(0, "排名条数必须为正数")

@@ -8,13 +8,13 @@ pub fn Change::correlation_key(self : Change) -> String raise ParseError {
   let rule = match self.kind {
     "path_change" =>
       Json::object({
-        "before": canonical_path(before.path).to_json(),
-        "after": canonical_path(after.path).to_json(),
+        "before": Json(canonical_path(before.path)),
+        "after": Json(canonical_path(after.path)),
       })
     "origin_change" =>
       Json::object({
-        "before": origin_as(before.path).to_json(),
-        "after": origin_as(after.path).to_json(),
+        "before": Json(origin_as(before.path)),
+        "after": Json(origin_as(after.path)),
       })
     "attribute_change" =>
       Json::object({
@@ -23,14 +23,14 @@ pub fn Change::correlation_key(self : Change) -> String raise ParseError {
       })
     "churn" =>
       Json::object({
-        "threshold": self.churn_count.to_json(),
-        "active": self.after.active.to_json(),
+        "threshold": Json(self.churn_count),
+        "active": Json(self.after.active),
       })
     _ => raise Invalid(0, "没有定义此变化类型的关联规则")
   }
   Json::object({
-    "prefix": self.prefix.to_json(),
-    "kind": self.kind.to_json(),
+    "prefix": Json(self.prefix),
+    "kind": Json(self.kind),
     "rule": rule,
   }).stringify()
 }

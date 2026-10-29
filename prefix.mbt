@@ -1,7 +1,7 @@
 ///|
 pub struct Prefix {
-  afi : Int
-  length : Int
+  afi : Int32
+  length : Int32
   address : Bytes
 } derive(Eq, ToJson)
 
@@ -12,7 +12,7 @@ pub extend Prefix with Eq::{equal, not_equal}
 pub extend Prefix with ToJson::{to_json}
 
 ///|
-fn address_size(afi : Int) -> Int raise ParseError {
+fn address_size(afi : Int32) -> Int32 raise ParseError {
   match afi {
     1 => 4
     2 => 16
@@ -21,7 +21,7 @@ fn address_size(afi : Int) -> Int raise ParseError {
 }
 
 ///|
-fn read_prefix(c : Cursor, afi : Int) -> Prefix raise ParseError {
+fn read_prefix(c : Cursor, afi : Int32) -> Prefix raise ParseError {
   let size = address_size(afi)
   let length = c.u8()
   if length > size * 8 {
@@ -40,7 +40,7 @@ fn read_prefix(c : Cursor, afi : Int) -> Prefix raise ParseError {
 }
 
 ///|
-pub fn parse_prefix(data : Bytes, afi : Int) -> Prefix raise ParseError {
+pub fn parse_prefix(data : Bytes, afi : Int32) -> Prefix raise ParseError {
   let c = Cursor::new(data)
   let prefix = read_prefix(c, afi)
   c.finish()

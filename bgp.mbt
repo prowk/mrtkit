@@ -1,12 +1,12 @@
 ///|
 pub struct StateChange {
   source : Source?
-  timestamp : UInt
-  microseconds : Int?
-  peer_asn : UInt
+  timestamp : UInt32
+  microseconds : Int32?
+  peer_asn : UInt32
   peer_ip : String
-  old_state : Int
-  new_state : Int
+  old_state : Int32
+  new_state : Int32
 } derive(ToJson)
 
 ///|
@@ -14,19 +14,19 @@ pub extend StateChange with ToJson::{to_json}
 
 ///|
 pub struct BgpRecord {
-  message_type : Int
+  message_type : Int32
   events : Array[RouteEvent]
   states : Array[StateChange]
-  ignored_families : Int
-  ignored : Array[(Int, Int)]
+  ignored_families : Int32
+  ignored : Array[(Int32, Int32)]
 }
 
 ///|
 fn read_nlri_paths(
   c : Cursor,
-  afi : Int,
+  afi : Int32,
   addpath : Bool,
-) -> Array[(String, UInt?)] raise ParseError {
+) -> Array[(String, UInt32?)] raise ParseError {
   let prefixes = []
   while c.remaining() > 0 {
     let id = if addpath { Some(c.u32()) } else { None }
@@ -38,13 +38,13 @@ fn read_nlri_paths(
 ///|
 fn make_event(
   frame : Frame,
-  peer_asn : UInt,
+  peer_asn : UInt32,
   peer_ip : String,
   outbound : Bool,
   action : String,
   prefix : String,
   attributes : Attributes,
-  path_id? : UInt,
+  path_id? : UInt32,
 ) -> RouteEvent {
   {
     schema_version: "2.0",

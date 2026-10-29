@@ -1,7 +1,7 @@
 ///|
 pub struct AsSegment {
-  kind : Int
-  asns : Array[UInt]
+  kind : Int32
+  asns : Array[UInt32]
 } derive(Eq, Hash, ToJson, @json.FromJson)
 
 ///|
@@ -18,17 +18,17 @@ pub extend AsSegment with @json.FromJson::{from_json}
 
 ///|
 pub struct RawAttribute {
-  flags : Int
-  code : Int
+  flags : Int32
+  code : Int32
   value : Bytes
 } derive(Eq, Hash)
 
 ///|
 pub impl ToJson for RawAttribute with fn to_json(self) {
   Json::object({
-    "flags": self.flags.to_json(),
-    "code": self.code.to_json(),
-    "value": self.value.to_array().map(fn(b) { b.to_int() }).to_json(),
+    "flags": Json(self.flags),
+    "code": Json(self.code),
+    "value": Json(self.value.to_array().map(fn(b) { b.to_int() })),
   })
 }
 
@@ -43,20 +43,20 @@ pub extend RawAttribute with ToJson::{to_json}
 
 ///|
 pub struct Attributes {
-  origin : Int?
+  origin : Int32?
   path : Array[AsSegment]
   wire_path : Array[AsSegment]
   as4_path : Array[AsSegment]
   next_hop : String?
-  med : UInt?
-  local_pref : UInt?
+  med : UInt32?
+  local_pref : UInt32?
   atomic_aggregate : Bool
   aggregator : Aggregator?
   wire_aggregator : Aggregator?
   as4_aggregator : Aggregator?
   raw_attributes : Array[RawAttribute]
-  communities : Array[UInt]
-  large_communities : Array[(UInt, UInt, UInt)]
+  communities : Array[UInt32]
+  large_communities : Array[(UInt32, UInt32, UInt32)]
   other : Array[RawAttribute]
 } derive(Eq, Hash, ToJson)
 
@@ -91,7 +91,7 @@ fn empty_attributes() -> Attributes {
 }
 
 ///|
-fn read_as_path(c : Cursor, width : Int) -> Array[AsSegment] raise ParseError {
+fn read_as_path(c : Cursor, width : Int32) -> Array[AsSegment] raise ParseError {
   let segments = []
   while c.remaining() > 0 {
     let kind = c.u8()
@@ -117,13 +117,13 @@ fn read_as_path(c : Cursor, width : Int) -> Array[AsSegment] raise ParseError {
 ///|
 pub fn parse_attributes(
   data : Bytes,
-  asn_width : Int,
+  asn_width : Int32,
 ) -> Attributes raise ParseError {
   if asn_width != 2 && asn_width != 4 {
     raise Invalid(0, "ASN 宽度必须为 2 或 4")
   }
   let c = Cursor::new(data)
-  let seen : Map[Int, Bool] = Map([])
+  let seen : Map[Int32, Bool] = Map([])
   let mut origin = None
   let mut path = []
   let mut as4_path = []
@@ -238,7 +238,7 @@ pub fn parse_attributes(
 
 ///|
 /// AS_SET 计一个跳数，联盟路径不参与常规路径长度统计。
-pub fn path_length(path : Array[AsSegment]) -> Int {
+pub fn path_length(path : Array[AsSegment]) -> Int32 {
   let mut length = 0
   for segment in path {
     if segment.kind == 1 {
@@ -253,7 +253,7 @@ pub fn path_length(path : Array[AsSegment]) -> Int {
 
 ///|
 /// 末段为 AS_SET 时无法唯一确定起源 AS。
-pub fn origin_as(path : Array[AsSegment]) -> UInt? {
+pub fn origin_as(path : Array[AsSegment]) -> UInt32? {
   for i = path.length() - 1; i >= 0; i = i - 1 {
     let segment = path[i]
     if segment.kind == 1 {

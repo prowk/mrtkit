@@ -2,8 +2,8 @@
 fn scoped_sample(
   collector : String,
   view : String,
-  time : UInt,
-  asn : UInt,
+  time : UInt32,
+  asn : UInt32,
 ) -> RouteEvent {
   {
     ..sample_event(time, "announce", [asn]),
