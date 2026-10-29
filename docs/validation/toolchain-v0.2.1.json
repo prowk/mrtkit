@@ -1,0 +1,156 @@
+{
+  "schema_version": "2.0",
+  "type": "toolchain_rectification_verification",
+  "date": "2026-10-29",
+  "source_revision": "09a5abdeed80cba9ef347141ba85d9e5228b8ca9",
+  "compiler": "v0.10.18+6c83a7f62 (2026-10-28)",
+  "moon": "moon 0.1.20261028 (e1e1f15 2026-10-28)\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
+  "minimum_moonc": "0.10.16",
+  "pinned_toolchain": "0.10.18+6c83a7f62",
+  "hash_encoding": "sha256 of UTF-8 text with LF normalized line endings",
+  "source_sha256": {
+    ".github/workflows/ci.yml": "124b9f8bbe0835dff19d64978b9ce2aa612bc96bde01e451bd2cfc27ca905759",
+    ".github/workflows/copilot-setup-steps.yml": "2ee86bcd3bbc32973b0159623effa45101ce1be76e81201e559d94c0185a3a56",
+    "aggregate.mbt": "ce46ab3fcfeee86818fc8d8063e1fd151fe51e6f2be4cc50a027b149ad291636",
+    "aggregator.mbt": "2f5c4eba0f0f0f58c10439e30acf0bb45ece368e529d8c22dd1b89e1e14ffe2a",
+    "analysis.mbt": "bbc59eb306977247e049c637e37cebed00c9be184e6ba8a13a95449d44d9e2b4",
+    "as4.mbt": "bb2e0154f8b44952d620f48e5cc0f75f7b19fba63c5d409be6821596f1bfe105",
+    "attribute_context.mbt": "7a8c79530781e76e398e9b9889973f6e3997a72069b9f8b99a8e6d0bee6cc331",
+    "attribute_flags.mbt": "d0a4865a800925aa972ca8040db7b3206e5f88ea22221c13f5274d5370b8be86",
+    "attributes.mbt": "fb2dd465fc30543840c95e00a1c5f81333a382c9ccc998fffa0cd485341823b9",
+    "bgp.mbt": "d28c3bcf67f3769e96b7803a0cd7ed05a118806b28a01e9245de370e5bcb6657",
+    "bridge/bridge.mbt": "2910c5a4cf6b658afd79135d3c8fef0cb722b8d33658cffddd2865b71300ccb6",
+    "bridge/pkg.generated.mbti": "a499695152efd3043d6cdb53eb417a84ab033d40f74136616496d557192ad0e8",
+    "cli/bundle.mjs": "d84678f64f4c4e3d31106b17eaf107c31918db0588b250eb8294f21c1f283f4e",
+    "cli/compact-changes.mjs": "80b19347fcc75fff543e542d59b512ec5344b94c5d572a3b2f737aef1d95b715",
+    "cli/correlate-external.mjs": "a3ccc771c5ffe138b8a36ebfb0643051e0452b99312325e5cc461b524b175fbc",
+    "cli/correlate.mjs": "023453d10fcf0d71a66fb3454ee95c18ae1189376d53887daf2d8f68a82e2f83",
+    "cli/diagnostics.mjs": "63064e1535832860b8c2a1d3297d7022d9cfb86ace8bd05b3f30814c219de4d2",
+    "cli/disk-replay-worker.mjs": "419c0843e764a23c5041da79a1a3933b83744233626ae04388ae05079ba28fda",
+    "cli/disk-replay.mjs": "64cf41cb5b24ff59f6a111cc52dc65a3f61b85da6839413704d706af940a9702",
+    "cli/disk-storage.mjs": "d8626856f4e273b5bfd47e974683e6d4fb2c7445b3d8e02085d59b2d1d83a175",
+    "cli/external-sort.mjs": "5b3b1549740f09d885a56328f8f003c3552ce7d36e603f21c7ce4ce3c1383643",
+    "cli/input.mjs": "91a4fc108201df7d9e5002fb520dba3bb9b3694007fcb658bc83693820d69edc",
+    "cli/mrtkit.mjs": "09d9bb833bae02b7dc930983bf3a2f93aed54462fe76d8f6ee3d2b410f6543f8",
+    "cli/multi.mjs": "6e2f4eab6a3a4a0022f71a454be93f7a0191dc8956bd6bfe795acb1120051867",
+    "cli/options.mjs": "ed80c347858142f483afa1ffb9b506e2f17e5e18b0506fadf27f87fd2af2fd75",
+    "cli/replay-resources.mjs": "29bd049444d2131a970d3c9bb9726bfc595018d44421d48ccee7c16dca8db25b",
+    "cli/report-app.js": "84a17761731f4a2f8f84a479e3beac5bc49795679db287f47a4bb303fa864eef",
+    "cli/report-correlation.mjs": "51ad7eae6a324b00c90b10c8fc55a178516de836cb2450ba449634138474a734",
+    "cli/report-data.mjs": "20220e17ed1d90c0b523a60a33089332380b9fbbd6ec77b41f5b2db9e7d4fb9b",
+    "cli/report.html": "35c51a4a35ccc44dccb8d1a195acd1601a128e82d80e1b61222408797f38c48b",
+    "cli/report.mjs": "2c0905d442512a2bfb4acabf420e8f9c5cd3629d1111301dd9dac20cba03c20a",
+    "cli/validation.mjs": "3f2421fe48181c43dfcf46b366525d9c53c26c5ed231c63e0581765022df7034",
+    "correlation.mbt": "162ea9954d547c8df8896b793227118c75c420d7d50136d1a37c9a350b8e70d6",
+    "cursor.mbt": "be1cc3b5203f44cede4ca532549d2c347ab3cd207217129912751f715cf9259e",
+    "decoder.mbt": "a4887faf567c28419b8aef174792d615867d72eb21d9da9816e178b350f605b2",
+    "diagnostics.mbt": "96a726d24d05c3d65ff20ce0f68c465ed3e105c50ddfbf52de3801b0da5621d6",
+    "diff.mbt": "c610c8ea9a6cfadde0b062b5ad24c4e79ead1ee5c205ce980b45ee7d6d0a3034",
+    "errors.mbt": "c6f990fa29a2178f29cbbd4341f9de28455be8f6d2e6a00219b8c6ca6765f998",
+    "frame.mbt": "5ae3eb36f134474033d05637bdabd1423b492bb07fcd56c0ae19b3f784596309",
+    "moon.mod": "bbedc7d9e3b09694ce7b787326b7f195b648dcece80e4d6db77eee3562488c44",
+    "moonbit-toolchain.version": "c2a48cd0c6cb8d227510bfd211adf0cb2a9fcc724304edbf4a8a5102a510e3d5",
+    "multiprotocol.mbt": "977f6a9b93434bde8db2e499d832a8e1cae3b516de2ae04606cc693b83838817",
+    "package.json": "ff60b1905a0bcaf4951d16a487066de0a23ceb96d69e15276dc6ebd2496c71be",
+    "partition.mbt": "734d58cb6678973c6c78ed825cf7c49dba8bdee71cdbd5736e129e465aad015c",
+    "pkg.generated.mbti": "44d973d5df83a8707af8e984d96aacf8b6fdf72e33da1d1a0ee1dfd20e731da5",
+    "prefix.mbt": "64b6fa7bbf706b2023417ba1c6a0ad40152da69f90c89874341a247b8a14c5af",
+    "prefix_text.mbt": "8b174f92e568a74172a31538671b981963efe86c541f2f66a8569b3508670716",
+    "provenance.mbt": "fb5870ee0bba34afa3e7ce84a2a8b41a3c57f95450eafc015aef4ac1fb11f901",
+    "query.mbt": "901f1447b21e88cc65cdbe85d854c29dc1c6d9c37878060954121793fd943578",
+    "rib.mbt": "6803e9db43ba87c516ac45a599b11254db932700e9acd24b974fcdbf4f889be5",
+    "scripts/check_toolchain.mjs": "bfd2079959d802f71d484d36a5cf94700f0f21fed2c5038fc0558e14ff933f08",
+    "semantics.mbt": "4420110dd1510d619400b91b67503ee3feb2392a4714a3459631da2ede2ffd96",
+    "snapshot.mbt": "62d9d807a5e89551fbbd8244b99f2318469cad6a062e06d1004544afcb43c425",
+    "storage.mbt": "f3d7c87ebcb74097e62a937629767130e5b2331fb1cb002938d34106845a999f",
+    "tests/toolchain.test.mjs": "15e64aecac7018f22334dd6d61d4a788a033f81efad887d69b7b457d5c4ecf0a",
+    "timeline.mbt": "6cb7316c04ca8cb8b2af3b438008f8608b0d4a3ca9ecddd8dae178d877425ad5",
+    "wire_json.mbt": "6176f1a462dda17f0e724a0d3b9209389f5eef03e3584d0deae8e3f208e2cf72"
+  },
+  "compiled_bridge_sha256": "8c6ca2987f635c7e1c7aff07e40d68a2cc6ca883e07ac9d7be743a4147bb119e",
+  "tests": {
+    "js": {
+      "passed": 58,
+      "failed": 0
+    },
+    "wasm": {
+      "passed": 58,
+      "failed": 0
+    },
+    "wasm_gc": {
+      "passed": 58,
+      "failed": 0
+    },
+    "node": {
+      "passed": 112,
+      "failed": 0
+    },
+    "python_compare": {
+      "passed": 3,
+      "failed": 0
+    },
+    "python_state_model": {
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "public_interfaces": "No change after normalizing legacy Int/UInt spellings to Int32/UInt32",
+  "examples_verified": [
+    {
+      "command": [
+        "node",
+        "cli/mrtkit.mjs",
+        "--version"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "node",
+        "cli/mrtkit.mjs",
+        "parse",
+        "fixtures/demo.mrt"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "node",
+        "cli/mrtkit.mjs",
+        "stats",
+        "--threshold",
+        "3",
+        "fixtures/demo.mrt"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "node",
+        "cli/mrtkit.mjs",
+        "timeline",
+        "--prefix",
+        "203.0.113.0/24",
+        "fixtures/demo.mrt"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "js_node_log_sha256": "c7fd83225a7c155616f813f69b5c832ed425d3a1d6d0c7aefe42460c5b4a4e10",
+  "python_compare_log_sha256": "fffa69bb48359140c30b8f4af375f7e9305886cbdd2de68b3b576bd8534b9c15",
+  "ci": {
+    "tested_core_revision": "7f8d91e481874ef24b1dfffac0f5e6c90a901e4e",
+    "verification_url": "https://github.com/prowk/mrtkit/actions/runs/40885941955",
+    "verification_result": "success",
+    "setup_url": "https://github.com/prowk/mrtkit/actions/runs/40885941922",
+    "setup_result": "success",
+    "note": "This subsequent source revision only renames and includes the pinned-version file; final release also requires successful CI for its exact HEAD."
+  },
+  "browser": {
+    "status": "deferred_by_user",
+    "date": "2026-10-29",
+    "reason": "file:// navigation explicitly denied, including alternative browser surfaces and indirect workarounds",
+    "user_instruction": "先完成其余整改，保留浏览器待办"
+  },
+  "historical_measurements": "v0.2.0 archive comparisons and full replay/compact/correlation/report performance remain bound to their original compiler/source; not rerun or relabeled as v0.2.1 measurements"
+}

@@ -45,6 +45,8 @@ MoonBit 项目可用 `moon add prowk/mrtkit@0.2.1` 引入核心库。完整安�
 
 浏览器工具禁止本地文件自动化，真实浏览器的离线布局与性能验收按用户要求保留待办；页面逻辑和分块加载已通过自动测试。
 
+上面的长时资源测量属于 v0.2.0 原工具链；v0.2.1 的编译器升级、输出兼容和回归结果见[工具链整改复验](docs/validation/v0.2.1-acceptance.md)。
+
 ```sh
 npm test
 moon test --target wasm --deny-warn
