@@ -3,6 +3,16 @@ import {join,resolve} from 'node:path';
 import {demo,bgpUpdate,attributes,attr,mrt,cat,u16,u32} from './fixtures.mjs';
 import {saveJson,fileHash} from '../cli/archive.mjs';
 
+export async function performanceCase(directory){await mkdir(directory,{recursive:false});const start=1700010000,records=[];
+  for(let i=0;i<10000;i++){const time=start+i,origin=65536+i%2,prefix=Buffer.from([24,203,0,113]);
+    const path=attributes(i%1000===0?[64512,...Array.from({length:32},(_,j)=>64520+j),origin]:[64512,origin]);
+    if(i%5===0){const hop=Buffer.from('20010db8000000000000000000000001','hex'),v6=Buffer.from('2020010db8','hex');records.push(bgpUpdate(undefined,undefined,cat(path,attr(14,cat(u16(2),Buffer.from([1,16]),hop,Buffer.from([0]),v6),128)),time));}
+    else records.push(bgpUpdate(prefix,undefined,path,time));
+  }
+  await writeFile(join(directory,'updates.mrt'),cat(...records));const window={from_us:String(BigInt(start)*1000000n),to_us:String(BigInt(start+10000)*1000000n)};
+  const plan={schema_version:'1.0',type:'archive_plan',case_kind:'synthetic_performance',window,collectors:[{collector:'synthetic-load <img src=x onerror=alert(1)>',view:'default',continuous:false,files:[{path:'updates.mrt',kind:'update',...window,sha256:await fileHash(join(directory,'updates.mrt'))}]}]},rules={schema_version:'1.0',version:'fixed-online-10000-1',...window,bucket_us:'60000000',continuous:false,capacity:20000,max_bytes:536870912,sequence_prefix:'203.0.113.0/24'};await saveJson(join(directory,'manifest.json'),plan);await saveJson(join(directory,'rules.json'),rules);return {manifest:join(directory,'manifest.json'),rules:join(directory,'rules.json')};
+}
+
 // 精选人工案例固定时间、路径和字节；绝不改写真实案例为人工多采集器。
 export async function syntheticCase(directory){await mkdir(directory,{recursive:false});const time=1700001000,prefix=Buffer.from([24,203,0,113]),child=Buffer.from([25,203,0,113,0]);let cut=0;const data=demo();for(let i=0;i<2;i++)cut+=12+data.readUInt32BE(cut+8);const rib=Buffer.from(data.subarray(0,cut));let at=0;while(at<rib.length){rib.writeUInt32BE(time,at);at+=12+rib.readUInt32BE(at+8);}
   function addpath(id,withdraw,offset,afi=1){const nlri=cat(u32(id),afi===1?prefix:Buffer.from('2020010db8','hex'));let announced=Buffer.alloc(0),withdrawn=Buffer.alloc(0),attrs=withdraw?Buffer.alloc(0):attributes([64512,65536]);if(afi===1){if(withdraw)withdrawn=nlri;else announced=nlri;}else attrs=cat(attrs,attr(withdraw?15:14,withdraw?cat(u16(2),Buffer.from([1]),nlri):cat(u16(2),Buffer.from([1,16]),Buffer.from('20010db8000000000000000000000001','hex'),Buffer.from([0]),nlri),128));const body=cat(u16(withdrawn.length),withdrawn,u16(attrs.length),attrs,announced),message=cat(Buffer.alloc(16,255),u16(19+body.length),Buffer.from([2]),body);return mrt(17,9,cat(u32(id*100+1),u32(64512),u32(64513),u16(0),u16(1),Buffer.from([192,0,2,1,192,0,2,2]),message),time+offset);}

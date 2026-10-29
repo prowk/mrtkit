@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "declared_before_measurement": true,
+  "workload": {"kind": "fixed_synthetic_update_window", "events": 10000, "generator": "scripts/investigation_cases.mjs:performanceCase", "long_sequence_asns": 34, "ipv6": true, "malicious_collector_label": true, "detail_page_rows": 100, "display_page_rows": 50, "catalog_chunk_rows": 1024},
+  "conditions": {"transport": "public_https_github_pages", "network": "browser_default_unthrottled_no_network_emulation", "desktop": [1280, 900], "narrow": [390, 844], "repetitions": 1},
+  "targets": {"first_screen_ms": 3000, "combined_filter_ms": 3000, "next_page_ms": 1000, "renderer_js_heap_bytes": 268435456},
+  "limits": "Online synthetic report only. Does not replace the existing fixed 100000-notice local-file report. Process RSS is unavailable through browser tooling; record renderer JS heap separately."
+}

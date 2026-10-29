@@ -31,6 +31,6 @@ node cli/mrtkit.mjs cache --plan .validation/plan.json --directory .validation/c
 
 既有完整回放与大规模关联仍使用[磁盘回放](disk-replay.md)、[外部排序关联](external-correlation.md)和[紧凑编码](../reference/compact-changes.md)。从固定样本开始的关联与报告完整流程见[HTML 报告](html-report.md)，内存模式适合受容量约束的小结果，外排模式输出分离的 groups/observations JSONL，再用 `report --correlation` 接入。
 
-精选静态案例通过 `node scripts/build_site.mjs --output .validation/pages` 构建，默认大小预算 16 MiB，`site-manifest.json` 记录案例版本、字节数和资源 SHA-256。仅包含入口、真实单观测点摘录、明确标注的人工案例、报告与来源说明；全部相对路径兼容 `/mrtkit/` 和案例深层链接。首次发布在仓库 Settings → Pages 将 Source 设为 GitHub Actions，之后独立 `pages.yml` 上传专用产物并部署；不重新执行全量 RIB 基准。在线入口为 [GitHub Pages 案例](https://prowk.github.io/mrtkit/)，这是静态预览，不提供服务器分析服务。
+精选静态案例通过 `node scripts/build_site.mjs --output .validation/pages` 构建，默认大小预算 16 MiB；Pages 工作流另显式包含固定 10,000 事件人工性能案例，使用 128 MiB 产物预算，`site-manifest.json` 记录案例版本、字节数和资源 SHA-256。仅包含入口、真实单观测点摘录、明确标注的人工案例、报告与来源说明；全部相对路径兼容 `/mrtkit/` 和案例深层链接。首次发布在仓库 Settings → Pages 将 Source 设为 GitHub Actions，之后独立 `pages.yml` 上传专用产物并部署；不重新执行全量 RIB 基准。在线入口为 [GitHub Pages 案例](https://prowk.github.io/mrtkit/)，这是静态预览，不提供服务器分析服务。
 
 真实浏览器的 `file://` 验收受工具策略限制，已按用户授权跳过；HTTP/HTTPS 检查不替代离线性能验收。

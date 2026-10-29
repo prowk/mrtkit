@@ -34,7 +34,7 @@ jobs:
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - run: npm run build
       - name: 构建精选静态案例（不执行全量 RIB 基准）
-        run: node scripts/build_site.mjs --output .validation/pages
+        run: node scripts/build_site.mjs --output .validation/pages --performance true --max-bytes 134217728
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
