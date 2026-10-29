@@ -11,6 +11,12 @@ options(
   link: {
     "js": {
       "exports": [
+        "investigation_configure",
+        "investigation_reset_file",
+        "investigation_consume",
+        "investigation_finish",
+        "investigation_match",
+        "investigation_summary",
         "configure",
         "correlation_key_from_json",
         "correlation_semantics_from_json",

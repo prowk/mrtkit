@@ -30,6 +30,7 @@ MoonBit 项目可用 `moon add prowk/mrtkit@0.2.1` 引入核心库。完整安�
 - 显式采集器/视图隔离回放，按 peer 磁盘分区保存完整逻辑状态。
 - 有界内存的跨观测点语义关联、分离式摘要/观测导出，以及可选紧凑变化流。
 - 离线 HTML 展示可读属性差异、关联组与来源跳转，提供倒排筛选、分页、取消和重置。
+- 调查规则、MOAS 区间、更具体前缀检查、窗口对比与路径演变；[操作流程](docs/guides/investigation.md)和[在线静态案例](https://prowk.github.io/mrtkit/)。
 
 从[多采集器示例](docs/guides/multi-collector.md)开始，或查看[固定真实案例](cases/rrc23-path-change/README.md)。
 

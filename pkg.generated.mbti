@@ -16,6 +16,14 @@ pub fn event_csv(RouteEvent) -> String
 
 pub fn event_json(RouteEvent) -> String
 
+pub fn investigation_filter_metadata(String, String) -> Bool raise ParseError
+
+pub fn investigation_match_json(String, String) -> Bool raise ParseError
+
+pub fn investigation_source_id(Source?) -> String
+
+pub fn investigation_summary_json(String, String) -> Json raise ParseError
+
 pub fn origin_as(Array[AsSegment]) -> UInt32?
 
 pub fn parse_attributes(Bytes, Int32) -> Attributes raise ParseError
@@ -81,6 +89,26 @@ pub struct AggregatorDiff {
 }
 pub fn AggregatorDiff::to_json(Self) -> Json
 pub impl ToJson for AggregatorDiff
+
+pub struct AnalysisQuery {
+  side : String?
+  origin_asns : Array[UInt32]?
+  path_asns : Array[UInt32]?
+  communities : Array[UInt32]?
+  origin_unknown : Bool?
+  prefix : String?
+  prefix_mode : String?
+  peer_asn : UInt32?
+  outbound : Bool?
+  path_id : UInt32?
+  collector : String?
+  view : String?
+  from_us : UInt64?
+  to_us : UInt64?
+  kind : String?
+} derive(ToJson, @json.FromJson)
+pub fn AnalysisQuery::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AnalysisQuery::to_json(Self) -> Json
 
 pub struct Analyzer {
   // private fields
@@ -188,6 +216,13 @@ pub struct CommunityDiff {
 } derive(ToJson)
 pub fn CommunityDiff::to_json(Self) -> Json
 
+pub struct ComparisonWindow {
+  from_us : UInt64
+  to_us : UInt64
+} derive(ToJson, @json.FromJson)
+pub fn ComparisonWindow::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComparisonWindow::to_json(Self) -> Json
+
 pub struct Decoder {
   // private fields
 }
@@ -207,6 +242,14 @@ pub struct Diagnostic {
   source : Source?
 } derive(ToJson)
 pub fn Diagnostic::to_json(Self) -> Json
+
+pub struct FocusRule {
+  prefix : String
+  expected_origins : Array[UInt32]?
+  allowed_more_specifics : Array[String]?
+} derive(ToJson, @json.FromJson)
+pub fn FocusRule::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FocusRule::to_json(Self) -> Json
 
 pub struct Frame {
   header : Header
@@ -232,6 +275,89 @@ pub struct HopDiff {
 }
 pub fn HopDiff::to_json(Self) -> Json
 pub impl ToJson for HopDiff
+
+pub struct Investigation {
+  // private fields
+}
+pub fn Investigation::new(String) -> Self raise ParseError
+pub fn Investigation::observe(Self, RouteEvent, baseline? : Bool) -> Unit raise ParseError
+pub fn Investigation::observe_state(Self, StateChange) -> Unit raise ParseError
+pub fn Investigation::report(Self) -> Json raise ParseError
+
+pub struct InvestigationEvent {
+  id : String
+  time_us : UInt64
+  prefix : String
+  peer : String
+  peer_asn : UInt32
+  peer_ip : String
+  outbound : Bool
+  path_id : UInt32?
+  source : Source?
+  kind : String
+  accepted : Bool
+  changes_state : Bool
+  before : RouteSnapshot?
+  after : RouteSnapshot?
+  changes : Array[Change]
+  selected : Bool
+  before_path : Json?
+  after_path : Json?
+} derive(ToJson)
+pub fn InvestigationEvent::to_json(Self) -> Json
+
+pub struct InvestigationGap {
+  from_us : UInt64
+  to_us : UInt64
+  collector : String?
+  view : String?
+} derive(ToJson, @json.FromJson)
+pub fn InvestigationGap::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InvestigationGap::to_json(Self) -> Json
+
+pub struct InvestigationInterval {
+  key : String
+  prefix : String
+  peer : String
+  peer_asn : UInt32
+  peer_ip : String
+  outbound : Bool
+  collector : String?
+  view : String?
+  path_id : UInt32?
+  from_us : UInt64
+  to_us : UInt64
+  state : String
+  duration_us : UInt64?
+  left_censored : Bool
+  right_censored : Bool
+  start_source : Source?
+  end_source : Source?
+  origin_as : UInt32?
+  path_length : Int32?
+} derive(ToJson)
+pub fn InvestigationInterval::to_json(Self) -> Json
+
+pub struct InvestigationRules {
+  schema_version : String
+  version : String
+  from_us : UInt64
+  to_us : UInt64
+  bucket_us : UInt64?
+  incident_us : UInt64?
+  capacity : Int32?
+  max_bytes : Int32?
+  continuous : Bool?
+  gaps : Array[InvestigationGap]?
+  focus : Array[FocusRule]?
+  query : AnalysisQuery?
+  comparison : Array[ComparisonWindow]?
+  sequence_prefix : String?
+  scope_prefixes : Array[String]?
+  scope_peer_asns : Array[UInt32]?
+} derive(ToJson, @json.FromJson)
+pub fn InvestigationRules::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InvestigationRules::to_json(Self) -> Json
 
 pub struct LargeCommunityDiff {
   before : Array[(UInt32, UInt32, UInt32)]
@@ -418,8 +544,9 @@ pub struct Source {
   event_index : Int32
   collector : String?
   view : String?
-} derive(Eq, Hash, ToJson)
+} derive(Eq, Hash, ToJson, @json.FromJson)
 pub fn Source::equal(Self, Self) -> Bool
+pub fn Source::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Source::hash(Self) -> Int32
 pub fn Source::hash_combine(Self, Hasher) -> Unit
 pub fn Source::not_equal(Self, Self) -> Bool

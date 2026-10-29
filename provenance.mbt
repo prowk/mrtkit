@@ -6,7 +6,10 @@ pub struct Source {
   event_index : Int32
   collector : String?
   view : String?
-} derive(Eq, Hash, ToJson)
+} derive(Eq, Hash, ToJson, @json.FromJson)
+
+///|
+pub extend Source with @json.FromJson::{from_json}
 
 ///|
 pub extend Source with Eq::{equal, not_equal}

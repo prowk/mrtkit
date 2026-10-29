@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "type": "archive_plan",
+  "window": {
+    "from_us": "1700000001000000",
+    "to_us": "1700000007000000"
+  },
+  "case_kind": "synthetic_multi_collector",
+  "collectors": [
+    {
+      "collector": "synthetic-a",
+      "view": "default",
+      "continuous": false,
+      "files": [
+        {
+          "path": "multi/initial.mrt",
+          "kind": "rib",
+          "from_us": "1700000000000000",
+          "to_us": "1700000000000000",
+          "sha256": "039e65b4d818e3d3abaa8cfe305ce0f64b286dcb131742258b913bf06db40570"
+        },
+        {
+          "path": "multi/collector-a.mrt",
+          "kind": "update",
+          "from_us": "1700000001000000",
+          "to_us": "1700000007000000",
+          "sha256": "024077b5729627edc717af64a5153392578738a9436aa7673de3a04c9f936810"
+        }
+      ]
+    },
+    {
+      "collector": "synthetic-b",
+      "view": "default",
+      "continuous": false,
+      "files": [
+        {
+          "path": "multi/initial.mrt",
+          "kind": "rib",
+          "from_us": "1700000000000000",
+          "to_us": "1700000000000000",
+          "sha256": "039e65b4d818e3d3abaa8cfe305ce0f64b286dcb131742258b913bf06db40570"
+        },
+        {
+          "path": "multi/collector-b.mrt",
+          "kind": "update",
+          "from_us": "1700000001000000",
+          "to_us": "1700000007000000",
+          "sha256": "1f19873c7e4bba10a96ba18544578e3ea437f434add312df42cf52e6985d321f"
+        }
+      ]
+    }
+  ]
+}

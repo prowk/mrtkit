@@ -14,6 +14,7 @@
 | 关联多观测点的同类语义变化 | [跨采集器关联](guides/correlation.md) |
 | 在有界内存中关联大量观测并流式导出 | [外部关联](guides/external-correlation.md) |
 | 生成本地可查看的分页复盘报告 | [离线 HTML 报告](guides/html-report.md) |
+| 输入计划、调查规则、图表与 Pages 案例 | [调查与案例发布](guides/investigation.md) |
 | 核查固定真实路径变化与原始记录 | [RIS rrc23 真实案例](../cases/rrc23-path-change/README.md) |
 | 查命令、选项、筛选与分析语义 | [命令行参考](reference/cli.md) |
 | 在 MoonBit 项目中使用核心库 | [库 API](reference/api.md) |

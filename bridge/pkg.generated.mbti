@@ -32,6 +32,18 @@ pub fn end_baseline() -> String
 
 pub fn finish() -> String
 
+pub fn investigation_configure(String) -> String
+
+pub fn investigation_consume(Bytes, String, Int64, Int64, String, String, Bool) -> String
+
+pub fn investigation_finish() -> String
+
+pub fn investigation_match(String, String) -> String
+
+pub fn investigation_reset_file() -> Unit
+
+pub fn investigation_summary(String, String) -> String
+
 pub fn partition_record(Bytes) -> String
 
 pub fn path_totals() -> String

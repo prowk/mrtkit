@@ -7,7 +7,9 @@ import {reportCorrelation} from './report-correlation.mjs';
 
 export async function generateReport(input,output,{pageSize=200,title='MRTKit 路由观测复盘',sourceLabels=null,correlation=null}={}){
   if(!Number.isInteger(pageSize)||pageSize<1||pageSize>1000)throw new Error('报告页大小须为 1..1000');
-  const inputPath=resolve(input),index=JSON.parse(await readFile(inputPath,'utf8'));validateIndex(index);
+  const inputPath=resolve(input),index=JSON.parse(await readFile(inputPath,'utf8'));
+  if(index.type==='investigation_bundle'){if(correlation)throw new Error('调查包已包含核心观测证据，不接受另一个关联包');return (await import('./investigation-report.mjs')).generateInvestigationReport(input,output,{pageSize,title});}
+  validateIndex(index);
   const directory=resolve(output);await mkdir(directory,{recursive:false});
   const events=await reportDataset(directory,'data',{pageSize});
   const manifest={schema_version:'2.0',type:'offline_route_report',title,status:'building',input_status:index.status,

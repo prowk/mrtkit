@@ -1,0 +1,51 @@
+name: Publish case previews
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.mbt'
+      - '**/moon.pkg'
+      - 'moon.mod'
+      - 'cli/**'
+      - 'fixtures/**'
+      - 'cases/**'
+      - 'scripts/build_site.mjs'
+      - 'scripts/investigation_cases.mjs'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 安装固定 MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- "$(cat moonbit-toolchain.version)"
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - run: npm run build
+      - name: 构建精选静态案例（不执行全量 RIB 基准）
+        run: node scripts/build_site.mjs --output .validation/pages
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .validation/pages
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署精选案例
+        id: deployment
+        uses: actions/deploy-pages@v4

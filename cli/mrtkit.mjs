@@ -5,6 +5,16 @@ import { options } from './options.mjs';
 import { DiagnosticCollector } from './diagnostics.mjs';
 
 const help = `mrtkit 0.2.1 — MoonBit BGP MRT 工具
+新增流程: plan → cache → check-input → investigate → query / export / evidence → report
+  plan        --collector ris:rrc23 --from UTC --to UTC --output plan.json
+  cache       --plan plan.json --directory cache [--offline true]
+  check-input --manifest cache/manifest.json --mode quick|full
+  investigate --manifest 清单 --rules 规则.json --output 新目录
+  query       --input 调查包/index.json [--query 条件.json] [--limit 100] [--cursor 游标]
+  reindex     --input 调查包/index.json --output 新目录
+  export / evidence --input 调查包/index.json --output 新目录 [--query 条件.json]
+  verify-evidence --input 证据/index.json（或界面导出的 JSON）
+调查流程独立 schema 1.0，参数与预算见 docs/guides/investigation.md。
 用法: node cli/mrtkit.mjs <parse|stats|changes|snapshot-diff|aggregate|timeline|multi|replay-disk|correlate|report> [选项] <文件...|->
   parse     输出路由 JSON Lines；--format csv 导出 CSV
   stats     输出统计 JSON
@@ -56,6 +66,8 @@ export function errorText(error) {
 async function execute(argv, output, diagnostic) {
   if (!argv.length || argv.includes('--help') || argv.includes('-h')) { await output(`${help}\n`); return; }
   if (argv[0] === '--version') { await output('0.2.1\n'); return; }
+  const newCommands={plan:['./archive.mjs','planCommand'],cache:['./archive.mjs','cacheCommand'],'check-input':['./archive.mjs','qualityCommand'],investigate:['./investigation.mjs','investigateCommand'],query:['./investigation.mjs','queryCommand'],reindex:['./investigation.mjs','reindexCommand'],export:['./investigation.mjs','exportCommand'],evidence:['./investigation.mjs','exportCommand'],'verify-evidence':['./investigation.mjs','verifyEvidenceCommand']};
+  if(Object.hasOwn(newCommands,argv[0])){const [module,name]=newCommands[argv[0]],command=(await import(module))[name];await output(`${JSON.stringify(await command(argv.slice(1),argv[0]==='evidence'))}\n`);return;}
   if (argv[0] === 'multi') {
     const {multiCommand} = await import('./multi.mjs');
     await output(`${JSON.stringify(await multiCommand(argv.slice(1)))}\n`);
