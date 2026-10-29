@@ -233,6 +233,7 @@ fn investigation_specifics(
   rules : InvestigationRules,
 ) -> Array[Json] raise ParseError {
   let rows = []
+  let mut bytes = 0
   for interval in intervals {
     if interval.state != "active" {
       continue
@@ -297,6 +298,12 @@ fn investigation_specifics(
           "interpretation": Json("active_more_specific_observation"),
         }),
       )
+      let size = rows[rows.length() - 1].stringify().length() * 4
+      if rows.length() > rules.capacity.unwrap_or(20000) * 8 ||
+        size > rules.max_bytes.unwrap_or(67108864) - bytes {
+        raise Invalid(0, "更具体区间超过派生结果预算")
+      }
+      bytes += size
     }
   }
   rows

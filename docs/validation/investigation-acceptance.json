@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0",
+  "type": "investigation_acceptance",
+  "local_date": "2026-10-30",
+  "timezone": "Asia/Shanghai",
+  "online_deployed_commit": "a19b5e3b6483bcf8ff715dfc86a38f68edbbce76",
+  "pages_run": "https://github.com/prowk/mrtkit/actions/runs/40920745373",
+  "ci_run": "https://github.com/prowk/mrtkit/actions/runs/40920745329",
+  "online_url": "https://prowk.github.io/mrtkit/",
+  "target_sha256": "f784383a67bde5496822cf95c1267baeb85093ca46f7bae40a6810a3986cc80c",
+  "data_version": "3923b0bfaae3544963d26101be7f8c4329981c99271a5316ce4fecda1446da06",
+  "input_sha256": "300f8ebbb4a65d0181d6da8ad4bd5f38ab4dcbe337c29a7498e05f2c5225ad32",
+  "rule_version": "fixed-online-10000-1",
+  "events": 10000,
+  "filtered_events": 6000,
+  "filtered_change_notices": 12167,
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+  "conditions": {
+    "transport": "public_https_github_pages",
+    "network": "browser_default_unthrottled_no_network_emulation",
+    "desktop": [
+      1280,
+      900
+    ],
+    "narrow": [
+      390,
+      844
+    ],
+    "repetitions": 1
+  },
+  "cache_condition": "fresh tab with default shared browser cache; cache not forcibly cleared",
+  "observed": {
+    "first_screen_ms": 1404.1000000014901,
+    "combined_filter_ms": 1320.5,
+    "next_page_ms": 617.1999999955297,
+    "renderer_js_heap_bytes": 32640038
+  },
+  "target_pass": {
+    "first_screen_ms": true,
+    "combined_filter_ms": true,
+    "next_page_ms": true,
+    "renderer_js_heap_bytes": true
+  },
+  "first_screen_detail_pages": 1,
+  "first_screen_catalog_chunks": 0,
+  "filtered_catalog_chunks": 10,
+  "displayed_rows_per_page": 50,
+  "functional_checks": [
+    "HTTPS /mrtkit/ and direct case paths",
+    "real single-collector excerpt, 3 measured events",
+    "prefix and IPv6 filters",
+    "Path Identifier 0, 2 events",
+    "time bucket click, 4 matching events and clipped bucket",
+    "URL reload and back/forward restore filters",
+    "explicit data version mismatch error",
+    "source scatter and state interval loading",
+    "player steps and source detail navigation",
+    "34-AS IPv6 path",
+    "malicious collector text remains literal; img[src=x] count 0",
+    "cancel then reset restores 10000 events; cancellation count 1",
+    "page 2 of 120 after combined filter",
+    "intentional missing detail page gives explicit load error",
+    "browser evidence download verified by CLI, 2 rows",
+    "1280x900 and 390x844 viewport checks"
+  ],
+  "local_checks": {
+    "moon_js_full": {
+      "total": 66,
+      "passed": 66
+    },
+    "new_core_js": {
+      "total": 8,
+      "passed": 8
+    },
+    "new_core_wasm": {
+      "total": 8,
+      "passed": 8
+    },
+    "new_core_wasm_gc": {
+      "total": 8,
+      "passed": 8
+    },
+    "new_node_integration": {
+      "total": 4,
+      "passed": 4
+    },
+    "existing_report_node": {
+      "total": 7,
+      "passed": 7
+    },
+    "moon_info_and_fmt": "passed"
+  },
+  "screenshots": [
+    {
+      "file": "screenshots/investigation-desktop.jpg",
+      "sha256": "842fe6901b60a4690eb3a1cab5fbdd0e3d73211e6d3c25c3365260b72b633bf9",
+      "bytes": 79129,
+      "captured_dimensions": [
+        1265,
+        900
+      ]
+    },
+    {
+      "file": "screenshots/investigation-narrow.jpg",
+      "sha256": "9e2c1e3e39edb37b725c419a8bb6ae66183da39bb32abf3402c43e36d2f1a4a6",
+      "bytes": 39888,
+      "captured_dimensions": [
+        375,
+        829
+      ]
+    }
+  ],
+  "limitations": [
+    "JS heap is a point observation, not process RSS or a peak measurement.",
+    "One declared repetition, default unthrottled network and browser cache.",
+    "10000-event online synthetic workload does not replace the fixed 100000-notice offline workload."
+  ],
+  "skipped": [
+    {
+      "todo_item": 29,
+      "scope": "file:// real-browser functional and fixed-large-report performance acceptance",
+      "reason": "Browser URL policy blocks file: and explicitly forbids alternate-surface workarounds.",
+      "authorization": "User explicitly permitted skipping file-related restricted items and requested final disclosure.",
+      "status": "not_completed_authorized_skip"
+    }
+  ],
+  "proposal_documents": "Existing proposal headings and information fields were left unchanged.",
+  "core_sources": {
+    "investigation.mbt": "215e76b7560dc700d834f8359cd0447a1bfc297f2ac9b1b6ea9af78cef48a5a0",
+    "investigation_state.mbt": "9528f8841f96161846b6c81fba20a4ec8788f80656415e51ce4f1a2cc2e5f1fa",
+    "investigation_compare.mbt": "fd2c288d763a578dd51749c001632a4999f77883e52d8248a7c473ce8abb5069",
+    "cli/investigation-app.js": "10e228d066b40d335939dc9b132a2e912cd1cb4987ebad1e799ffb0efae4f118"
+  }
+}

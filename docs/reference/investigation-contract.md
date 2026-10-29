@@ -6,7 +6,7 @@
 
 路由键为 `(collector,view,peer_asn,peer_ip,outbound,prefix,path_id)`；来源键为上述观测点及 `(file,record,offset,event_index)`。file 是包内可移植标签，offset 是解压偏移。排序为 `(baseline优先,time_us,collector,view,file,record,event_index)`，相同时按输入顺序。稳定事件 ID 为此来源元组的 JSON 字符串；提醒 ID 为事件 ID 加规则名称。禁止用显示行号作为永久引用。
 
-`null` 表示不存在可确定值，须结合 `quality` 解读：`unknown` 是证据不足，`not_applicable` 是字段不适用，空数组是已知空集合。`baseline=missing` 不证明没有路由；`explicit_rib` 表示显式基线，不能覆盖缺档。`gap` 是声明的观测中断，`withdrawn` 是明确撤回，`session_reset` 是会话状态失效。部分结果 `partial` 保留有效证据和质量限制；`failed` 表示没有可用完成结果。容量超限必须失败或显式输出 partial，禁止静默截断。
+可选字段省略与 `null` 等价，解码均接受，不能视为已知空集合。`null` 表示不存在可确定值，须结合 `quality` 解读：`unknown` 是证据不足，`not_applicable` 是字段不适用，空数组是已知空集合。`baseline=missing` 不证明没有路由；`explicit_rib` 表示显式基线，不能覆盖缺档。`gap` 是声明的观测中断，`withdrawn` 是明确撤回，`session_reset` 是会话状态失效。部分结果 `partial` 保留有效证据和质量限制；`failed` 表示没有可用完成结果。容量超限必须失败或显式输出 partial，禁止静默截断。
 
 规则配置 `investigation_rules` 1.0 包含 `version`、`from_us/to_us`、`bucket_us`、`incident_us`、`continuous`、`gaps[]`、`focus[]`、可选 `query`、可选 `comparison`。每条 focus 为 `prefix/expected_origins/allowed_more_specifics`。未配置 expected_origins 与空数组均表示未配置预期，输出 `expectation_unconfigured`；非空配置与已知实际值不符才输出 `unexpected_origin`。允许的更具体前缀只豁免对应精确子前缀。查询 origin_asns、path_asns、communities 各自为 OR 集合，字段之间 AND；side 为 before/after/either，选择完整一侧，撤回后值为已知非活动。origin_unknown 可明确匹配活动但起源不确定的路径。路径 ASN 包含 AS_SET/联盟成员；社区按集合匹配，不受重排影响。核心先维护完整状态再筛选输出。
 
