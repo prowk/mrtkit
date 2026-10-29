@@ -284,6 +284,13 @@ fn investigation_specifics(
           "condition": Json(condition),
           "expected_origins": Json(expected),
           "actual_origin": analysis_optional(interval.origin_as),
+          "quality": Json(
+            if interval.duration_us is Some(_) {
+              "continuous_observation"
+            } else {
+              "continuity_unverified"
+            },
+          ),
           "rule_version": Json(rules.version),
           "start_source": analysis_optional(interval.start_source),
           "end_source": analysis_optional(interval.end_source),
