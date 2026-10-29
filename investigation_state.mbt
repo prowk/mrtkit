@@ -227,6 +227,75 @@ fn analysis_findings(
 }
 
 ///|
+/// 从活动区间检查更具体路由，包含窗口内从未更新的基线路由。
+fn investigation_specifics(
+  intervals : Array[InvestigationInterval],
+  rules : InvestigationRules,
+) -> Array[Json] raise ParseError {
+  let rows = []
+  for interval in intervals {
+    if interval.state != "active" {
+      continue
+    }
+    let target = parse_prefix_text(interval.prefix)
+    for focus in rules.focus.unwrap_or([]) {
+      let parent = parse_prefix_text(focus.prefix)
+      if parent.length >= target.length || !parent.contains(target) {
+        continue
+      }
+      let expected = focus.expected_origins.unwrap_or([])
+      let allowed = focus.allowed_more_specifics
+        .unwrap_or([])
+        .any(text => parse_prefix_text(text) == target)
+      let condition = if interval.origin_as is None {
+        "origin_unknown"
+      } else if expected.is_empty() {
+        "expectation_unconfigured"
+      } else if allowed {
+        "allowed_more_specific"
+      } else if interval.origin_as
+        .map(fn(asn) { expected.contains(asn) })
+        .unwrap_or(false) {
+        "same_origin_more_specific"
+      } else {
+        "unexpected_origin"
+      }
+      rows.push(
+        Json::object({
+          "id": Json(
+            interval.key +
+            "|" +
+            interval.from_us.to_string() +
+            "|" +
+            parent.text(),
+          ),
+          "prefix": Json(interval.prefix),
+          "parent_prefix": Json(parent.text()),
+          "peer": Json(interval.peer),
+          "peer_asn": Json(interval.peer_asn),
+          "peer_ip": Json(interval.peer_ip),
+          "outbound": Json(interval.outbound),
+          "collector": analysis_optional(interval.collector),
+          "view": analysis_optional(interval.view),
+          "path_id": analysis_optional(interval.path_id),
+          "from_us": Json(interval.from_us),
+          "to_us": Json(interval.to_us),
+          "duration_us": analysis_optional(interval.duration_us),
+          "condition": Json(condition),
+          "expected_origins": Json(expected),
+          "actual_origin": analysis_optional(interval.origin_as),
+          "rule_version": Json(rules.version),
+          "start_source": analysis_optional(interval.start_source),
+          "end_source": analysis_optional(interval.end_source),
+          "interpretation": Json("active_more_specific_observation"),
+        }),
+      )
+    }
+  }
+  rows
+}
+
+///|
 priv struct IncidentTrace {
   first_us : UInt64
   mut last_us : UInt64
@@ -322,6 +391,10 @@ pub fn Investigation::report(self : Investigation) -> Json raise ParseError {
   let moas_traces : Map[String, MoasTrace] = Map([])
   let baselines : Map[String, Unit] = Map([])
   let scopes : Map[String, Unit] = Map([])
+  for scope in self.baseline_scopes.keys() {
+    baselines[scope] = ()
+    scopes[scope] = ()
+  }
   let initial = []
   let controls = []
   let all = chart_counts()
@@ -746,6 +819,7 @@ pub fn Investigation::report(self : Investigation) -> Json raise ParseError {
     "intervals": Json(intervals),
     "moas": Json(moas),
     "findings": Json(findings),
+    "more_specifics": Json(investigation_specifics(intervals, rules)),
     "incidents": Json(incidents),
     "summary": Json::object({
       "all": all.report("all", rules),

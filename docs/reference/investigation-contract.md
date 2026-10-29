@@ -10,7 +10,7 @@
 
 规则配置 `investigation_rules` 1.0 包含 `version`、`from_us/to_us`、`bucket_us`、`incident_us`、`continuous`、`gaps[]`、`focus[]`、可选 `query`、可选 `comparison`。每条 focus 为 `prefix/expected_origins/allowed_more_specifics`。未配置 expected_origins 与空数组均表示未配置预期，输出 `expectation_unconfigured`；非空配置与已知实际值不符才输出 `unexpected_origin`。允许的更具体前缀只豁免对应精确子前缀。查询 origin_asns、path_asns、communities 各自为 OR 集合，字段之间 AND；side 为 before/after/either，选择完整一侧，撤回后值为已知非活动。origin_unknown 可明确匹配活动但起源不确定的路径。路径 ASN 包含 AS_SET/联盟成员；社区按集合匹配，不受重排影响。核心先维护完整状态再筛选输出。
 
-输出 `index.json` 含 `schema_version/type/status/data_version/rules/inputs/quality/files`。文件清单含 bytes、sha256、rows。`events.jsonl` 保存筛选前事件，`selected.jsonl` 保存查询结果，`intervals.jsonl` 保存路径状态区间，`moas.jsonl` 保存同时有效的多起源区间，`findings.jsonl` 保存规则线索，`incidents.jsonl` 保存归并事件；`summary.json`、`comparison.json`、`initial.json` 为独立 JSON。引用指向事件 ID 与提醒 ID，跨文件计数可对账。基线不计测量事件。
+输出 `index.json` 含 `schema_version/type/status/data_version/rules/inputs/quality/files`。文件清单含 bytes、sha256、rows。`events.jsonl` 保存筛选前事件，`selected.jsonl` 保存查询结果，`intervals.jsonl` 保存路径状态区间，`moas.jsonl` 保存同时有效的多起源区间，`more_specifics.jsonl` 保存含基线的活动更具体区间，`findings.jsonl` 保存事件规则线索，`incidents.jsonl` 保存归并事件；`summary.json`、`comparison.json`、`initial.json` 为独立 JSON。引用指向事件 ID 与提醒 ID，跨文件计数可对账。基线不计测量事件。
 
 摘要同时提供 `all/selected`，明确 `scope`、事件数和提醒数；同一来源有多种提醒时事件计一次、提醒逐条计数。时间桶固定从 window.from_us 对齐，末桶截尾；类型、前缀、peer 排名按计数降序、键升序，Top N 以外归入其他项。仅凭变化明细不能反推 announcement/withdrawal 数，缺失输入的值为 null。图表与列表必须使用相同 scope，不能将 all 标作 selected。
 

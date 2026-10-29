@@ -187,6 +187,7 @@ pub struct Investigation {
   priv latest_routes : Map[String, UInt64]
   priv latest_peers : Map[String, UInt64]
   priv resets : Map[String, UInt64]
+  priv baseline_scopes : Map[String, Unit]
 }
 
 ///|
@@ -276,7 +277,30 @@ pub fn Investigation::new(text : String) -> Investigation raise ParseError {
     latest_routes: Map([]),
     latest_peers: Map([]),
     resets: Map([]),
+    baseline_scopes: Map([]),
   }
+}
+
+///|
+/// 空 RIB 的有效 peer 表同样证明显式基线存在。
+pub fn Investigation::set_baseline_scope(
+  self : Investigation,
+  collector : String,
+  view : String,
+) -> Unit raise ParseError {
+  if collector == "" || view == "" {
+    raise Invalid(0, "基线观测点身份不能为空")
+  }
+  self.baseline_scopes[source_scope(
+    Some({
+      file: "",
+      record: 0L,
+      offset: 0L,
+      event_index: 0,
+      collector: Some(collector),
+      view: Some(view),
+    }),
+  )] = ()
 }
 
 ///|

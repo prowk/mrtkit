@@ -283,6 +283,7 @@ pub fn Investigation::new(String) -> Self raise ParseError
 pub fn Investigation::observe(Self, RouteEvent, baseline? : Bool) -> Unit raise ParseError
 pub fn Investigation::observe_state(Self, StateChange) -> Unit raise ParseError
 pub fn Investigation::report(Self) -> Json raise ParseError
+pub fn Investigation::set_baseline_scope(Self, String, String) -> Unit raise ParseError
 
 pub struct InvestigationEvent {
   id : String

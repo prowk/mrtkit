@@ -250,6 +250,10 @@ test "空输入与容量界限显式输出未知或失败" {
       ..
     },
   )
+  engine.set_baseline_scope("test", "v")
+  assert_true(
+    engine.report() is { "quality": { "baseline": "explicit_rib", .. }, .. },
+  )
   engine.observe(investigation_fixture(100U, 1U, [1U]))
   assert_true(
     try {
@@ -257,6 +261,42 @@ test "空输入与容量界限显式输出未知或失败" {
       false
     } catch {
       _ => true
+    },
+  )
+}
+
+///|
+test "仅基线存在的更具体路由仍输出活动证据和路径时长分布" {
+  let engine = Investigation::new(
+    "{\"schema_version\":\"1.0\",\"version\":\"baseline-test\",\"from_us\":\"100000000\",\"to_us\":\"110000000\",\"continuous\":true,\"sequence_prefix\":\"192.0.2.0/24\",\"focus\":[{\"prefix\":\"0.0.0.0/0\",\"expected_origins\":[1]}],\"comparison\":[{\"from_us\":\"100000000\",\"to_us\":\"105000000\"},{\"from_us\":\"105000000\",\"to_us\":\"110000000\"}]}",
+  )
+  engine.observe(
+    investigation_fixture(99U, 1U, [1U], action="rib"),
+    baseline=true,
+  )
+  let report = engine.report()
+  assert_eq(investigation_array(report, "events").length(), 0)
+  assert_eq(investigation_array(report, "more_specifics").length(), 1)
+  assert_true(
+    investigation_array(report, "more_specifics")[0]
+    is {
+      "condition": "same_origin_more_specific",
+      "from_us": "100000000",
+      "to_us": "110000000",
+      ..
+    },
+  )
+  assert_true(
+    report
+    is {
+      "comparison": {
+        "windows": [
+          { "path_length_observed_path_us": [[1, "5000000"]], .. },
+          { "path_length_observed_path_us": [[1, "5000000"]], .. },
+        ],
+        ..
+      },
+      ..
     },
   )
 }

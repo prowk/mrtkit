@@ -8,8 +8,9 @@ import {fileHash,saveJson} from './archive.mjs';
 export async function generateInvestigationReport(input,output,{pageSize=100,title='MRTKit 调查工作台',maxBytes=134217728,maxRows=200000}={}){
   const bundle=await readInvestigation(input),directory=resolve(output);await mkdir(directory,{recursive:false});let used=0;
   const datasets={},catalog=[],eventIds=new Set(),peers=new Set(),prefixes=new Set(),kinds=new Set(),points=new Set();
-  for(const name of ['events','intervals','moas','findings','incidents','controls']){
+  for(const name of ['events','intervals','moas','findings','more_specifics','incidents','controls']){
     const dataset=await reportDataset(directory,name,{pageSize});datasets[name]=dataset.data;
+    if(!bundle.index.files[name]){if(name!=='more_specifics')throw new Error('调查包缺少必需明细');await dataset.close();continue;}
     let ordinal=0;
     for await(const row of jsonLines(await bundlePath(bundle.directory,bundle.index.files[name].path))){used+=Buffer.byteLength(JSON.stringify(row));if(used>maxBytes||ordinal>=maxRows)throw new Error('报告生成超过行数或内存预算');
       if(name==='events'){if(eventIds.has(row.id))throw new Error('重复事件引用');eventIds.add(row.id);const collector=row.source?.collector??'',view=row.source?.view??'';
@@ -25,7 +26,7 @@ export async function generateInvestigationReport(input,output,{pageSize=100,tit
   datasets.catalog={name:'catalog',rows:catalog.length,indexes,pages:[]};
   const objects={};for(const name of ['summary','comparison','initial'])objects[name]=JSON.parse(await readFile(await bundlePath(bundle.directory,bundle.index.files[name].path),'utf8'));
   // 初始状态独立分页，首屏只加载摘要和当前页。
-  const initial=await reportDataset(directory,'initial',{pageSize});for(const row of objects.initial)await initial.add(row);await initial.close();datasets.initial=initial.data;delete objects.initial;
+  const initial=await reportDataset(directory,'initial',{pageSize}),initialCatalog=await reportDataset(directory,'initial_catalog',{pageSize:1000});let initialOrdinal=0;for(const row of objects.initial){await initial.add(row);const source=row.event.source;await initialCatalog.add({ordinal:initialOrdinal++,prefix:row.event.prefix,peer:row.key.slice(0,row.key.lastIndexOf('|'+row.event.prefix+'|')),event_id:source?JSON.stringify([source.collector??null,source.view??null,source.file,source.record,source.offset,source.event_index]):null});}await initial.close();await initialCatalog.close();datasets.initial=initial.data;datasets.initial_catalog=initialCatalog.data;delete objects.initial;
   const manifest={schema_version:'1.0',type:'investigation_report',title,status:bundle.index.status,data_version:bundle.index.data_version,window:bundle.index.window,
     rules:bundle.index.rules,quality:bundle.index.quality,core_quality:bundle.index.core_quality,inputs:bundle.index.inputs,datasets,...objects,
     filter_budget:{max_rows:maxRows,max_bytes:maxBytes,index_chunk_rows:1024,detail_cache_pages:2},options:{prefixes:[...prefixes].sort(),peers:[...peers].sort(),kinds:[...kinds].sort(),points:[...points].sort()},

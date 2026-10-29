@@ -41,6 +41,9 @@ pub fn investigation_consume(
     if baseline && (batch.header.kind != 13 || batch.skipped) {
       return error_json(0, "基线包含非 RIB 数据")
     }
+    if baseline && batch.header.subtype == 1 {
+      current.set_baseline_scope(collector, view)
+    }
     for event in batch.events {
       current.observe(event, baseline~)
     }

@@ -71,6 +71,7 @@ fn investigation_comparison(
     let mut duration = 0UL
     let mut changes = 0
     let lengths : Map[Int32, Int32] = Map([])
+    let path_time : Map[Int32, UInt64] = Map([])
     let origins : Map[UInt32, Unit] = Map([])
     for peer in common {
       duration += confirmed_peer_time(intervals, peer, window)
@@ -100,11 +101,19 @@ fn investigation_comparison(
         if interval.origin_as is Some(asn) {
           origins[asn] = ()
         }
+        if interval.duration_us is Some(_) &&
+          interval.path_length is Some(length) &&
+          overlap_us(interval.from_us, interval.to_us, window)
+          is Some((start, end)) {
+          path_time[length] = path_time.get(length).unwrap_or(0UL) + end - start
+        }
       }
     }
     let ordered = origins.keys().to_array()
     ordered.sort()
     let histogram = lengths.to_array()
+    let duration_histogram = path_time.to_array()
+    duration_histogram.sort_by_key(fn(pair) { pair.0 })
     histogram.sort_by_key(fn(pair) { pair.0 })
     reports.push(
       Json::object({
@@ -119,6 +128,10 @@ fn investigation_comparison(
           Json::null()
         },
         "path_length_samples": Json(histogram),
+        "path_length_observed_path_us": Json(duration_histogram),
+        "path_length_duration_basis": Json(
+          "confirmed_active_path_microseconds_add_path_counted_separately",
+        ),
         "origins": Json(ordered),
         "coverage_peers": Json(common.length()),
       }),
