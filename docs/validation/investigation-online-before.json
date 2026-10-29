@@ -1,0 +1,35 @@
+{
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+  "transport": "https:",
+  "network": "browser_default_unthrottled",
+  "first_screen_ms": 1450.199999999255,
+  "queries": [
+    {
+      "ms": 266.80000000074506,
+      "rows": 10000,
+      "index_bytes": 0
+    },
+    {
+      "ms": 3174.89999999851,
+      "rows": 6000,
+      "index_bytes": 11523608
+    }
+  ],
+  "renders": [
+    {
+      "ms": 261.80000000074506,
+      "rows": 50
+    },
+    {
+      "ms": 9.300000000745058,
+      "rows": 50
+    }
+  ],
+  "detail_loads": 1,
+  "index_loads": 10,
+  "cancelled": 0,
+  "renderer_js_heap_bytes": 24609912,
+  "index_metadata_bytes": 11523608,
+  "data_version": "f1d2cb8d59bb199e3a34a3f85622c1965c8db0e10f48ac6604b6ea80f74c7473",
+  "rows": 10000
+}
