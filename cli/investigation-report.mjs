@@ -13,6 +13,7 @@ export async function generateInvestigationReport(input,output,{pageSize=100,tit
     if(!bundle.index.files[name]){if(name!=='more_specifics')throw new Error('调查包缺少必需明细');await dataset.close();continue;}
     let ordinal=0;
     for await(const row of jsonLines(await bundlePath(bundle.directory,bundle.index.files[name].path))){used+=Buffer.byteLength(JSON.stringify(row));if(used>maxBytes||ordinal>=maxRows)throw new Error('报告生成超过行数或内存预算');
+      if(name==='moas'&&!row.id)row.id=`moas|${row.prefix}|${row.from_us}`;
       if(name==='events'){if(eventIds.has(row.id))throw new Error('重复事件引用');eventIds.add(row.id);const collector=row.source?.collector??'',view=row.source?.view??'';
         const meta={ordinal,event_id:row.id,time_us:row.time_us,prefix:row.prefix,peer:row.peer,peer_asn:row.peer_asn,peer_ip:row.peer_ip,path_id:row.path_id??null,outbound:row.outbound,collector,view,kind:row.kind,kinds:[row.kind,...row.changes.map(change=>change.kind)],notices:row.changes.length,selected:row.selected,accepted:row.accepted};
         meta.notice_kinds=row.changes.map(change=>change.kind);catalog.push(meta);peers.add(row.peer);prefixes.add(row.prefix);points.add(JSON.stringify([collector,view]));for(const kind of meta.kinds)kinds.add(kind);

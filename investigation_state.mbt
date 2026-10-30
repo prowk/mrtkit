@@ -115,6 +115,14 @@ fn moas_now(
                 ),
               ),
               "source": analysis_optional(route.event.source),
+              "observed_at_us": Json(route.time),
+              "time_precision": Json(
+                if route.event.microseconds is Some(_) {
+                  "microsecond"
+                } else {
+                  "second"
+                },
+              ),
             }),
           ),
         )
@@ -151,6 +159,7 @@ fn moas_close(
   Some(
     Json::object({
       "prefix": Json(prefix),
+      "id": Json("moas|" + prefix + "|" + trace.from_us.to_string()),
       "from_us": Json(trace.from_us),
       "to_us": Json(end),
       "origins": Json(trace.origins),

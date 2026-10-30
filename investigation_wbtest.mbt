@@ -93,6 +93,10 @@ test "正常 MOAS 同时性、ADD-PATH 单路径撤回与 AS_SET 未知" {
       "to_us": "102000000",
       "origins": [1, 2],
       "duration_us": "1000000",
+      "evidence": [
+        { "observed_at_us": "100000000", "time_precision": "second", .. },
+        { "observed_at_us": "101000000", "time_precision": "second", .. },
+      ],
       ..
     },
   )
