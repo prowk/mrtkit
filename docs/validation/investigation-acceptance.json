@@ -3,9 +3,9 @@
   "type": "investigation_acceptance",
   "local_date": "2026-10-30",
   "timezone": "Asia/Shanghai",
-  "online_deployed_commit": "a19b5e3b6483bcf8ff715dfc86a38f68edbbce76",
-  "pages_run": "https://github.com/prowk/mrtkit/actions/runs/40920745373",
-  "ci_run": "https://github.com/prowk/mrtkit/actions/runs/40920745329",
+  "online_deployed_commit": "9dcfe0df7b90b6475d802941e3ed7f1202d42df6",
+  "pages_run": "https://github.com/prowk/mrtkit/actions/runs/41038340894",
+  "ci_run": "https://github.com/prowk/mrtkit/actions/runs/41038340802",
   "online_url": "https://prowk.github.io/mrtkit/",
   "target_sha256": "f784383a67bde5496822cf95c1267baeb85093ca46f7bae40a6810a3986cc80c",
   "data_version": "3923b0bfaae3544963d26101be7f8c4329981c99271a5316ce4fecda1446da06",
@@ -127,8 +127,35 @@
   "proposal_documents": "Existing proposal headings and information fields were left unchanged.",
   "core_sources": {
     "investigation.mbt": "215e76b7560dc700d834f8359cd0447a1bfc297f2ac9b1b6ea9af78cef48a5a0",
-    "investigation_state.mbt": "9528f8841f96161846b6c81fba20a4ec8788f80656415e51ce4f1a2cc2e5f1fa",
+    "investigation_state.mbt": "61eae565f559ba8e87ddc87ca1fff9bd9dc6f5102629d825ce01fd4877f21973",
     "investigation_compare.mbt": "fd2c288d763a578dd51749c001632a4999f77883e52d8248a7c473ce8abb5069",
-    "cli/investigation-app.js": "10e228d066b40d335939dc9b132a2e912cd1cb4987ebad1e799ffb0efae4f118"
+    "cli/investigation-app.js": "f959cf2b1f495afe9004aa0c377623fd0f19da687c398a3ede755541de417c6d"
+  },
+  "performance_measured_commit": "a19b5e3b6483bcf8ff715dfc86a38f68edbbce76",
+  "functional_followup": {
+    "commit": "9dcfe0df7b90b6475d802941e3ed7f1202d42df6",
+    "synthetic_data_version": "adcc6bc4d98c75eb0b701fc6cd8803dddef2e730c6c730817a8db4a573f2acbb",
+    "group_id": "moas|203.0.113.0/24|1700001002000000",
+    "witness_times_us": [
+      "1700001001000000",
+      "1700001002000000"
+    ],
+    "witness_precision": "second",
+    "group_window_us": [
+      "1700001002000000",
+      "1700001003000001"
+    ],
+    "share_reload_restored": {
+      "count_mode": "notices",
+      "top_n": 5,
+      "group": true
+    },
+    "svg_export": {
+      "valid_xml": true,
+      "sha256": "a670f6ea6d0b5fac6149e10a12be6f83757fd447c111adc94aefa4b7fe2e6c94",
+      "bytes": 2759,
+      "current_window_and_counting": true,
+      "prefix_peer_type_rankings": true
+    }
   }
 }

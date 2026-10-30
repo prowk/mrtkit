@@ -14,7 +14,7 @@
 
 摘要同时提供 `all/selected`，明确 `scope`、事件数和提醒数；同一来源有多种提醒时事件计一次、提醒逐条计数。时间桶固定从 window.from_us 对齐，末桶截尾；类型、前缀、peer 排名按计数降序、键升序，Top N 以外归入其他项。仅凭变化明细不能反推 announcement/withdrawal 数，缺失输入的值为 null。图表与列表必须使用相同 scope，不能将 all 标作 selected。
 
-状态区间为 `[from_us,to_us)`，保留 start/end source、left/right_censored。活动、撤回、会话重置、缺档、未知分别呈现；按 Path ID 展示，不能用单路径撤回推断整个 peer 不可见。无连续观测声明的 duration_us 为 null；跨缺档不能延续路由。MOAS 只聚合当前活动且有唯一起源的路径，AS_SET 不猜测起源，前后起源变化不等同同时多起源；保留每个来源和 Path ID。正常 MOAS 也输出，解释为观测事实。
+状态区间为 `[from_us,to_us)`，保留 start/end source、left/right_censored。活动、撤回、会话重置、缺档、未知分别呈现；按 Path ID 展示，不能用单路径撤回推断整个 peer 不可见。无连续观测声明的 duration_us 为 null；跨缺档不能延续路由。MOAS 只聚合当前活动且有唯一起源的路径，AS_SET 不猜测起源，前后起源变化不等同同时多起源；保留每个来源、Path ID、`observed_at_us` 和 `time_precision`；关联图使用证据的原始观测时间，不能用区间开始时间替代。正常 MOAS 也输出，解释为观测事实。
 
 调查事件按 `(prefix,collector,view,peer,direction,path_id)` 和首条提醒起固定窗口归并，不链式延长；保留全部原提醒、首次/末次时间，结束条件为固定窗口到期或窗口截尾。恢复引用只引用实际重新宣告且符合预期的证据，未知区间独立保留。窗口对比要求同一资源、共同 peer 范围，按可确认区间并集计算有效观测时长；分母不足则 frequency=null，不把覆盖变化解释为异常。
 
