@@ -21,7 +21,7 @@ with zipfile.ZipFile(path) as archive:
             forbidden.append(name)
     assert not forbidden, forbidden
     assert len(names) == len(set(names)), 'ZIP 条目重复'
-    required = [str(file.relative_to(root)).replace('\\', '/') for file in (root / 'cli').iterdir() if file.suffix in ('.mjs', '.js', '.html')]
+    required = [str(file.relative_to(root)).replace('\\', '/') for file in (root / 'cli').iterdir() if file.suffix in ('.mjs', '.js', '.html', '.css')]
     required += ['scripts/check_toolchain.mjs', 'moonbit-toolchain.version', 'package.json']
     for name in required:
         assert name in names, f'缺少运行文件 {name}'

@@ -1,7 +1,6 @@
 {
   "scope": "isolated_DOM_script_logic_only_not_browser_rendering",
-  "browser_acceptance": "deferred_by_user_after_file_protocol_policy_denial",
-  "target": "report-performance-target.json browser targets remain unmeasured",
+  "target": "report-performance-target.json",
   "node": "v22.14.0",
   "report_manifest_sha256": "6751bb051cd78ee6ef85f2b9cfa3279b02408d678111ad6ffb6485734f471592",
   "source_sha256": {

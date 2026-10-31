@@ -16,5 +16,3 @@
 真实浏览器检查包括子路径与深层链接、刷新和前进后退、组合筛选、时间桶联动、分页、取消/重置、明确缺页错误、IPv6、长路径、ADD-PATH 0、散点、状态区间、路径步进、恶意文本和证据下载。界面下载的 2 行证据通过 CLI 哈希与计数核验。核心固定用例覆盖仅有基线的更具体路由及路径时长分布，避免仅检查更新事件。
 
 [原始测量](investigation-online-after.json) · [预定目标](investigation-online-target.json) · [完整收据、来源哈希与检查范围](investigation-acceptance.json) · [桌面截图](screenshots/investigation-desktop.jpg) · [窄屏截图](screenshots/investigation-narrow.jpg)
-
-`file://` 真实浏览器功能和固定 100,000 提醒离线性能验收受 URL 策略限制，按用户授权跳过，TODO 保持未勾选。HTTPS 与隔离页面检查均不替代该项；既有离线目标未改动。

@@ -38,4 +38,4 @@ node scripts/reproduce_case.mjs --output .validation/rrc23-rebuilt
 
 输出目录必须是新目录。脚本核对 [case.json](case.json) 固定的全部来源 URL、SHA-256 和时间范围；完整回放 RIB 与十二个更新文件，复算统计，验证三个路径锚点的前后值与原始位置、结束状态，再原样提取摘录并生成 HTML。预期统计还对应[独立 Python 业务模型的完整窗口复算](../../docs/validation/replay-acceptance.json)。
 
-生成的 `.validation/rrc23-rebuilt-html/index.html` 无需服务器即可在本地浏览器打开。仓库也附带[固定离线报告](report/index.html)，含 46 条时间线明细、93 条提醒和 93 个同源语义变化组；本例只有一个观测点，不是跨采集器传播证据。组内观测可跳转到来源事件，筛选使用独立倒排索引。公开报告对事件及关联明细统一使用档案文件标签，记录号和解压后偏移保持原值；全部文件均可按清单哈希重取。[本次重建收据](../../docs/validation/case-v020.json)保留计数和哈希。当前环境拒绝本地文件浏览器自动化，真实浏览器验收按用户要求保留待办。
+生成的 `.validation/rrc23-rebuilt-html/index.html` 无需服务器即可在本地浏览器打开。仓库也附带[固定离线报告](report/index.html)，含 46 条时间线明细、93 条提醒和 93 个同源语义变化组；本例只有一个观测点，不是跨采集器传播证据。组内观测可跳转到来源事件，筛选使用独立倒排索引。公开报告对事件及关联明细统一使用档案文件标签，记录号和解压后偏移保持原值；全部文件均可按清单哈希重取。[本次重建收据](../../docs/validation/case-v020.json)保留计数和哈希。

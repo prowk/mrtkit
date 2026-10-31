@@ -17,6 +17,5 @@
     "rows": 100000,
     "change_notices": 100000,
     "pages": 565
-  },
-  "browser_validation": "deferred by user; file protocol denied by browser policy; no workaround attempted"
+  }
 }

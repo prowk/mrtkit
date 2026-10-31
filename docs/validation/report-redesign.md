@@ -31,7 +31,7 @@
 - .validation/redesign-tests.log
 - .validation/redesign-report-tests.log
 
-本次提交包含重构页面与复查修复；GitHub Pages 改为仅手动触发，等待用户指令后发布。离线 file:// 的真实浏览器行为未在本轮复测；浏览器检查使用本机 HTTP 预览。
+重构页面与复查修复已通过 [GitHub Pages 工作流](https://github.com/prowk/mrtkit/actions/runs/41184585057)发布。后续发布通过手动触发；本轮浏览器检查使用本机 HTTP 预览。
 
 ## 复查修复
 

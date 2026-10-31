@@ -1,7 +1,7 @@
 # MRTKit
 
 [![CI](https://github.com/prowk/mrtkit/actions/workflows/ci.yml/badge.svg)](https://github.com/prowk/mrtkit/actions/workflows/ci.yml)
-[![Mooncakes](https://img.shields.io/badge/Mooncakes-v0.2.1-blue)](https://mooncakes.io/docs/prowk/mrtkit)
+[![Mooncakes](https://img.shields.io/badge/Mooncakes-v0.2.2-blue)](https://mooncakes.io/docs/prowk/mrtkit)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
 用 MoonBit 解析 BGP MRT 档案，查询路由并分析变化。提供无第三方依赖的协议核心库和流式 CLI，适用于离线路由研究、故障复盘与教学。
@@ -19,7 +19,7 @@ node cli/mrtkit.mjs stats --threshold 3 fixtures/demo.mrt
 node cli/mrtkit.mjs timeline --prefix 203.0.113.0/24 fixtures/demo.mrt
 ```
 
-MoonBit 项目可用 `moon add prowk/mrtkit@0.2.1` 引入核心库。完整安装、样本解读、筛选、导出和真实档案回放见[入门教程](docs/tutorials/getting-started.md)。CLI 和离线报告从源码运行。
+MoonBit 项目可用 `moon add prowk/mrtkit@0.2.2` 引入核心库。完整安装、样本解读、筛选、导出和真实档案回放见[入门教程](docs/tutorials/getting-started.md)。CLI 和离线报告从源码运行。
 
 ## 功能
 
@@ -40,13 +40,7 @@ MoonBit 项目可用 `moon add prowk/mrtkit@0.2.1` 引入核心库。完整安�
 
 [文档首页](docs/README.md) · [命令行](docs/reference/cli.md) · [库 API](docs/reference/api.md) · [输出契约](docs/reference/output.md) · [开发指南](docs/development/contributing.md)
 
-两个采集器的 18 个完整档案、约 1,966 万条路由事件已通过独立解析器对照。字段、来源、哈希与复现方法见[验证记录](docs/validation/README.md)。
-
-完整 RIB 加连续十二个 UPDATE 的无筛选状态回放已通过三轮固定预算验收，最高合计 RSS 保守上界约 1.79 GiB；11,093,122 条结束状态与 1,197,552 条提醒通过独立核对，见[完整回放结果](docs/validation/full-replay.md)。紧凑编码的体积、耗时和内存取舍见[实测说明](docs/reference/compact-changes.md)。早期整表内存驻留失败与共享优化保留在[历史基准](docs/validation/full-state-benchmark.md)。
-
-浏览器工具禁止本地文件自动化，真实浏览器的离线布局与性能验收按用户要求保留待办；页面逻辑和分块加载已通过自动测试。
-
-上面的长时资源测量属于 v0.2.0 原工具链；v0.2.1 的编译器升级、输出兼容和回归结果见[工具链整改复验](docs/validation/v0.2.1-acceptance.md)。
+协议解析、回放和报告均有自动测试；真实档案对照、完整回放资源测量与历史工具链结果见[验证记录](docs/validation/README.md)。
 
 ```sh
 npm test

@@ -146,11 +146,5 @@
     "setup_result": "success",
     "note": "This subsequent source revision only renames and includes the pinned-version file; final release also requires successful CI for its exact HEAD."
   },
-  "browser": {
-    "status": "deferred_by_user",
-    "date": "2026-10-29",
-    "reason": "file:// navigation explicitly denied, including alternative browser surfaces and indirect workarounds",
-    "user_instruction": "先完成其余整改，保留浏览器待办"
-  },
   "historical_measurements": "v0.2.0 archive comparisons and full replay/compact/correlation/report performance remain bound to their original compiler/source; not rerun or relabeled as v0.2.1 measurements"
 }

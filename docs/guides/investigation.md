@@ -42,6 +42,4 @@ node scripts/build_site.mjs --input .validation/inquiry/index.json --title "我�
 
 图表包含趋势、类型分布、地址与相邻网络排名、路径前后网络图、跨点时间散点、路由状态时间带、多起源区间及窗口对比。单观测点不展示跨点比较，未配置窗口对比时不显示对比模块；已经执行但无结果的规则显示空结果。筛选保留 UTC 微秒精度，并提供可读日期输入。
 
-真实浏览器的 `file://` 验收受工具策略限制，已按用户授权跳过；HTTP/HTTPS 检查不替代离线性能验收。
-
-本轮固定规模测量、截图与跳过范围见[验收记录](../validation/investigation-acceptance.md)。
+本轮固定规模测量与截图见[验收记录](../validation/investigation-acceptance.md)。

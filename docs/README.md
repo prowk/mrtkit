@@ -28,7 +28,7 @@
 | 修改实现、运行测试 | [开发指南](development/contributing.md) |
 | 查看完整数据对照、回放与验收证据 | [验证记录](validation/README.md) |
 | 核查三轮无筛选完整状态回放的资源与独立证明 | [完整回放结果](validation/full-replay.md) |
-| 核查历史完整回放交付与浏览器待办 | [v0.2.0 验收](validation/v0.2.0-acceptance.md) |
+| 核查历史完整回放交付 | [v0.2.0 验收](validation/v0.2.0-acceptance.md) |
 | 核查新编译器门槛、接口兼容与完整回归 | [v0.2.1 工具链整改复验](validation/v0.2.1-acceptance.md) |
 | 阅读限定提交的性能测量 | [历史性能基准](validation/performance.md) |
 | 核查早期全量状态资源边界与共享优化 | [历史全量状态基准](validation/full-state-benchmark.md) |

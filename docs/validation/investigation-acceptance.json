@@ -115,15 +115,6 @@
     "One declared repetition, default unthrottled network and browser cache.",
     "10000-event online synthetic workload does not replace the fixed 100000-notice offline workload."
   ],
-  "skipped": [
-    {
-      "todo_item": 29,
-      "scope": "file:// real-browser functional and fixed-large-report performance acceptance",
-      "reason": "Browser URL policy blocks file: and explicitly forbids alternate-surface workarounds.",
-      "authorization": "User explicitly permitted skipping file-related restricted items and requested final disclosure.",
-      "status": "not_completed_authorized_skip"
-    }
-  ],
   "proposal_documents": "Existing proposal headings and information fields were left unchanged.",
   "core_sources": {
     "investigation.mbt": "215e76b7560dc700d834f8359cd0447a1bfc297f2ac9b1b6ea9af78cef48a5a0",

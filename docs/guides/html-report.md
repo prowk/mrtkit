@@ -26,4 +26,4 @@ node cli/mrtkit.mjs report --input .validation/report-input/index.json --correla
 
 报告带源字段时默认保留输入路径。固定公开案例使用显式档案标签避免包含机器路径，具体规则记在 `source_path_policy` 中。
 
-索引、取消和导航规则见[报告索引参考](../reference/report-index.md)。`tests/report.test.mjs` 在隔离 DOM 执行实际页面与分块脚本，覆盖 17,000 行、组合筛选、取消竞态、关联计数、来源跳转及恶意文本。真实浏览器的本地文件验收和性能目标单独记录，不能用这些逻辑测试替代；当前浏览器工具拒绝 `file://` 且禁止绕过，已按用户要求保留浏览器验收待办。
+索引、取消和导航规则见[报告索引参考](../reference/report-index.md)。`tests/report.test.mjs` 在隔离 DOM 执行实际页面与分块脚本，覆盖 17,000 行、组合筛选、取消竞态、关联计数、来源跳转及恶意文本。
