@@ -1,17 +1,6 @@
 name: Publish case previews
 on:
-  push:
-    branches: [main]
-    paths:
-      - '**.mbt'
-      - '**/moon.pkg'
-      - 'moon.mod'
-      - 'cli/**'
-      - 'fixtures/**'
-      - 'cases/**'
-      - 'scripts/build_site.mjs'
-      - 'scripts/investigation_cases.mjs'
-      - '.github/workflows/pages.yml'
+  # 代码推送仅运行 CI，网站发布由用户决定后手动触发。
   workflow_dispatch:
 permissions:
   contents: read
@@ -33,8 +22,8 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- "$(cat moonbit-toolchain.version)"
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - run: npm run build
-      - name: 构建精选静态案例（不执行全量 RIB 基准）
-        run: node scripts/build_site.mjs --output .validation/pages --performance true --max-bytes 134217728
+      - name: 构建路由观察页面
+        run: node scripts/build_site.mjs --output .validation/pages --max-bytes 134217728
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -46,6 +35,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: 部署精选案例
+      - name: 部署路由观察页面
         id: deployment
         uses: actions/deploy-pages@v4

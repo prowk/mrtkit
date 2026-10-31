@@ -5,7 +5,7 @@ import {bundlePath,jsonLines} from './bundle.mjs';
 import {reportDataset,safeJson} from './report-data.mjs';
 import {fileHash,saveJson} from './archive.mjs';
 
-export async function generateInvestigationReport(input,output,{pageSize=100,title='MRTKit 调查工作台',maxBytes=134217728,maxRows=200000}={}){
+export async function generateInvestigationReport(input,output,{pageSize=100,title='路由变化',maxBytes=134217728,maxRows=200000,sources=[],selectedSource='index.html'}={}){
   const bundle=await readInvestigation(input),directory=resolve(output);await mkdir(directory,{recursive:false});let used=0;
   const datasets={},catalog=[],eventIds=new Set(),peers=new Set(),prefixes=new Set(),kinds=new Set(),points=new Set();
   for(const name of ['events','intervals','moas','findings','more_specifics','incidents','controls']){
@@ -35,7 +35,8 @@ export async function generateInvestigationReport(input,output,{pageSize=100,tit
   await writeFile(join(directory,'manifest.js'),`globalThis.MRTKitInvestigation=JSON.parse(${safeJson(JSON.stringify(manifest))});\n`,'utf8');
   const compiled=await readFile(new URL('../_build/js/release/build/browser/browser.js',import.meta.url),'utf8'),match=/export \{([^}]+)\}\s*;?\s*$/.exec(compiled);if(!match||/^import /m.test(compiled))throw new Error('浏览器核心构建格式不支持，请重新构建');
   const exports=match[1].split(',').map(item=>{const [symbol,name]=item.trim().split(/\s+as\s+/);return `${JSON.stringify(name??symbol)}:${symbol}`;}).join(',');await writeFile(join(directory,'core.js'),`(()=>{\n${compiled.slice(0,match.index)}\nglobalThis.MRTKitCore={${exports}};\n})();\n`,'utf8');
-  for(const [source,target]of [['investigation.html','index.html'],['investigation-app.js','app.js'],['investigation.css','style.css']])await writeFile(join(directory,target),await readFile(new URL(source,import.meta.url),'utf8'),'utf8');
+  for(const [source,target]of [['investigation.html','index.html'],['investigation-app.js','app.js'],['investigation.css','style.css'],['report-about.html','about.html']])await writeFile(join(directory,target),await readFile(new URL(source,import.meta.url),'utf8'),'utf8');
+  await writeFile(join(directory,'sources.js'),`globalThis.MRTKitSources=${safeJson(sources.length?sources:[{title,href:'index.html'}])};globalThis.MRTKitCurrentSource=${safeJson(selectedSource)};\n`,'utf8');
   const resources=[];async function walk(path,prefix=''){for(const item of await readdir(path,{withFileTypes:true})){const name=prefix+item.name,target=join(path,item.name);if(item.isDirectory())await walk(target,name+'/');else resources.push({path:name,bytes:(await stat(target)).size,sha256:await fileHash(target)});}}await walk(directory);
   const receipt={schema_version:'1.0',type:'investigation_report',data_version:manifest.data_version,status:manifest.status,rows:catalog.length,resources,artifact_bytes:resources.reduce((sum,file)=>sum+file.bytes,0),artifact_hash:stableHash(resources)};await saveJson(join(directory,'report.json'),receipt);
   return {status:manifest.status,data_version:manifest.data_version,index:join(directory,'index.html'),rows:catalog.length,artifact_bytes:receipt.artifact_bytes};

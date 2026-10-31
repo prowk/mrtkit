@@ -31,7 +31,16 @@ node cli/mrtkit.mjs cache --plan .validation/plan.json --directory .validation/c
 
 既有完整回放与大规模关联仍使用[磁盘回放](disk-replay.md)、[外部排序关联](external-correlation.md)和[紧凑编码](../reference/compact-changes.md)。从固定样本开始的关联与报告完整流程见[HTML 报告](html-report.md)，内存模式适合受容量约束的小结果，外排模式输出分离的 groups/observations JSONL，再用 `report --correlation` 接入。
 
-精选静态案例通过 `node scripts/build_site.mjs --output .validation/pages` 构建，默认大小预算 16 MiB；Pages 工作流另显式包含固定 10,000 事件人工性能案例，使用 128 MiB 产物预算，`site-manifest.json` 记录案例版本、字节数和资源 SHA-256。仅包含入口、真实单观测点摘录、明确标注的人工案例、报告与来源说明；全部相对路径兼容 `/mrtkit/` 和案例深层链接。首次发布在仓库 Settings → Pages 将 Source 设为 GitHub Actions，之后独立 `pages.yml` 上传专用产物并部署；不重新执行全量 RIB 基准。在线入口为 [GitHub Pages 案例](https://prowk.github.io/mrtkit/)，这是静态预览，不提供服务器分析服务。
+GitHub Pages 首页直接显示真实路由摘录的概览、图表和路径演变。顶部的数据源选择切换真实摘录与人工多观测点数据，继续使用同一报告界面。页面视觉统一参考 Cloudflare Radar，路径前后网络图参考 BGPlay 的时间演变表达；演示局限放在页脚“演示说明”链接中。
+
+```sh
+node scripts/build_site.mjs --output .validation/pages
+node scripts/build_site.mjs --input .validation/inquiry/index.json --title "我的路由数据" --output .validation/my-pages
+```
+
+`--input` 接收已经分析完成的调查结果包，直接以这份数据生成首页。未指定时使用内置数据源。`--performance true` 可额外构建 10,000 条记录的人工数据源用于性能验证，公共 Pages 默认不包含此测试数据。站点清单记录资源大小与哈希，默认大小预算 16 MiB。全部相对路径支持 `/mrtkit/`、深层链接和离线打开。首次发布在仓库 Settings → Pages 将 Source 设为 GitHub Actions。在线入口为 [路由观察](https://prowk.github.io/mrtkit/)。
+
+图表包含趋势、类型分布、地址与相邻网络排名、路径前后网络图、跨点时间散点、路由状态时间带、多起源区间及窗口对比。单观测点不展示跨点比较，未配置窗口对比时不显示对比模块；已经执行但无结果的规则显示空结果。筛选保留 UTC 微秒精度，并提供可读日期输入。
 
 真实浏览器的 `file://` 验收受工具策略限制，已按用户授权跳过；HTTP/HTTPS 检查不替代离线性能验收。
 

@@ -37,7 +37,7 @@ export async function generateReport(input,output,{pageSize=200,title='MRTKit è·
     }
     manifest.status='complete';
     await writeFile(join(directory,'manifest.js'),`globalThis.MRTKitManifest=JSON.parse(${safeJson(JSON.stringify(manifest))});\n`,'utf8');
-    for(const [source,target]of [['report.html','index.html'],['report-app.js','app.js']])await writeFile(join(directory,target),await readFile(new URL(source,import.meta.url),'utf8'),'utf8');
+    for(const [source,target]of [['report.html','index.html'],['report-app.js','app.js'],['investigation.css','style.css'],['report-about.html','about.html']])await writeFile(join(directory,target),await readFile(new URL(source,import.meta.url),'utf8'),'utf8');
     await writeFile(join(directory,'report.json'),JSON.stringify(manifest,null,2)+'\n','utf8');
   }catch(error){manifest.status='partial';manifest.error=error.message;await writeFile(join(directory,'report.json'),JSON.stringify(manifest,null,2)+'\n','utf8');throw error;}
   return {schema_version:'2.0',type:'offline_route_report',status:manifest.status,input_status:index.status,index:join(directory,'index.html'),rows:manifest.rows,change_notices:manifest.change_notices,pages:manifest.pages.length};

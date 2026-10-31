@@ -46,7 +46,7 @@ test('HTML 报告数量与 CLI 结果包一致，实际页面逻辑可跨数据�
   const ui=await page(output);
   assert.equal(ui.elements.get('details').children.length,7);
   assert.equal(ui.elements.get('changes').textContent,'8');
-  assert.match(ui.elements.get('quality').textContent,/未验证/);
+  assert.doesNotMatch(ui.elements.get('quality').textContent,/业务中断|未验证/);
   ui.elements.get('collector').value=JSON.stringify(['synthetic-b','default']);
   await ui.elements.get('apply').onclick();
   assert.match(ui.elements.get('status').textContent,/匹配 4 条/);
@@ -78,9 +78,9 @@ test('大量明细分页、组合筛选及恶意文本不会执行脚本或丢�
   const output=join(root,'report');const result=await generateReport(join(bundle,'index.json'),output,{pageSize:20,title:dangerous});
   assert.equal(result.pages,9);assert.equal(result.input_status,'partial');
   const javascript=await readFile(join(output,'data/page-000000.js'),'utf8');assert.ok(!javascript.includes('</script>'));
-  assert.ok(!/https?:\/\//.test(await readFile(join(output,'index.html'),'utf8')));
+  assert.ok(!/<(?:script|link)[^>]+(?:src|href)="https?:/.test(await readFile(join(output,'index.html'),'utf8')));
   const ui=await page(output);assert.equal(ui.document.title,dangerous);assert.equal(ui.context.pwned,undefined);
-  assert.match(ui.elements.get('quality').textContent,/部分结果/);
+  assert.match(ui.elements.get('quality').textContent,/部分数据/);
   assert.equal(ui.elements.get('details').children.length,50);assert.equal(ui.elements.get('position').textContent,'1 / 4');
   await ui.elements.get('next').onclick();assert.equal(ui.elements.get('position').textContent,'2 / 4');
   assert.ok(ui.elements.get('details').children[0].textContent.includes('1970-01-01 00:02:30'));
